@@ -112,10 +112,18 @@ function PortfolioContent() {
 
   const projects = [
     {
+      title: "NZ Electricity Calculator",
+      description:
+        "A web application to calculate electricity costs depending of appliances usage for New Zealand households.",
+      technologies: ["React", "Tailwind CSS", "Vercel"],
+      link: "https://nzec.vercel.app",
+      
+    },
+    {
       title: "AR Sports Spectating",
       description:
         "Mixed Reality visualization system for enhancing on-site sports experiences with situated data visualizations.",
-      technologies: ["Unity", "AR", "Data Visualization", "UX Research"],
+      technologies: ["Unity", "XR", "Data Visualization", "UX Research"],
       link: "https://www.sciencedirect.com/science/article/pii/S009784932100265X",
     },
     {
@@ -125,13 +133,7 @@ function PortfolioContent() {
       technologies: ["Arduino", "IoT", "Interactive Design", "HCI"],
       link: "#",
     },
-    {
-      title: "Medical Mobile App",
-      description:
-        "Android application for University Malaya Medical Center - pain diary for autism care management.",
-      technologies: ["Android", "Mobile Development", "Healthcare", "UX"],
-      link: "#",
-    },
+
   ];
 
   return (
@@ -200,8 +202,11 @@ function PortfolioContent() {
                 Wei Hong Lo
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-4">
+            {/* <p className="text-xl md:text-2xl text-gray-300 mb-4">
               PhD | AR/VR Specialist | Digital Product Creator
+            </p> */}
+             <p className="text-xl md:text-2xl text-gray-300 mb-4">
+              [Site is work in progress, please check back later!]
             </p>
             <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
               Passionate about using technology to solve challenges and help
@@ -423,7 +428,7 @@ function PortfolioContent() {
             <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
               <Mail size={32} className="text-blue-400 mb-4" />
               <h3 className="text-white font-semibold mb-2">Email</h3>
-              <p className="text-gray-300">weihong.lo@example.com</p>
+              <p className="text-gray-300">weihong.work@outlook.com</p>
             </div>
 
             <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
@@ -442,10 +447,10 @@ function PortfolioContent() {
           <Button
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
             onClick={() =>
-              window.open("mailto:weihong.lo@example.com", "_blank")
+              window.open("mailto:weihong.work@outlook.com", "_blank")
             }
           >
-            Send Message
+            Send Me an Email
           </Button>
         </div>
       </section>
@@ -454,7 +459,7 @@ function PortfolioContent() {
       <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-gray-800">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-gray-400">
-            © 2024 Wei Hong Lo. Built with React, Tailwind CSS, and lots of ☕
+            © 2025 Wei Hong Lo. Built with React, Tailwind CSS, and lots of ☕
           </p>
         </div>
       </footer>
