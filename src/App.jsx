@@ -27,15 +27,6 @@ import {
 } from "lucide-react";
 import "./App.css";
 
-// Import tempo routes
-let routes = [];
-try {
-  routes = await import("tempo-routes");
-  routes = routes.default || routes;
-} catch (e) {
-  // Tempo routes not available
-}
-
 function PortfolioContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("hero");
@@ -472,6 +463,31 @@ function PortfolioContent() {
 }
 
 function AppContent() {
+  const [routes, setRoutes] = useState([]);
+  const [routesLoaded, setRoutesLoaded] = useState(false);
+
+  useEffect(() => {
+    if (import.meta.env.VITE_TEMPO) {
+      // Dynamically import tempo routes only when needed
+      import("tempo-routes")
+        .then((tempoRoutes) => {
+          setRoutes(tempoRoutes.default || tempoRoutes);
+          setRoutesLoaded(true);
+        })
+        .catch(() => {
+          // Tempo routes not available
+          setRoutesLoaded(true);
+        });
+    } else {
+      setRoutesLoaded(true);
+    }
+  }, []);
+
+  // Show loading state while routes are being loaded in Tempo environment
+  if (import.meta.env.VITE_TEMPO && !routesLoaded) {
+    return <div>Loading...</div>;
+  }
+
   const tempoRoutes = import.meta.env.VITE_TEMPO && useRoutes(routes);
 
   if (tempoRoutes) {
