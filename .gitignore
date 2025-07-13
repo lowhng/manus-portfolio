@@ -7,13 +7,20 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-lock.yaml
+package-lock.json
 
 # Build output
 dist/
 build/
+.next/
 
 # Vite
 .vite/
+
+# Package managers
+.pnpm-store/
+.yarn/
+.npm/
 
 # IDEs
 .vscode/
@@ -29,3 +36,12 @@ build/
 
 # System files
 Thumbs.db
+
+# Tempo
+**/tempobook/dynamic/
+**/tempobook/storyboards/
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
