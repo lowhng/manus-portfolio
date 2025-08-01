@@ -26,6 +26,7 @@ import {
   Award,
 } from "lucide-react";
 import "./App.css";
+import profilePhoto from "@/assets/profile.jpg";
 
 function PortfolioContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -206,7 +207,7 @@ function PortfolioContent() {
               PhD | AR/VR Specialist | Digital Product Creator
             </p> */}
              <p className="text-xl md:text-2xl text-gray-300 mb-4">
-              [Site is work in progress, please check back later!]
+              [Site is work in progress, but feel free to look around!]
             </p>
             <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
               Passionate about using technology to solve challenges and help
@@ -249,17 +250,17 @@ function PortfolioContent() {
             About Me
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-2xl mb-6 w-80 h-80 mx-auto">
-                <div className="bg-gray-800 rounded-2xl p-8 h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                      <span className="text-4xl font-bold text-white">WH</span>
-                    </div>
-                    <p className="text-gray-300">Professional Photo</p>
-                  </div>
+              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-2xl mb-6 w-80 h-100 mx-auto">
+                <div className="w-full h-full rounded-2xl overflow-hidden">
+                  <img
+                    src={profilePhoto}
+                    alt="Wei Hong Lo"
+                    className="object-cover w-full h-full"
+                  />
                 </div>
+                 <p className="text-gray-100 text-lg font-bold p-8 text-center">Wei Hong</p>
               </div>
             </div>
 
@@ -428,7 +429,7 @@ function PortfolioContent() {
             <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
               <Mail size={32} className="text-blue-400 mb-4" />
               <h3 className="text-white font-semibold mb-2">Email</h3>
-              <p className="text-gray-300">weihong.work@outlook.com</p>
+              <p className="text-gray-300">hello@weihong.dev</p>
             </div>
 
             <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
@@ -447,7 +448,7 @@ function PortfolioContent() {
           <Button
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
             onClick={() =>
-              window.open("mailto:weihong.work@outlook.com", "_blank")
+              window.open("mailto:hello@weihong.dev", "_blank")
             }
           >
             Send Me an Email
