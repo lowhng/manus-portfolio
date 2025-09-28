@@ -27,6 +27,9 @@ import {
 } from "lucide-react";
 import "./App.css";
 import profilePhoto from "@/assets/profile.jpg";
+import physiomedScreenshot from "@/assets/physiomed-screenshot.png";
+import nzecScreenshot from "@/assets/nzec.png";
+import resplitScreenshot from "@/assets/resplit.png";
 
 function PortfolioContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,7 +38,7 @@ function PortfolioContent() {
   // Handle scroll to update active section
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["hero", "about", "experience", "projects", "contact"];
+      const sections = ["hero", "about", "skills", "experience", "projects", "contact"];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -67,13 +70,19 @@ function PortfolioContent() {
     setIsMenuOpen(false);
   };
 
-  const skills = [
-    { name: "AR/VR Development", icon: Brain, level: 95 },
-    { name: "UX/UI Design", icon: Palette, level: 90 },
-    { name: "Web Development", icon: Code, level: 85 },
-    { name: "Research & Analysis", icon: Users, level: 92 },
-    { name: "Photography", icon: Camera, level: 88 },
-    { name: "Project Management", icon: Award, level: 87 },
+  const softSkills = [
+    { name: "Project Management", icon: Award },
+    { name: "Research & Analysis", icon: Users },
+  ];
+
+  const technicalSkills = [
+    { name: "Web Development", icon: Code },
+    { name: "AR/VR Development", icon: Brain },
+  ];
+
+  const designSkills = [
+    { name: "UX/UI Design", icon: Palette },
+    { name: "Photography", icon: Camera },
   ];
 
   const experiences = [
@@ -82,7 +91,7 @@ function PortfolioContent() {
       company: "Mettle International",
       period: "Oct 2024 - Present",
       description:
-        "Leading technology consulting projects and strategic initiatives.",
+        "At Mettle, I lead consulting engagements in the utilities sector, with a focus on digital transformation and service delivery optimisation. My primary project involves a medium-sized Electricity Distribution Business (EDB), where I’m driving the design and rollout of a new Service Request Portal on Microsoft Power Platform. I am now also starting another project exploring the billing system of the same client.",
       technologies: ["Consulting", "Strategy", "Technology"],
     },
     {
@@ -90,7 +99,7 @@ function PortfolioContent() {
       company: "SPICAE",
       period: "Feb 2024 - Sep 2024",
       description:
-        "Assisted with rollout of Asset Management System for power distribution company. Specialized in user experience, user stories, and business process analysis.",
+        "I worked with a medium-sized electricity distribution company (different from my current client), supporting the rollout of an Asset Management System and improving the end-to-end service request process. My role combined business analysis, UX consulting, and project delivery across multiple streams.",
       technologies: ["UX Research", "Business Analysis", "Prototyping"],
     },
     {
@@ -98,7 +107,7 @@ function PortfolioContent() {
       company: "SPICAE",
       period: "Feb 2023 - Feb 2024",
       description:
-        "Conducted brainstorming workshops, developed user personas and journey maps for electricity distribution company.",
+        "I was contracted as a UX Consultant for SPICAE for a specific project managing power outage notifications to customers for an Electricity Distribution Business. I conducted a brainstorming workshop and developed user personas, user journey maps, requirements, and suggested actions to be taken for current and future iterations of the product.",
       technologies: ["UX Design", "User Research", "Workshops"],
     },
     {
@@ -106,7 +115,7 @@ function PortfolioContent() {
       company: "University of Otago",
       period: "Jul 2022 - Apr 2024",
       description:
-        "Worked on PhD project regarding Augmented Reality in sports spectating. Developed AR prototypes and conducted user studies.",
+        "Worked as a Research Assistant on multiple projects, including my PhD project regarding using Augmented Reality in on-site sports spectating scenario. My job is to revamp and reorganise work done by other PhD students and bring it to a usable state on-site. Concurrently, I was also working on widget placement strategy for AR head-mounted displays for pervasive AR. I was tasked to design a user study to evaluate various placement strategies.",
       technologies: ["AR/VR", "Unity", "User Studies", "Research"],
     },
   ];
@@ -118,21 +127,24 @@ function PortfolioContent() {
         "A web application to calculate electricity costs depending of appliances usage for New Zealand households.",
       technologies: ["React", "Tailwind CSS", "Vercel"],
       link: "https://nzec.vercel.app",
-      
+      image: nzecScreenshot,
     },
     {
-      title: "AR Sports Spectating",
+      title: "ReSplit",
       description:
-        "Mixed Reality visualization system for enhancing on-site sports experiences with situated data visualizations.",
-      technologies: ["Unity", "XR", "Data Visualization", "UX Research"],
-      link: "https://www.sciencedirect.com/science/article/pii/S009784932100265X",
+        "AI-powered receipt scanning and bill splitting app that automatically extracts items and prices, assigns them to friends, and calculates splits instantly.",
+      technologies: ["AI/ML", "Web Development", "Receipt Scanning", "Bill Splitting"],
+      link: "https://resplit.vercel.app",
+      image: resplitScreenshot,
     },
     {
-      title: "Interactive Museum Exhibits",
+      title: "PhysioMed Otago",
       description:
-        "Technology-enabled exhibits for museums using IoT, Arduino, and interactive design principles.",
-      technologies: ["Arduino", "IoT", "Interactive Design", "HCI"],
-      link: "#",
+        "Professional physiotherapy practice website featuring appointment booking, service information, and patient resources.",
+      technologies: ["Web Development", "Healthcare", "Patient Portal", "Responsive Design"],
+      link: "https://physiomedotago.co.nz",
+      image: physiomedScreenshot,
+      tag: "Client Project",
     },
 
   ];
@@ -147,7 +159,7 @@ function PortfolioContent() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8">
-              {["About", "Experience", "Projects", "Contact"].map((item) => (
+              {["About", "Skills", "Experience", "Projects", "Contact"].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
@@ -176,7 +188,7 @@ function PortfolioContent() {
         {isMenuOpen && (
           <div className="md:hidden bg-gray-800 border-t border-gray-700">
             <div className="px-4 py-2 space-y-2">
-              {["About", "Experience", "Projects", "Contact"].map((item) => (
+              {["About", "Skills", "Experience", "Projects", "Contact"].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
@@ -207,13 +219,13 @@ function PortfolioContent() {
               PhD | AR/VR Specialist | Digital Product Creator
             </p> */}
              <p className="text-xl md:text-2xl text-gray-300 mb-4">
-              [Site is work in progress, but feel free to look around!]
+              AI Specialist | Digital Product Creator | Web Developer
             </p>
             <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
               Passionate about using technology to solve challenges and help
-              communities. Exploring advanced web development technologies,
-              AI-driven tools, and creating innovative SaaS solutions that
-              enhance user experiences.
+              communities. Exploring web development technologies,
+              AI-driven tools, and creating innovative SaaS solutions with a focus on
+              user experiences. I help small businesses create simple websites too!
             </p>
           </div>
 
@@ -252,7 +264,7 @@ function PortfolioContent() {
 
           <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-2xl mb-6 w-80 h-100 mx-auto">
+              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-2xl mb-6 w-80 h-96 mx-auto">
                 <div className="w-full h-full rounded-2xl overflow-hidden">
                   <img
                     src={profilePhoto}
@@ -280,24 +292,73 @@ function PortfolioContent() {
                 integrations to enhance user experiences and streamline business
                 processes.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <div className="grid grid-cols-2 gap-4 mt-8">
-                {skills.map((skill, index) => (
+      {/* Skills Section */}
+      <section id="skills" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white mb-12 text-center">
+            Skills & Expertise
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Technical Skills */}
+            <div>
+              <h3 className="text-2xl font-semibold text-purple-400 mb-6 text-center">Technical Skills</h3>
+              <div className="space-y-4">
+                {technicalSkills.map((skill, index) => (
                   <div
                     key={index}
-                    className="bg-gray-800/50 p-4 rounded-lg border border-gray-700"
+                    className="bg-gray-800/50 p-4 rounded-lg border-2 border-purple-400/50 hover:border-purple-400 transition-all duration-300"
                   >
-                    <div className="flex items-center mb-2">
-                      <skill.icon size={20} className="text-blue-400 mr-2" />
+                    <div className="flex items-center">
+                      <skill.icon size={20} className="text-purple-400 mr-3" />
                       <span className="text-white font-medium">
                         {skill.name}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-blue-400 to-purple-500 h-2 rounded-full transition-all duration-1000"
-                        style={{ width: `${skill.level}%` }}
-                      ></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Soft Skills */}
+            <div>
+              <h3 className="text-2xl font-semibold text-blue-400 mb-6 text-center">Soft Skills</h3>
+              <div className="space-y-4">
+                {softSkills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800/50 p-4 rounded-lg border-2 border-blue-400/50 hover:border-blue-400 transition-all duration-300"
+                  >
+                    <div className="flex items-center">
+                      <skill.icon size={20} className="text-blue-400 mr-3" />
+                      <span className="text-white font-medium">
+                        {skill.name}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Design Skills */}
+            <div>
+              <h3 className="text-2xl font-semibold text-pink-400 mb-6 text-center">Design Skills</h3>
+              <div className="space-y-4">
+                {designSkills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className="bg-gray-800/50 p-4 rounded-lg border-2 border-pink-400/50 hover:border-pink-400 transition-all duration-300"
+                  >
+                    <div className="flex items-center">
+                      <skill.icon size={20} className="text-pink-400 mr-3" />
+                      <span className="text-white font-medium">
+                        {skill.name}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -371,35 +432,52 @@ function PortfolioContent() {
             {projects.map((project, index) => (
               <Card
                 key={index}
-                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 group"
+                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 group h-full flex flex-col"
               >
-                <CardContent className="p-6">
-                  <div className="h-40 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg mb-4 flex items-center justify-center">
-                    <Code size={48} className="text-blue-400" />
+                <CardContent className="p-6 flex flex-col h-full">
+                  <div className="h-40 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                    {project.image ? (
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full object-cover object-top rounded-lg"
+                      />
+                    ) : (
+                      <Code size={48} className="text-blue-400" />
+                    )}
                   </div>
 
-                  <h3 className="text-xl font-bold text-white mb-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-gray-300 mb-4 leading-relaxed">
-                    {project.description}
-                  </p>
+                  <div className="flex-1 flex flex-col">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-xl font-bold text-white">
+                        {project.title}
+                      </h3>
+                      {project.tag && (
+                        <Badge className="bg-green-600/20 text-green-300 border-green-600/30 text-xs">
+                          {project.tag}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-gray-300 mb-4 leading-relaxed">
+                      {project.description}
+                    </p>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.map((tech, techIndex) => (
-                      <Badge
-                        key={techIndex}
-                        variant="secondary"
-                        className="bg-gray-700 text-gray-300"
-                      >
-                        {tech}
-                      </Badge>
-                    ))}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.technologies.map((tech, techIndex) => (
+                        <Badge
+                          key={techIndex}
+                          variant="secondary"
+                          className="bg-gray-700 text-gray-300"
+                        >
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
 
                   <Button
                     variant="outline"
-                    className="w-full border-gray-600 text-white hover:bg-gray-700 group-hover:border-blue-400 group-hover:text-blue-400 transition-all"
+                    className="w-full border-gray-600 text-white hover:bg-gray-700 group-hover:border-blue-400 group-hover:text-blue-400 transition-all mt-auto"
                     onClick={() => window.open(project.link, "_blank")}
                   >
                     <ExternalLink size={16} className="mr-2" />
