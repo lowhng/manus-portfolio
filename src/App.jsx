@@ -133,15 +133,15 @@ function PortfolioContent() {
       title: "ReSplit",
       description:
         "AI-powered receipt scanning and bill splitting app that automatically extracts items and prices, assigns them to friends, and calculates splits instantly.",
-      technologies: ["AI/ML", "Web Development", "Receipt Scanning", "Bill Splitting"],
+      technologies: ["AI", "Web Development", "PWA", "NextJS"],
       link: "https://resplit.vercel.app",
       image: resplitScreenshot,
     },
     {
       title: "PhysioMed Otago",
       description:
-        "Professional physiotherapy practice website featuring appointment booking, service information, and patient resources.",
-      technologies: ["Web Development", "Healthcare", "Patient Portal", "Responsive Design"],
+        "Professional physiotherapy practice website featuring modern aesthetics, service information, and patient resources.",
+      technologies: ["Web Development", "HTML", "SEO", "Responsive Design"],
       link: "https://physiomedotago.co.nz",
       image: physiomedScreenshot,
       tag: "Client Project",
