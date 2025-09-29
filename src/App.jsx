@@ -163,7 +163,7 @@ function PortfolioContent() {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
-                  className={`text-sm font-medium transition-colors hover:text-blue-400 ${
+                  className={`text-sm font-medium transition-colors hover:text-blue-400 cursor-pointer ${
                     activeSection === item.toLowerCase()
                       ? "text-blue-400"
                       : "text-gray-300"
@@ -176,7 +176,7 @@ function PortfolioContent() {
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden text-white"
+              className="md:hidden text-white cursor-pointer"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -192,7 +192,7 @@ function PortfolioContent() {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
-                  className="block w-full text-left px-3 py-2 text-gray-300 hover:text-blue-400 hover:bg-gray-700 rounded-md transition-colors"
+                  className="block w-full text-left px-3 py-2 text-gray-300 hover:text-blue-400 hover:bg-gray-700 rounded-md transition-colors cursor-pointer"
                 >
                   {item}
                 </button>
@@ -219,27 +219,28 @@ function PortfolioContent() {
               PhD | AR/VR Specialist | Digital Product Creator
             </p> */}
              <p className="text-xl md:text-2xl text-gray-300 mb-4">
-              AI Specialist | Digital Product Creator | Web Developer
+              Tech Consultant | Photographer | AI Enthusiast
             </p>
             <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
               Passionate about using technology to solve challenges and help
               communities. Exploring web development technologies,
               AI-driven tools, and creating innovative SaaS solutions with a focus on
-              user experiences. I help small businesses create simple websites too!
+              user experiences. Under my business brand Wei Hong Innovations, I help small 
+              businesses solve day-to-day problems with technology and create simple websites too!
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button
               onClick={() => scrollToSection("projects")}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg cursor-pointer"
             >
               View My Work
             </Button>
             <Button
               onClick={() => scrollToSection("contact")}
               variant="outline"
-              className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg"
+              className="border-gray-600 text-white hover:bg-gray-800 px-8 py-3 text-lg cursor-pointer"
             >
               Get in Touch
             </Button>
@@ -432,7 +433,8 @@ function PortfolioContent() {
             {projects.map((project, index) => (
               <Card
                 key={index}
-                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 group h-full flex flex-col"
+                className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 transition-all duration-300 group h-full flex flex-col cursor-pointer hover:shadow-lg hover:shadow-blue-500/20 hover:border-blue-500/30"
+                onClick={() => window.open(project.link, "_blank")}
               >
                 <CardContent className="p-6 flex flex-col h-full">
                   <div className="h-40 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
@@ -474,15 +476,6 @@ function PortfolioContent() {
                       ))}
                     </div>
                   </div>
-
-                  <Button
-                    variant="outline"
-                    className="w-full border-gray-600 text-white hover:bg-gray-700 group-hover:border-blue-400 group-hover:text-blue-400 transition-all mt-auto"
-                    onClick={() => window.open(project.link, "_blank")}
-                  >
-                    <ExternalLink size={16} className="mr-2" />
-                    View Project
-                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -504,19 +497,28 @@ function PortfolioContent() {
           </p>
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div 
+              className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-800/70 hover:border-blue-500/30 transition-all duration-300 cursor-pointer"
+              onClick={() => window.open("mailto:hello@weihong.dev", "_blank")}
+            >
               <Mail size={32} className="text-blue-400 mb-4" />
               <h3 className="text-white font-semibold mb-2">Email</h3>
               <p className="text-gray-300">hello@weihong.dev</p>
             </div>
 
-            <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div 
+              className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-800/70 hover:border-blue-500/30 transition-all duration-300 cursor-pointer"
+              onClick={() => window.open("https://linkedin.com/in/weihonglo", "_blank")}
+            >
               <Linkedin size={32} className="text-blue-400 mb-4" />
               <h3 className="text-white font-semibold mb-2">LinkedIn</h3>
               <p className="text-gray-300">linkedin.com/in/weihonglo</p>
             </div>
 
-            <div className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700">
+            <div 
+              className="flex flex-col items-center p-6 bg-gray-800/50 rounded-lg border border-gray-700 hover:bg-gray-800/70 hover:border-blue-500/30 transition-all duration-300 cursor-pointer"
+              onClick={() => window.open("https://maps.google.com/?q=Dunedin,New+Zealand", "_blank")}
+            >
               <MapPin size={32} className="text-blue-400 mb-4" />
               <h3 className="text-white font-semibold mb-2">Location</h3>
               <p className="text-gray-300">Dunedin, New Zealand</p>
@@ -524,7 +526,7 @@ function PortfolioContent() {
           </div>
 
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg cursor-pointer"
             onClick={() =>
               window.open("mailto:hello@weihong.dev", "_blank")
             }
