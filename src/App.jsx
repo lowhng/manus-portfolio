@@ -29,7 +29,7 @@ import "./App.css";
 import profilePhoto from "@/assets/profile.jpg";
 import physiomedScreenshot from "@/assets/physiomed-screenshot.png";
 import nzecScreenshot from "@/assets/nzec.png";
-import resplitScreenshot from "@/assets/resplit.png";
+import shareShareScreenshot from "@/assets/shareshare.png";
 
 function PortfolioContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +38,7 @@ function PortfolioContent() {
   // Handle scroll to update active section
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["hero", "about", "skills", "experience", "projects", "contact"];
+      const sections = ["hero", "about", "skills", "experience", "projects", "services", "contact"];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -91,8 +91,8 @@ function PortfolioContent() {
       company: "Mettle International",
       period: "Oct 2024 - Present",
       description:
-        "At Mettle, I lead consulting engagements in the utilities sector, with a focus on digital transformation and service delivery optimisation. My primary project involves a medium-sized Electricity Distribution Business (EDB), where I’m driving the design and rollout of a new Service Request Portal on Microsoft Power Platform. I am now also starting another project exploring the billing system of the same client.",
-      technologies: ["Consulting", "Strategy", "Technology"],
+        "At Mettle, I lead consulting engagements in the utilities sector, with a focus on digital transformation and service delivery optimisation. My primary project involves a medium-sized Electricity Distribution Business (EDB), where I’m driving the design and rollout of a new Service Request Portal on Microsoft Power Platform. I also manage a few other projects within the same client.",
+      technologies: ["Consulting", "Development", "Technology"],
     },
     {
       title: "IT Business Analyst",
@@ -122,20 +122,20 @@ function PortfolioContent() {
 
   const projects = [
     {
+      title: "ShareShare",
+      description:
+        "AI-powered receipt scanning and bill splitting app that automatically extracts items and prices, assigns them to friends, and calculates splits instantly.",
+      technologies: ["AI", "Web Development", "PWA", "NextJS"],
+      link: "https://getshareshare.app",
+      image: shareShareScreenshot,
+    },
+    {
       title: "NZ Electricity Calculator",
       description:
         "A web application to calculate electricity costs depending of appliances usage for New Zealand households.",
       technologies: ["React", "Tailwind CSS", "Vercel"],
       link: "https://nzec.vercel.app",
       image: nzecScreenshot,
-    },
-    {
-      title: "ReSplit",
-      description:
-        "AI-powered receipt scanning and bill splitting app that automatically extracts items and prices, assigns them to friends, and calculates splits instantly.",
-      technologies: ["AI", "Web Development", "PWA", "NextJS"],
-      link: "https://resplit.vercel.app",
-      image: resplitScreenshot,
     },
     {
       title: "PhysioMed Otago",
@@ -159,7 +159,7 @@ function PortfolioContent() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8">
-              {["About", "Skills", "Experience", "Projects", "Contact"].map((item) => (
+              {["About", "Skills", "Experience", "Projects", "Services", "Contact"].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
@@ -188,7 +188,7 @@ function PortfolioContent() {
         {isMenuOpen && (
           <div className="md:hidden bg-gray-800 border-t border-gray-700">
             <div className="px-4 py-2 space-y-2">
-              {["About", "Skills", "Experience", "Projects", "Contact"].map((item) => (
+              {["About", "Skills", "Experience", "Projects", "Services", "Contact"].map((item) => (
                 <button
                   key={item}
                   onClick={() => scrollToSection(item.toLowerCase())}
@@ -479,6 +479,133 @@ function PortfolioContent() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services & Pricing Section */}
+      <section id="services" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-800/30">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white mb-12 text-center">
+            Services & Pricing
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Website Design & Development */}
+            <Card className="bg-gray-800/50 border-gray-700 hover:bg-gray-800/70 hover:shadow-lg hover:shadow-blue-500/20 hover:border-blue-500/30 transition-all duration-300 group">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <Code size={24} className="text-blue-400 mr-3" />
+                  <h3 className="text-xl font-bold text-white">Website Development</h3>
+                </div>
+                <p className="text-gray-300 mb-4 leading-relaxed">
+                  I build simple responsive websites and bring you along the journey. Fast turnaround time and affordable pricing.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-700/50">
+                    <span className="text-gray-300">Basic Website (Single Page)</span>
+                    <span className="text-blue-400 font-semibold">1,299 NZD</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-700/50">
+                    <span className="text-gray-300">SEO Starter Pack</span>
+                    <span className="text-blue-400 font-semibold">199 NZD</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-700/50">
+                    <span className="text-gray-300">Multipage Website</span>
+                    <span className="text-blue-400 font-semibold">From 1,999 NZD</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-300">Website Edits</span>
+                    <span className="text-blue-400 font-semibold">From 100 NZD</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Photography */}
+            <Card className="bg-gray-800/30 border-gray-600 opacity-60 relative">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <Camera size={24} className="text-gray-500 mr-3" />
+                  <h3 className="text-xl font-bold text-gray-400">Photography</h3>
+                </div>
+                <p className="text-gray-500 mb-4 leading-relaxed">
+                  Professional photography services for events, portraits, and commercial use. 
+                  High-quality images that tell your story.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-600/50">
+                    <span className="text-gray-500">Portrait Session (1hr)</span>
+                    <span className="text-gray-500 font-semibold">350 NZD</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-600/50">
+                    <span className="text-gray-500">Event Photography (3hrs)</span>
+                    <span className="text-gray-500 font-semibold">800 NZD</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-600/50">
+                    <span className="text-gray-500">Property Photography</span>
+                    <span className="text-gray-500 font-semibold">500 NZD</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-500">All Other Photography</span>
+                    <span className="text-gray-500 font-semibold">POA</span>
+                  </div>
+                </div>
+              </CardContent>
+              {/* Portfolio Button - Centered Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Button
+                  onClick={() => window.open("https://weihongphotography.myportfolio.com/", "_blank")}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg font-semibold cursor-pointer shadow-lg border-2 border-purple-500"
+                >
+                  View My Portfolio
+                </Button>
+              </div>
+              {/* Contact for Enquiry Stamp */}
+              <div className="absolute top-4 right-4 transform rotate-12">
+                <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg border-2 border-red-500">
+                  Contact for Enquiry
+                </div>
+              </div>
+            </Card>
+
+            {/* Consulting & Prototyping */}
+            <Card className="bg-gray-800/30 border-gray-600 opacity-60 relative">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <Brain size={24} className="text-gray-500 mr-3" />
+                  <h3 className="text-xl font-bold text-gray-400">Consulting & Prototyping</h3>
+                </div>
+                <p className="text-gray-500 mb-4 leading-relaxed">
+                  Strategic technology consulting and rapid prototyping services. 
+                  Turn your ideas into actionable solutions.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b border-gray-600/50">
+                    <span className="text-gray-500">Tech Consultation</span>
+                    <span className="text-gray-500 font-semibold">120 NZD/hr</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-600/50">
+                    <span className="text-gray-500">UX Research & Analysis</span>
+                    <span className="text-gray-500 font-semibold">140 NZD/hr</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-gray-600/50">
+                    <span className="text-gray-500">Rapid Prototyping</span>
+                    <span className="text-gray-500 font-semibold">160 NZD/hr</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-500">Process Mapping</span>
+                    <span className="text-gray-500 font-semibold">160 NZD/hr</span>
+                  </div>
+                </div>
+              </CardContent>
+              {/* Not Currently Offered Stamp */}
+              <div className="absolute top-4 right-4 transform rotate-12">
+                <div className="bg-gray-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg border-2 border-gray-500">
+                  Not Currently Offered
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </section>
