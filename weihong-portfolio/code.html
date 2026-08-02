@@ -181,13 +181,6 @@
             z-index: -2;
             background: #050505;
         }
-        #particles-container {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-        }
         .gradient-mesh {
             position: fixed;
             inset: 0;
@@ -210,13 +203,13 @@
             height: 2px;
             background: rgba(253, 139, 0, 0.3);
             border-radius: 50%;
-            box-shadow: 0 0 12px rgba(253, 139, 0, 0.85), 0 0 4px rgba(238, 193, 47, 0.6);
+            box-shadow: 0 0 10px rgba(253, 139, 0, 0.5);
             animation: float-particle linear infinite;
         }
         @keyframes float-particle {
             0% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 0.85; }
-            90% { opacity: 0.85; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
             100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
         }
 
@@ -284,7 +277,9 @@
                     View My Work
                     <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
 </a>
-<a class="btn-secondary px-10 py-4 rounded-xl font-label-code text-label-code inline-flex items-center justify-center h-16" href="#contact">Get In Touch</a>
+<a class="btn-secondary px-10 py-4 rounded-xl font-label-code text-label-code h-16" href="#contact">
+                    Get In Touch
+                </a>
 </div>
 </div>
 <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
@@ -667,18 +662,18 @@
     // Particle System Generation
     const particleContainer = document.getElementById('particles-container');
     particleContainer.innerHTML = '';
-    const particleCount = 55;
+    const particleCount = 40;
 
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
-        const size = Math.random() * 2.5 + 1.5;
+        const size = Math.random() * 2 + 1;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         particle.style.left = `${Math.random() * 100}vw`;
         particle.style.top = `${Math.random() * 100}vh`;
-        particle.style.animationDuration = `${Math.random() * 18 + 10}s`;
-        particle.style.animationDelay = `${Math.random() * 8}s`;
+        particle.style.animationDuration = `${Math.random() * 20 + 10}s`;
+        particle.style.animationDelay = `${Math.random() * 10}s`;
         particleContainer.appendChild(particle);
     }
 
