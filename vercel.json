@@ -1,9 +1,9 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/",
+      "src": "/",
       "has": [{ "type": "host", "value": "goldenleaf.weihong.dev" }],
-      "destination": "/goldenleaf/index.html"
+      "dest": "/goldenleaf/index.html"
     }
   ]
 }
