@@ -4,6 +4,16 @@
       "src": "/",
       "has": [{ "type": "host", "value": "goldenleaf.weihong.dev" }],
       "dest": "/goldenleaf/index.html"
+    },
+    {
+      "src": "/",
+      "has": [{ "type": "host", "value": "ayanna.weihong.dev" }],
+      "dest": "/ayanna/index.html"
+    },
+    {
+      "src": "/ayanna_model.txt",
+      "has": [{ "type": "host", "value": "ayanna.weihong.dev" }],
+      "dest": "/ayanna/ayanna_model.txt"
     }
   ]
 }
