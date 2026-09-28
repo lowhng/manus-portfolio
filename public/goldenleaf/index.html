@@ -1,0 +1,175 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>3B Golden Leaf Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#e6e9eb;--panel:#fbfaf7;--ink:#1f2326;--muted:#646b70;--line:#d6d9d8;--accent:#2f6f8f;--entry:#b4532a;
+ --wall:#f7f5f0;--room:#d8d2c6;--wet:#cdd8de;--hall:#e5e0d6;--store:#b9b2a5;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161a1e;--panel:#20252a;--ink:#e8eaeb;--muted:#9aa2a8;--line:#343b41;--accent:#6fb0cf;--entry:#e0875e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161a1e;--panel:#20252a;--ink:#e8eaeb;--muted:#9aa2a8;--line:#343b41;--accent:#6fb0cf;--entry:#e0875e;color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;overflow:hidden}
+#app{position:relative;height:100%}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-50%);text-align:center;white-space:nowrap;font-size:12px;font-weight:600;color:#1f2326;text-shadow:0 0 3px rgba(255,255,255,.9),0 0 6px rgba(255,255,255,.7)}
+.lbl small{display:block;font:400 10.5px "IBM Plex Mono",monospace;color:#4a5055}
+.lbl.store{font-size:10px;font-weight:500;color:#3d4246}
+.panel{position:absolute;left:16px;top:calc(16px + env(safe-area-inset-top,0px));width:min(290px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+h1{font-size:15px;font-weight:600;margin:0;text-wrap:balance}
+.sub{font-size:12px;color:var(--muted);margin-top:2px}
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{flex:1;font:500 12.5px "IBM Plex Sans",sans-serif;padding:7px 0;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px}
+.row input[type=range]{flex:1;accent-color:var(--accent)}
+.mono{font-family:"IBM Plex Mono",monospace;font-size:12px;font-variant-numeric:tabular-nums}
+dl{display:grid;grid-template-columns:auto auto;gap:3px 12px;margin:0;font-size:12px;border-top:1px solid var(--line);padding-top:10px}
+dt{color:var(--muted)} dd{margin:0;text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.hint{font-size:11px;color:var(--muted)}
+details summary{cursor:pointer;font-size:12px;color:var(--muted)}
+@media (max-width:520px){.panel{top:auto;bottom:calc(16px + env(safe-area-inset-bottom,0px));padding:12px}dl,.hint{display:none}}
+</style>
+<div id="app">
+ <canvas id="c" aria-label="3D model of apartment 3B"></canvas>
+ <div id="labels"></div>
+ <section class="panel">
+  <div><h1>3B Golden Leaf</h1><div class="sub">Model from LiDAR scan, v6 · approx. ±15 cm</div></div>
+  <div class="seg" role="group" aria-label="View">
+   <button id="v3d" aria-pressed="true">3D</button><button id="vtop" aria-pressed="false">Plan</button>
+  </div>
+  <div class="row"><label for="cut">Wall height</label><input id="cut" type="range" min="0.3" max="2.5" step="0.05" value="1.3"><span class="mono" id="cutv">1.30 m</span></div>
+  <div class="row"><label for="doors">Doors</label><input id="doors" type="checkbox" checked></div>
+  <div class="row"><label for="lab">Room labels</label><input id="lab" type="checkbox" checked></div>
+  <details><summary>Dimensions used</summary>
+  <dl style="margin-top:8px">
+   <dt>Ceiling</dt><dd>2.50 m</dd>
+   <dt>Living windows</dt><dd>1.00 × 1.75 m</dd>
+   <dt>Bed / study windows</dt><dd>1.00 × 1.50 m</dd>
+   <dt>Window head</dt><dd>2.40 m</dd>
+   <dt>Kitchen–study window</dt><dd>1.0 × 1.4 m, frosted</dd>
+   <dt>Wardrobe doors</dt><dd>2.0 × 2.05 m, mirrored</dd>
+   <dt>Door height</dt><dd>2.00 m*</dd>
+   <dt>Breakfast bar</dt><dd>1.00 m*</dd>
+   <dt>Floor area</dt><dd id="tot"></dd>
+  </dl></details>
+  <div class="hint">Slide wall height to 2.5 m for full walls. Drag to orbit, right-drag to pan, scroll to zoom. * assumed</div>
+ </section>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const D={"H": 2.5, "door_h": 2.0, "sill": 0.65, "head": 2.4, "bar_h": 1.0, "walls": [[[0.967, 1.451], [6.19, 1.451]], [[0.0, 2.369], [0.967, 1.451]], [[0.0, 2.369], [0.0, 7.205]], [[2.708, 1.451], [2.708, 3.162]], [[2.708, 3.917], [2.708, 3.965]], [[3.627, 1.451], [3.627, 2.369]], [[4.545, 1.451], [4.545, 2.369]], [[2.708, 2.466], [2.805, 2.466]], [[3.549, 2.466], [3.627, 2.466]], [[3.627, 2.369], [3.627, 2.466]], [[3.627, 2.369], [3.791, 2.369]], [[6.19, 1.451], [6.19, 1.122]], [[6.19, 0.28], [6.19, 0.0]], [[6.19, 0.0], [15.039, 0.0]], [[15.039, 0.0], [15.039, 0.542]], [[15.039, 0.542], [15.329, 0.542]], [[15.039, 1.538], [15.329, 1.538]], [[15.039, 1.538], [15.039, 3.143]], [[15.039, 3.143], [15.329, 3.143]], [[15.039, 4.139], [15.329, 4.139]], [[15.039, 4.139], [15.039, 5.464]], [[15.039, 5.464], [15.329, 5.464]], [[15.039, 6.46], [15.329, 6.46]], [[15.039, 6.46], [15.039, 7.157]], [[10.977, 7.157], [12.515, 7.157]], [[12.515, 7.157], [12.515, 7.447]], [[13.511, 7.157], [13.511, 7.447]], [[13.511, 7.157], [15.039, 7.157]], [[0.0, 3.965], [2.93, 3.965]], [[3.694, 3.965], [3.859, 3.965]], [[4.42, 3.965], [4.642, 3.965]], [[3.723, 3.965], [3.723, 4.642]], [[4.642, 3.965], [4.642, 4.642]], [[3.723, 4.642], [4.642, 4.642]], [[4.178, 4.642], [4.178, 7.205]], [[3.723, 4.642], [3.723, 4.923]], [[3.723, 6.925], [3.723, 7.205]], [[4.642, 4.642], [4.642, 4.923]], [[4.642, 6.925], [4.642, 7.205]], [[0.0, 7.205], [0.904, 7.205]], [[0.904, 7.205], [0.904, 7.495]], [[1.9, 7.205], [1.9, 7.495]], [[1.9, 7.205], [4.773, 7.205]], [[4.773, 7.205], [4.773, 7.495]], [[5.769, 7.205], [5.769, 7.495]], [[5.769, 7.205], [8.641, 7.205]], [[8.641, 7.205], [8.641, 7.495]], [[9.637, 7.205], [9.637, 7.495]], [[9.637, 7.205], [10.977, 7.205]], [[4.642, 3.965], [4.781, 3.868]], [[5.443, 3.409], [5.474, 3.385]], [[5.851, 3.385], [6.528, 2.756]], [[6.528, 2.756], [6.596, 2.756]], [[7.195, 2.756], [7.253, 2.756]], [[7.253, 2.756], [7.253, 2.321]], [[7.253, 2.321], [7.389, 2.321]], [[8.017, 2.321], [8.221, 2.321]], [[5.474, 3.385], [8.221, 3.385]], [[8.221, 1.789], [8.221, 7.205]], [[8.221, 1.789], [9.091, 1.789]], [[10.106, 1.789], [10.977, 1.789]], [[10.977, 1.789], [10.977, 3.046]], [[10.977, 4.787], [10.977, 5.851]], [[10.977, 6.673], [10.977, 7.205]], [[8.221, 5.271], [9.091, 5.271]], [[10.097, 5.271], [10.977, 5.271]]], "openings": [[[9.091, 1.789], [10.106, 1.789]], [[10.977, 5.851], [10.977, 6.673]]], "bars": [[[10.977, 3.046], [10.977, 4.787]]], "windows": [[[15.329, 0.542], [15.329, 1.538], 0.65, 2.4, "clear"], [[15.329, 3.143], [15.329, 4.139], 0.65, 2.4, "clear"], [[15.329, 5.464], [15.329, 6.46], 0.65, 2.4, "clear"], [[12.515, 7.447], [13.511, 7.447], 0.65, 2.4, "clear"], [[0.904, 7.495], [1.9, 7.495], 0.9, 2.4, "clear"], [[4.773, 7.495], [5.769, 7.495], 0.9, 2.4, "clear"], [[8.641, 7.495], [9.637, 7.495], 0.9, 2.4, "clear"], [[9.091, 5.271], [10.097, 5.271], 0.8, 2.2, "frosted"]], "slides": [[[3.723, 4.923], [3.723, 6.925], 2.05], [[4.642, 4.923], [4.642, 6.925], 2.05]], "doors": [{"h": [2.708, 3.917], "e": [2.708, 3.162], "into": [2.321, 3.53], "kind": "room"}, {"h": [2.805, 2.466], "e": [3.549, 2.466], "into": [3.191, 2.853], "kind": "store"}, {"h": [3.791, 2.369], "e": [4.536, 2.369], "into": [4.159, 2.756], "kind": "store"}, {"h": [6.19, 0.28], "e": [6.19, 1.122], "into": [6.673, 0.725], "kind": "entry"}, {"h": [3.694, 3.965], "e": [2.93, 3.965], "into": [3.288, 4.691], "kind": "room"}, {"h": [3.859, 3.965], "e": [4.42, 3.965], "into": [4.159, 3.53], "kind": "store"}, {"h": [4.781, 3.868], "e": [5.443, 3.409], "into": [5.416, 4.207], "kind": "room"}, {"h": [7.195, 2.756], "e": [6.596, 2.756], "into": [6.867, 2.369], "kind": "store"}, {"h": [8.017, 2.321], "e": [7.389, 2.321], "into": [7.689, 1.983], "kind": "store"}], "rooms": [{"name": "Bathroom", "poly": [[0.967, 1.451], [2.708, 1.451], [2.708, 3.965], [0.0, 3.965], [0.0, 2.369]], "kind": "wet", "label": [1.354, 2.805], "area": 6.4}, {"name": "Laundry", "poly": [[2.708, 1.451], [3.627, 1.451], [3.627, 2.466], [2.708, 2.466]], "kind": "store", "label": [3.162, 1.905], "area": 0.9}, {"name": "HWC", "poly": [[3.627, 1.451], [4.545, 1.451], [4.545, 2.369], [3.627, 2.369]], "kind": "store", "label": [4.081, 1.905], "area": 0.8}, {"name": "Bedroom 1", "poly": [[0.0, 3.965], [3.723, 3.965], [3.723, 7.205], [0.0, 7.205]], "kind": "room", "label": [1.857, 5.658], "area": 12.1}, {"name": "Linen", "poly": [[3.723, 3.965], [4.642, 3.965], [4.642, 4.642], [3.723, 4.642]], "kind": "store", "label": [4.178, 4.304], "area": 0.6}, {"name": "Wardrobe 1", "poly": [[3.723, 4.642], [4.178, 4.642], [4.178, 7.205], [3.723, 7.205]], "kind": "store", "label": [3.946, 5.928], "area": 1.2}, {"name": "Wardrobe 2", "poly": [[4.178, 4.642], [4.642, 4.642], [4.642, 7.205], [4.178, 7.205]], "kind": "store", "label": [4.41, 5.928], "area": 1.2}, {"name": "Bedroom 2", "poly": [[4.642, 3.965], [5.474, 3.385], [8.221, 3.385], [8.221, 7.205], [4.642, 7.205]], "kind": "room", "label": [6.528, 5.464], "area": 13.4}, {"name": "Storage", "poly": [[5.851, 3.385], [6.528, 2.756], [7.253, 2.756], [7.253, 2.321], [8.221, 2.321], [8.221, 3.385]], "kind": "store", "label": [7.398, 3.124], "area": 1.7}, {"name": "Kitchen", "poly": [[8.221, 1.789], [10.977, 1.789], [10.977, 5.271], [8.221, 5.271]], "kind": "wet", "label": [9.594, 3.482], "area": 9.6}, {"name": "Study", "poly": [[8.221, 5.271], [10.977, 5.271], [10.977, 7.205], [8.221, 7.205]], "kind": "room", "label": [9.594, 6.257], "area": 5.3}, {"name": "Living / Dining", "poly": [[10.977, 0.0], [15.039, 0.0], [15.039, 7.157], [10.977, 7.157]], "kind": "room", "label": [13.008, 3.627], "area": 29.1}, {"name": "Hallway", "poly": [[2.708, 2.466], [3.627, 2.466], [3.627, 2.369], [4.545, 2.369], [4.545, 1.451], [6.19, 1.451], [6.19, 0.0], [10.977, 0.0], [10.977, 1.789], [8.221, 1.789], [8.221, 2.321], [7.253, 2.321], [7.253, 2.756], [6.528, 2.756], [5.851, 3.385], [5.474, 3.385], [4.642, 3.965], [2.708, 3.965]], "kind": "hall", "label": [8.221, 0.822], "area": 16.4}, {"name": "", "poly": [[15.039, 0.542], [15.329, 0.542], [15.329, 1.538], [15.039, 1.538]], "kind": "room", "label": null, "area": 0.3}, {"name": "", "poly": [[15.039, 3.143], [15.329, 3.143], [15.329, 4.139], [15.039, 4.139]], "kind": "room", "label": null, "area": 0.3}, {"name": "", "poly": [[15.039, 5.464], [15.329, 5.464], [15.329, 6.46], [15.039, 6.46]], "kind": "room", "label": null, "area": 0.3}, {"name": "", "poly": [[0.904, 7.205], [1.9, 7.205], [1.9, 7.495], [0.904, 7.495]], "kind": "room", "label": null, "area": 0.3}, {"name": "", "poly": [[4.773, 7.205], [5.769, 7.205], [5.769, 7.495], [4.773, 7.495]], "kind": "room", "label": null, "area": 0.3}, {"name": "", "poly": [[8.641, 7.205], [9.637, 7.205], [9.637, 7.495], [8.641, 7.495]], "kind": "room", "label": null, "area": 0.3}, {"name": "", "poly": [[12.515, 7.157], [13.511, 7.157], [13.511, 7.447], [12.515, 7.447]], "kind": "room", "label": null, "area": 0.3}]};
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.localClippingEnabled=true;
+const scene=new THREE.Scene();
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function applyTheme(){renderer.setClearColor(new THREE.Color(css('--bg')));}
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+const CX=7.5, CZ=3.7;
+const camera=new THREE.PerspectiveCamera(40,1,0.1,200);
+const controls=new OrbitControls(camera,canvas);
+controls.target.set(CX,0,CZ); controls.enableDamping=true; controls.maxPolarAngle=Math.PI*0.49; controls.minDistance=3; controls.maxDistance=40;
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x8a8378,1.4));
+const sun=new THREE.DirectionalLight(0xffffff,1.6);
+sun.position.set(CX-6,14,CZ+8); sun.target.position.set(CX,0,CZ); scene.add(sun,sun.target);
+sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-11,right:11,top:8,bottom:-8,near:1,far:40}); sun.shadow.bias=-0.0005; sun.shadow.normalBias=0.03;
+
+const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.9},o));
+const matWall=M(0xf7f5f0), matLeaf=M(0xe9e3d6), matEntry=M(0xb4532a), matTimber=M(0xd9c7a6), matBench=M(0xcfd2d0,{roughness:.5});
+const matFrost=M(0xdfe6e8,{transparent:true,opacity:.8,roughness:.6}), matMirror=M(0xc9d3d8,{metalness:.6,roughness:.15});
+const matGlass=M(0x9cc7dc,{transparent:true,opacity:.35,roughness:.1});
+const T=0.1;
+const specs=[], group=new THREE.Group(); scene.add(group);
+let showDoors=true, curCut=1.3;
+function box(a,b,y0,y1,mat,thick=T,extend=0,tag=''){specs.push([a,b,y0,y1,mat,thick,extend,tag]);}
+function build(cut){
+  group.clear();
+  curCut=cut;
+  for(const [a,b,y0,y1,mat,thick,extend,tag] of specs){ if(tag==='door'&&!showDoors) continue; mk(a,b,y0,Math.min(y1,cut),mat,thick,extend); }
+}
+function mk(a,b,y0,y1,mat,thick,extend){
+  const dx=b[0]-a[0], dz=b[1]-a[1], L=Math.hypot(dx,dz); if(L<1e-3||y1<=y0+1e-3) return;
+  const m=new THREE.Mesh(new THREE.BoxGeometry(L+extend,y1-y0,thick),mat);
+  m.position.set((a[0]+b[0])/2,(y0+y1)/2,(a[1]+b[1])/2); m.rotation.y=-Math.atan2(dz,dx);
+  m.castShadow=m.receiveShadow=true; group.add(m);
+}
+D.walls.forEach(([a,b])=>box(a,b,0,D.H,matWall,T,T));
+D.openings.forEach(([a,b])=>box(a,b,D.door_h,D.H,matWall,T,T));
+D.windows.forEach(([a,b,s,hd,t])=>{box(a,b,0,s,matWall,T,T);box(a,b,hd,D.H,matWall,T,T);box(a,b,s,hd,t==='frosted'?matFrost:matGlass,0.02);});
+D.slides.forEach(([a,b,hd])=>{box(a,b,hd,D.H,matWall,T,T);box(a,b,0,hd,matMirror,0.04,0,'door');});
+D.bars.forEach(([a,b])=>{box(a,b,0,D.bar_h,matWall,T,T);
+  const off=0.2; box([a[0]+off,a[1]-0.05],[b[0]+off,b[1]+0.05],D.bar_h,D.bar_h+0.04,matBench,0.42);});
+D.doors.forEach(d=>{
+  const {h,e,into}=d; box(h,e,D.door_h,D.H,matWall,T,T);
+  let dx=e[0]-h[0], dz=e[1]-h[1]; const L=Math.hypot(dx,dz); dx/=L; dz/=L;
+  let nx=-dz, nz=dx; if((into[0]-h[0])*nx+(into[1]-h[1])*nz<0){nx=-nx;nz=-nz;}
+  const th=THREE.MathUtils.degToRad(80), ox=Math.cos(th)*dx+Math.sin(th)*nx, oz=Math.cos(th)*dz+Math.sin(th)*nz;
+  box(h,[h[0]+ox*(L-.02),h[1]+oz*(L-.02)],0,D.door_h-.02,d.kind==='entry'?matEntry:matLeaf,0.04,0,'door');
+});
+// floors
+const fcol={room:0xd8d2c6,wet:0xcdd8de,hall:0xe5e0d6,store:0xb9b2a5};
+let total=0;
+D.rooms.forEach(r=>{
+  const s=new THREE.Shape(r.poly.map(p=>new THREE.Vector2(p[0],-p[1])));
+  const m=new THREE.Mesh(new THREE.ShapeGeometry(s),new THREE.MeshStandardMaterial({color:fcol[r.kind],roughness:1}));
+  m.rotation.x=-Math.PI/2; m.position.y=0.001; m.receiveShadow=true; scene.add(m);
+  total+=r.area||0;
+});
+document.getElementById('tot').textContent=total.toFixed(0)+' m²';
+const base=new THREE.Mesh(new THREE.BoxGeometry(16.6,0.08,8.6),new THREE.MeshStandardMaterial({color:0x9a958c,roughness:1}));
+base.position.set(CX+0.25,-0.041,CZ+0.1); base.receiveShadow=true; scene.add(base);
+
+// labels
+const LW=document.getElementById('labels'), labels=[];
+D.rooms.filter(r=>r.label).forEach(r=>{
+  const el=document.createElement('div'); el.className='lbl'+(r.kind==='store'?' store':'');
+  if(r.kind==='store'){el.textContent=r.name.replace('Wardrobe ','WR');}
+  else{const xs=r.poly.map(p=>p[0]),zs=r.poly.map(p=>p[1]);
+    const dims=r.kind==='hall'?'':`${(Math.max(...xs)-Math.min(...xs)).toFixed(1)} × ${(Math.max(...zs)-Math.min(...zs)).toFixed(1)} m · `;
+    el.innerHTML=`${r.name}<small>${dims}${r.area} m²</small>`;}
+  LW.appendChild(el); labels.push({el,v:new THREE.Vector3(r.label[0],0.05,r.label[1])});
+});
+const labBox=document.getElementById('lab');
+labBox.addEventListener('change',()=>LW.hidden=!labBox.checked);
+const doorBox=document.getElementById('doors');
+doorBox.addEventListener('change',()=>{showDoors=doorBox.checked; build(curCut);});
+
+// views
+const b3=document.getElementById('v3d'), bt=document.getElementById('vtop');
+function view(top){
+  b3.setAttribute('aria-pressed',!top); bt.setAttribute('aria-pressed',top);
+  controls.target.set(CX,0,CZ);
+  const far=innerWidth<600?1.7:1;
+  if(top) camera.position.set(CX,22*far,CZ+0.01); else camera.position.set(CX-7*far,11*far,CZ+13*far);
+  controls.update();
+}
+b3.onclick=()=>{view(false); setCut(1.3);}; bt.onclick=()=>{view(true); setCut(1.2);};
+const cut=document.getElementById('cut'), cutv=document.getElementById('cutv');
+function setCut(v){build(+v); cut.value=v; cutv.textContent=(+v).toFixed(2)+' m';}
+cut.addEventListener('input',()=>setCut(cut.value));
+
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+addEventListener('resize',resize); resize(); setCut(1.3); view(false);
+const tmp=new THREE.Vector3();
+renderer.setAnimationLoop(()=>{
+  controls.update(); renderer.render(scene,camera);
+  if(!LW.hidden){const w=canvas.clientWidth,h=canvas.clientHeight;
+    for(const l of labels){tmp.copy(l.v).project(camera);
+      const vis=tmp.z<1; l.el.style.display=vis?'':'none';
+      l.el.style.left=((tmp.x+1)/2*w)+'px'; l.el.style.top=((1-tmp.y)/2*h)+'px';}}
+});
+</script>
+
+</body></html>
