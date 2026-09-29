@@ -70,9 +70,18 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   h1{font-size:18px}
   #hint{display:none}
 }
+#picker{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--panel-line);border-radius:12px;padding:8px 8px 8px 14px;max-width:calc(100% - 32px)}
+#pickName{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:4px}
+#picker .chip{white-space:nowrap}
+kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:4px;background:rgba(0,0,0,.12)}
+#toast{position:fixed;left:50%;top:calc(72px + env(safe-area-inset-top,0px));transform:translateX(-50%);font:500 12.5px/1.3 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:9px 14px;border-radius:999px;pointer-events:none;transition:opacity .2s;max-width:calc(100% - 32px);text-align:center}
+#toast:not(.on){opacity:0}
+#stage.editing canvas{cursor:default}
+#stage.over canvas{cursor:grab}
+#stage.held canvas{cursor:grabbing}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .body{display:flex;flex-direction:column;gap:16px}
-@media (prefers-reduced-motion:reduce){.lbl{transition:none}}
+@media (prefers-reduced-motion:reduce){.lbl,#toast{transition:none}}
 </style>
 
 <div id="stage"></div>
@@ -97,11 +106,26 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       <h2>Rooms · approx. from model</h2>
       <ul class="rooms" id="rooms"></ul>
     </div>
+    <div class="sec">
+      <h2>Furniture</h2>
+      <div class="chips">
+        <button class="chip" id="editToggle" aria-pressed="false">Move furniture</button>
+        <button class="chip" id="resetLayout" hidden>Reset layout</button>
+      </div>
+      <div class="foot" id="editHelp" hidden>Drag a piece to move it. It snaps to a 25 cm grid and to walls. Green means it fits, red means it doesn't. Drag empty floor to orbit.</div>
+    </div>
     <label class="toggle"><input type="checkbox" id="showLabels" checked> Show room labels</label>
     <div class="foot">Dimensions are read off the 3D model, not the developer's floor plan. Treat them as a guide.</div>
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>
+<div id="picker" role="toolbar" aria-label="Selected furniture" hidden>
+  <span id="pickName"></span>
+  <button class="chip" id="rotBtn" title="Rotate 90° (R)">Rotate<kbd>R</kbd></button>
+  <button class="chip" id="homeBtn">Put back</button>
+  <button class="chip" id="doneBtn" aria-label="Deselect" title="Deselect (Esc)">✕</button>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script type="importmap">
 {"imports":{
@@ -380,6 +404,300 @@ new ResizeObserver(resize).observe(stage);
 resize();
 goView(VIEWS[0], true);
 
+// ---------- furniture editing ----------
+const GRID = 0.25;    // snap step, metres
+const LIFT = 0.1;     // how far a piece floats while held
+const TOL = 0.05;     // overlap allowed (the model has wardrobes 4 cm into walls)
+const MAGNET = 0.12;  // pull flush to a wall or fixture within this distance
+const MOVABLE = /^(Armchair|Balcony_Chair_\d|Balcony_Plant_\d|Balcony_SideTable|Bed\d_Bed|Bed\d_Bedside(_[AB])?|Bed\d_Wardrobe|Bed2_Plant|Coffee_Table|Dining_Chair_\w+|Dining_Table|Living_Plant_[LR]|Master_(Bed|Bedside_[LR]|Desk|DeskChair|Dresser|Plant|Wardrobe)|Rug_\w+|Shoe_Cabinet|Sofa|TV_Unit)$/;
+const FOLIAGE = /_(Leaves|Stems)$/;        // leaves may overhang, so they don't count as footprint
+const SKIP = /^(Floor_|Curtain_|Camera_Target)|glass/i;   // never blocks or gets picked
+const TONE = { idle: 0x3f5a3a, ok: 0x4fbf5a, bad: 0xe25b4c };
+
+const items = [], solids = [], floors = [], pickables = [];
+let editMode = false, selected = null, hovered = null, drag = null, tap = null, hoverQueued = false;
+
+const stageEl = document.getElementById('stage');
+const canvas = renderer.domElement;
+const pickerEl = document.getElementById('picker'), pickName = document.getElementById('pickName');
+const editToggle = document.getElementById('editToggle'), resetBtn = document.getElementById('resetLayout');
+const editHelp = document.getElementById('editHelp'), hintEl = document.getElementById('hint'), toastEl = document.getElementById('toast');
+const HINT = hintEl.textContent, EDIT_HINT = 'Drag furniture to move · R to rotate · drag empty space to orbit';
+
+let toastTimer;
+function toast(msg) {
+  toastEl.textContent = msg; toastEl.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toastEl.classList.remove('on'), 2200);
+}
+
+const extent = (it, rot) => (rot & 1) ? [it.hz, it.hx] : [it.hx, it.hz];
+function footBox(it, cx, cz, rot, shrink) {
+  const [hx, hz] = extent(it, rot);
+  return new THREE.Box3(new THREE.Vector3(cx - hx + shrink, it.yLo, cz - hz + shrink), new THREE.Vector3(cx + hx - shrink, it.yHi, cz + hz - shrink));
+}
+const overFloor = (x, z) => floors.some((f) => x >= f.min.x - 0.01 && x <= f.max.x + 0.01 && z >= f.min.z - 0.01 && z <= f.max.z + 0.01);
+// chairs may slide under tables and desks
+const tucks = (a, b) => (a.chair && b.table) || (b.chair && a.table);
+
+function fits(it, cx, cz, rot) {
+  const b = footBox(it, cx, cz, rot, TOL);
+  for (const x of [b.min.x, b.max.x]) for (const z of [b.min.z, b.max.z]) if (!overFloor(x, z)) return false;
+  if (solids.some((s) => b.intersectsBox(s))) return false;
+  if (it.flat) return true;
+  return !items.some((o) => o !== it && !o.flat && !tucks(it, o) && b.intersectsBox(footBox(o, o.cx, o.cz, o.rot, TOL / 2)));
+}
+
+// pull an edge flush against a wall/fixture face that is close by
+function magnet(it, axis, c, other, h, ho) {
+  const o = axis === 'x' ? 'z' : 'x';
+  let best = c, bd = MAGNET;
+  for (const s of solids) {
+    if (s.max.y <= it.yLo || s.min.y >= it.yHi) continue;
+    if (s.max[o] <= other - ho || s.min[o] >= other + ho) continue;
+    for (const d of [s.max[axis] + h - c, s.min[axis] - h - c]) if (Math.abs(d) < bd) { bd = Math.abs(d); best = c + d; }
+  }
+  return best;
+}
+function snap(it, x, z, rot) {
+  const [hx, hz] = extent(it, rot);
+  let cx = Math.round((x - hx) / GRID) * GRID + hx;
+  let cz = Math.round((z - hz) / GRID) * GRID + hz;
+  cx = magnet(it, 'x', cx, cz, hx, hz);
+  cz = magnet(it, 'z', cz, cx, hz, hx);
+  return [cx, cz];
+}
+// nearest snapped spot to (x, z) where the piece fits, or null
+function findSpot(it, x, z, rot, radius = 3) {
+  const tries = [];
+  for (let i = -radius; i <= radius; i++) for (let j = -radius; j <= radius; j++) tries.push([i, j]);
+  tries.sort((a, b) => a[0] ** 2 + a[1] ** 2 - b[0] ** 2 - b[1] ** 2);
+  for (const [i, j] of tries) {
+    const [cx, cz] = snap(it, x + i * GRID, z + j * GRID, rot);
+    if (fits(it, cx, cz, rot)) return [cx, cz];
+  }
+  return null;
+}
+
+function place(it, cx, cz, rot) {
+  it.cx = cx; it.cz = cz; it.rot = rot;
+  it.pivot.position.set(cx, it.held ? LIFT : 0, cz);
+  it.pivot.rotation.y = -rot * Math.PI / 2;
+  it.pivot.updateMatrixWorld(true);   // keep raycasts exact between frames
+  it.ok = fits(it, cx, cz, rot);
+  if (it === selected) syncMarker();
+}
+
+// ---------- footprint markers ----------
+function makeMarker() {
+  const g = new THREE.Group();
+  const fill = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.3, depthWrite: false, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+  const pts = [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, .5]].map(([x, z]) => new THREE.Vector3(x, 0, z));
+  const edge = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ toneMapped: false, depthWrite: false }));
+  g.add(fill, edge); g.visible = false; g.renderOrder = 5;
+  scene.add(g);
+  return { g, fill, edge };
+}
+const markSel = makeMarker(), markHover = makeMarker();
+markHover.fill.material.opacity = 0.14;
+function showMarker(m, it, tone) {
+  if (!it) { m.g.visible = false; return; }
+  const [hx, hz] = extent(it, it.rot);
+  m.g.position.set(it.cx, 0.012, it.cz);
+  m.g.scale.set(hx * 2 + 0.06, 1, hz * 2 + 0.06);
+  m.fill.material.color.set(tone); m.edge.material.color.set(tone);
+  m.g.visible = true;
+}
+const toneOf = (it) => it && it.held ? (it.ok ? TONE.ok : TONE.bad) : TONE.idle;
+function syncMarker() { showMarker(markSel, editMode ? selected : null, toneOf(selected)); }
+
+// ---------- snap grid overlay (only over the floors) ----------
+let gridMesh = null;
+function makeGrid() {
+  const u = new THREE.Box3(); floors.forEach((f) => u.union(f));
+  const n = floors.length;
+  const mat = new THREE.ShaderMaterial({
+    transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
+    uniforms: { uBoxes: { value: floors.map((f) => new THREE.Vector4(f.min.x, f.min.z, f.max.x, f.max.z)) }, uGrid: { value: GRID }, uColor: { value: new THREE.Color(0x2c3527) }, uAlpha: { value: 0.3 } },
+    vertexShader: 'varying vec2 vXZ; void main(){ vec4 w = modelMatrix * vec4(position, 1.); vXZ = w.xz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: `varying vec2 vXZ; uniform vec4 uBoxes[${n}]; uniform float uGrid, uAlpha; uniform vec3 uColor;
+      void main(){
+        bool inside = false;
+        for (int i = 0; i < ${n}; i++) { vec4 b = uBoxes[i]; if (vXZ.x >= b.x && vXZ.x <= b.z && vXZ.y >= b.y && vXZ.y <= b.w) inside = true; }
+        if (!inside) discard;
+        vec2 g = vXZ / uGrid; vec2 d = abs(fract(g - .5) - .5) / fwidth(g);
+        float line = 1. - min(min(d.x, d.y), 1.);
+        gl_FragColor = vec4(uColor, line * uAlpha);
+      }`,
+  });
+  gridMesh = new THREE.Mesh(new THREE.PlaneGeometry(u.max.x - u.min.x, u.max.z - u.min.z).rotateX(-Math.PI / 2), mat);
+  gridMesh.position.set((u.min.x + u.max.x) / 2, 0.006, (u.min.z + u.max.z) / 2);
+  gridMesh.renderOrder = 4; gridMesh.visible = false;
+  scene.add(gridMesh);
+}
+
+// ---------- set up from the loaded model ----------
+function addSolid(node) {
+  const b = new THREE.Box3().setFromObject(node);
+  if (b.isEmpty()) return;
+  solids.push(b);
+  node.traverse((o) => { if (o.isMesh && !SKIP.test(o.name)) pickables.push(o); });
+}
+function initFurniture(root) {
+  root.updateMatrixWorld(true);
+  const nodes = [...root.children];
+  for (const n of nodes) if (n.name.startsWith('Floor_')) floors.push(new THREE.Box3().setFromObject(n));
+  for (const node of nodes) {
+    if (SKIP.test(node.name)) continue;
+    if (!MOVABLE.test(node.name)) { addSolid(node); continue; }   // walls, kitchen, bathroom fittings, wall art
+    const fp = new THREE.Box3();
+    node.traverse((o) => { if (o.isMesh && !FOLIAGE.test(o.name)) fp.expandByObject(o); });
+    if (fp.isEmpty()) fp.setFromObject(node);
+    const cx = (fp.min.x + fp.max.x) / 2, cz = (fp.min.z + fp.max.z) / 2;
+    const pivot = new THREE.Group();
+    pivot.position.set(cx, 0, cz);
+    root.add(pivot); pivot.attach(node);
+    const flat = fp.max.y < 0.05;
+    const it = {
+      name: node.name, pivot, cx, cz, rot: 0, home: { cx, cz, rot: 0 }, held: false, ok: true,
+      label: node.name.replace(/^Bed(\d)_/, 'Bedroom $1 ').replace(/_/g, ' '),
+      hx: (fp.max.x - fp.min.x) / 2, hz: (fp.max.z - fp.min.z) / 2,
+      flat, yLo: flat ? 0 : fp.min.y + 0.02, yHi: flat ? 0.01 : fp.max.y,
+      chair: /Chair/.test(node.name) && node.name !== 'Armchair', table: /^(Dining_Table|Master_Desk)$/.test(node.name),
+    };
+    node.traverse((o) => { if (o.isMesh) { o.userData.item = it; pickables.push(o); } });
+    items.push(it);
+  }
+  for (const it of items) it.ok = fits(it, it.cx, it.cz, it.rot);
+  makeGrid();
+  editToggle.disabled = false;
+}
+
+// ---------- selection + actions ----------
+function select(it) {
+  selected = it;
+  pickerEl.hidden = !it || !editMode;
+  if (it) pickName.textContent = it.label;
+  if (hovered === it) setHover(null);
+  syncMarker();
+}
+function setHover(it) {
+  if (it === selected) it = null;
+  hovered = it;
+  showMarker(markHover, editMode ? it : null, TONE.idle);
+}
+function rotate(it) {
+  const rot = (it.rot + 1) & 3;
+  if (it.held) { const [cx, cz] = snap(it, it.cx, it.cz, rot); place(it, cx, cz, rot); return; }
+  const spot = findSpot(it, it.cx, it.cz, rot);
+  if (!spot) { toast('No room to rotate here'); return; }
+  place(it, spot[0], spot[1], rot);
+}
+function putBack(it) {
+  const h = it.home;
+  if (!fits(it, h.cx, h.cz, h.rot)) { toast('Something is in the way of its original spot'); return; }
+  place(it, h.cx, h.cz, h.rot);
+}
+function resetLayout() {
+  cancelDrag();
+  for (const it of items) place(it, it.home.cx, it.home.cz, it.home.rot);
+}
+function setEdit(on) {
+  editMode = on;
+  editToggle.setAttribute('aria-pressed', String(on));
+  editToggle.textContent = on ? 'Done moving' : 'Move furniture';
+  resetBtn.hidden = editHelp.hidden = !on;
+  hintEl.textContent = on ? EDIT_HINT : HINT;
+  stageEl.classList.toggle('editing', on);
+  if (gridMesh) gridMesh.visible = on;
+  if (!on) { cancelDrag(); setHover(null); stageEl.classList.remove('over'); }
+  select(on ? selected : null);
+}
+
+// ---------- pointer handling ----------
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit = new THREE.Vector3();
+function aim(e) {
+  const r = canvas.getBoundingClientRect();
+  ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+}
+function pickItem(e) {
+  aim(e);
+  // walls and fixtures are in the list too, so furniture behind a wall can't be grabbed
+  const h = ray.intersectObjects(pickables, false)[0];
+  return h ? h.object.userData.item || null : null;
+}
+const floorPoint = () => ray.ray.intersectPlane(floorPlane, hit);
+
+stageEl.addEventListener('pointerdown', (e) => {
+  if (!editMode || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || drag) return;
+  const it = pickItem(e);
+  if (!it) { tap = { id: e.pointerId, x: e.clientX, y: e.clientY }; return; }   // empty floor: let OrbitControls take it
+  controls.enabled = false;
+  canvas.setPointerCapture(e.pointerId);
+  select(it);
+  const p = floorPoint();
+  drag = { it, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, dx: p ? p.x - it.cx : 0, dz: p ? p.z - it.cz : 0, from: { cx: it.cx, cz: it.cz, rot: it.rot } };
+  stageEl.classList.add('held');
+}, true);
+
+window.addEventListener('pointermove', (e) => {
+  if (!editMode) return;
+  if (drag) {
+    if (e.pointerId !== drag.id) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+    drag.moved = true; drag.it.held = true;
+    aim(e);
+    const p = floorPoint();
+    if (!p) return;
+    const [cx, cz] = snap(drag.it, p.x - drag.dx, p.z - drag.dz, drag.it.rot);
+    place(drag.it, cx, cz, drag.it.rot);
+    return;
+  }
+  if (e.pointerType === 'touch' || hoverQueued) return;
+  hoverQueued = true;
+  requestAnimationFrame(() => {
+    hoverQueued = false;
+    if (!editMode || drag) return;
+    const it = pickItem(e);
+    setHover(it);
+    stageEl.classList.toggle('over', !!it);
+  });
+});
+
+function endDrag(commit) {
+  const d = drag; if (!d) return;
+  drag = null;
+  controls.enabled = true;
+  stageEl.classList.remove('held');
+  const it = d.it; it.held = false;
+  if (!d.moved) { place(it, it.cx, it.cz, it.rot); return; }
+  if (commit && it.ok) place(it, it.cx, it.cz, it.rot);
+  else { place(it, d.from.cx, d.from.cz, d.from.rot); if (commit) toast("That doesn't fit there, so it went back"); }
+}
+function cancelDrag() { endDrag(false); }
+window.addEventListener('pointerup', (e) => {
+  if (drag && e.pointerId === drag.id) endDrag(true);
+  if (tap && e.pointerId === tap.id) {
+    if (Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 5) select(null);
+    tap = null;
+  }
+});
+window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
+
+window.addEventListener('keydown', (e) => {
+  if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if ((e.key === 'r' || e.key === 'R') && selected) { rotate(selected); e.preventDefault(); }
+  else if (e.key === 'Escape') { if (drag) cancelDrag(); else select(null); }
+});
+
+editToggle.disabled = true;
+editToggle.onclick = () => setEdit(!editMode);
+resetBtn.onclick = resetLayout;
+document.getElementById('rotBtn').onclick = () => selected && rotate(selected);
+document.getElementById('homeBtn').onclick = () => selected && putBack(selected);
+document.getElementById('doneBtn').onclick = () => select(null);
+
 // ---------- load ----------
 const loadtxt = document.getElementById('loadtxt');
 function onModel(gltf) {
@@ -400,6 +718,7 @@ function onModel(gltf) {
     o.receiveShadow = true;
   });
   scene.add(root);
+  initFurniture(root);
   document.getElementById('loader').hidden = true;
 }
 function onFail(err) {
