@@ -69,10 +69,20 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
   h1{font-size:18px}
   #hint{display:none}
+  #picker{flex-wrap:wrap;justify-content:center;padding:8px 10px}
+  #pickName{flex-basis:100%;text-align:center}
+  kbd{display:none}
 }
 #picker{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--panel-line);border-radius:12px;padding:8px 8px 8px 14px;max-width:calc(100% - 32px)}
 #pickName{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:4px}
 #picker .chip{white-space:nowrap}
+#pickName{min-width:0;flex:1}
+#editTools{gap:12px}
+#catalog summary{cursor:pointer;font-size:13px;font-weight:600;padding:2px 0}
+#catalog summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+#catalogList{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.cat h3{margin:0 0 6px;font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+#homeBtn[hidden]{display:none}
 kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:4px;background:rgba(0,0,0,.12)}
 #toast{position:fixed;left:50%;top:calc(72px + env(safe-area-inset-top,0px));transform:translateX(-50%);font:500 12.5px/1.3 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:9px 14px;border-radius:999px;pointer-events:none;transition:opacity .2s;max-width:calc(100% - 32px);text-align:center}
 #toast:not(.on){opacity:0}
@@ -112,7 +122,14 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
         <button class="chip" id="editToggle" aria-pressed="false">Move furniture</button>
         <button class="chip" id="resetLayout" hidden>Reset layout</button>
       </div>
-      <div class="foot" id="editHelp" hidden>Drag a piece to move it. It snaps to a 25 cm grid and to walls. Green means it fits, red means it doesn't. Drag empty floor to orbit.</div>
+      <div id="editTools" class="sec" hidden>
+        <label class="toggle"><input type="checkbox" id="showGrid" checked> Show snap grid</label>
+        <details id="catalog">
+          <summary>Add furniture</summary>
+          <div id="catalogList"></div>
+        </details>
+      </div>
+      <div class="foot" id="editHelp" hidden>Drag a piece to move it. It snaps to a 25 cm grid and to walls. Green means it fits, red means it doesn't. Delete removes the selected piece. Drag empty floor to orbit.</div>
     </div>
     <label class="toggle"><input type="checkbox" id="showLabels" checked> Show room labels</label>
     <div class="foot">Dimensions are read off the 3D model, not the developer's floor plan. Treat them as a guide.</div>
@@ -123,6 +140,7 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
   <span id="pickName"></span>
   <button class="chip" id="rotBtn" title="Rotate 90° (R)">Rotate<kbd>R</kbd></button>
   <button class="chip" id="homeBtn">Put back</button>
+  <button class="chip" id="delBtn" title="Remove (Delete)">Delete</button>
   <button class="chip" id="doneBtn" aria-label="Deselect" title="Deselect (Esc)">✕</button>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -420,6 +438,7 @@ let editMode = false, selected = null, hovered = null, drag = null, tap = null, 
 const stageEl = document.getElementById('stage');
 const canvas = renderer.domElement;
 const pickerEl = document.getElementById('picker'), pickName = document.getElementById('pickName');
+const homeBtn = document.getElementById('homeBtn'), editTools = document.getElementById('editTools'), showGridEl = document.getElementById('showGrid'), catalogEl = document.getElementById('catalog');
 const editToggle = document.getElementById('editToggle'), resetBtn = document.getElementById('resetLayout');
 const editHelp = document.getElementById('editHelp'), hintEl = document.getElementById('hint'), toastEl = document.getElementById('toast');
 const HINT = hintEl.textContent, EDIT_HINT = 'Drag furniture to move · R to rotate · drag empty space to orbit';
@@ -543,41 +562,112 @@ function addSolid(node) {
   solids.push(b);
   node.traverse((o) => { if (o.isMesh && !SKIP.test(o.name)) pickables.push(o); });
 }
+// Every movable piece in the model becomes a template. Pieces in the scene are
+// clones of a template (geometry and materials are shared), so the menu can add more.
+const templates = {}, initial = [];
+let furnRoot = null;
+function makeTemplate(node) {
+  const fp = new THREE.Box3();
+  node.traverse((o) => { if (o.isMesh && !FOLIAGE.test(o.name)) fp.expandByObject(o); });
+  if (fp.isEmpty()) fp.setFromObject(node);
+  const cx = (fp.min.x + fp.max.x) / 2, cz = (fp.min.z + fp.max.z) / 2;
+  node.position.x -= cx; node.position.z -= cz;   // now local to a pivot sitting at the footprint centre
+  const flat = fp.max.y < 0.05;
+  return {
+    node, name: node.name, cx, cz, flat,
+    label: node.name.replace(/^Bed(\d)_/, 'Bedroom $1 ').replace(/_/g, ' '),
+    hx: (fp.max.x - fp.min.x) / 2, hz: (fp.max.z - fp.min.z) / 2,
+    yLo: flat ? 0 : fp.min.y + 0.02, yHi: flat ? 0.01 : fp.max.y,
+    chair: /Chair/.test(node.name) && node.name !== 'Armchair', table: /^(Dining_Table|Master_Desk)$/.test(node.name),
+  };
+}
+function spawn(tpl, cx, cz, rot, label, home) {
+  const pivot = new THREE.Group();
+  pivot.add(tpl.node.clone(true));
+  furnRoot.add(pivot);
+  const it = { ...tpl, node: undefined, pivot, label, cx, cz, rot, home, held: false, ok: true };
+  pivot.traverse((o) => { if (o.isMesh) { o.userData.item = it; pickables.push(o); } });
+  items.push(it);
+  place(it, cx, cz, rot);
+  return it;
+}
+function removeItem(it) {
+  if (drag && drag.it === it) cancelDrag();
+  furnRoot.remove(it.pivot);
+  items.splice(items.indexOf(it), 1);
+  for (let i = pickables.length - 1; i >= 0; i--) if (pickables[i].userData.item === it) pickables.splice(i, 1);
+  if (selected === it) select(null);
+  if (hovered === it) setHover(null);
+}
+
+// What the "Add furniture" menu offers. `src` is a node name in the model; to offer
+// something new later, add a template for it and list it here.
+const CATALOG = [
+  ['Living', [['Sofa', 'Sofa'], ['Armchair', 'Armchair'], ['Coffee_Table', 'Coffee table'], ['TV_Unit', 'TV unit']]],
+  ['Dining', [['Dining_Table', 'Dining table'], ['Dining_Chair_L1', 'Dining chair']]],
+  ['Bedroom', [['Master_Bed', 'Bed · large'], ['Bed1_Bed', 'Bed · standard'], ['Master_Bedside_L', 'Bedside table'],
+    ['Master_Wardrobe', 'Wardrobe · large'], ['Bed1_Wardrobe', 'Wardrobe · medium'], ['Bed2_Wardrobe', 'Wardrobe · small'],
+    ['Master_Dresser', 'Dresser'], ['Master_Desk', 'Desk'], ['Master_DeskChair', 'Desk chair']]],
+  ['Hall', [['Shoe_Cabinet', 'Shoe cabinet']]],
+  ['Outdoor', [['Balcony_Chair_1', 'Balcony chair'], ['Balcony_SideTable', 'Side table']]],
+  ['Plants', [['Living_Plant_L', 'Plant · tall'], ['Living_Plant_R', 'Plant · medium'], ['Master_Plant', 'Plant · leafy'],
+    ['Bed2_Plant', 'Plant · small'], ['Balcony_Plant_1', 'Plant · pot A'], ['Balcony_Plant_2', 'Plant · pot B']]],
+  ['Rugs', [['Rug_Living', 'Rug · large'], ['Rug_Master', 'Rug · medium'], ['Rug_Bed1', 'Rug · small']]],
+];
+function buildCatalog() {
+  const list = document.getElementById('catalogList');
+  for (const [cat, entries] of CATALOG) {
+    const sec = document.createElement('div');
+    sec.className = 'cat';
+    sec.innerHTML = `<h3>${cat}</h3><div class="chips"></div>`;
+    for (const [src, name] of entries) {
+      if (!templates[src]) continue;
+      const b = document.createElement('button');
+      b.className = 'chip'; b.textContent = name;
+      b.onclick = () => addFromCatalog(src, name);
+      sec.lastChild.appendChild(b);
+    }
+    list.appendChild(sec);
+  }
+}
+// drop a new piece at the nearest free spot to where the camera is looking
+function addFromCatalog(src, name) {
+  const tpl = templates[src];
+  const { x, z } = controls.target;
+  const it = spawn(tpl, x, z, 0, name, null);
+  const spot = findSpot(it, x, z, 0, 32);   // up to 8 m out: anywhere on the plan
+  if (!spot) { removeItem(it); toast("There is no free spot big enough. Move or delete something first."); return; }
+  place(it, spot[0], spot[1], 0);
+  select(it);
+}
+
 function initFurniture(root) {
+  furnRoot = root;
   root.updateMatrixWorld(true);
   const nodes = [...root.children];
   for (const n of nodes) if (n.name.startsWith('Floor_')) floors.push(new THREE.Box3().setFromObject(n));
   for (const node of nodes) {
     if (SKIP.test(node.name)) continue;
     if (!MOVABLE.test(node.name)) { addSolid(node); continue; }   // walls, kitchen, bathroom fittings, wall art
-    const fp = new THREE.Box3();
-    node.traverse((o) => { if (o.isMesh && !FOLIAGE.test(o.name)) fp.expandByObject(o); });
-    if (fp.isEmpty()) fp.setFromObject(node);
-    const cx = (fp.min.x + fp.max.x) / 2, cz = (fp.min.z + fp.max.z) / 2;
-    const pivot = new THREE.Group();
-    pivot.position.set(cx, 0, cz);
-    root.add(pivot); pivot.attach(node);
-    const flat = fp.max.y < 0.05;
-    const it = {
-      name: node.name, pivot, cx, cz, rot: 0, home: { cx, cz, rot: 0 }, held: false, ok: true,
-      label: node.name.replace(/^Bed(\d)_/, 'Bedroom $1 ').replace(/_/g, ' '),
-      hx: (fp.max.x - fp.min.x) / 2, hz: (fp.max.z - fp.min.z) / 2,
-      flat, yLo: flat ? 0 : fp.min.y + 0.02, yHi: flat ? 0.01 : fp.max.y,
-      chair: /Chair/.test(node.name) && node.name !== 'Armchair', table: /^(Dining_Table|Master_Desk)$/.test(node.name),
-    };
-    node.traverse((o) => { if (o.isMesh) { o.userData.item = it; pickables.push(o); } });
-    items.push(it);
+    const tpl = makeTemplate(node);
+    root.remove(node);
+    templates[node.name] = tpl;
+    initial.push(tpl);
   }
-  for (const it of items) it.ok = fits(it, it.cx, it.cz, it.rot);
+  spawnInitial();
   makeGrid();
+  buildCatalog();
   editToggle.disabled = false;
+}
+function spawnInitial() {
+  for (const tpl of initial) spawn(tpl, tpl.cx, tpl.cz, 0, tpl.label, { cx: tpl.cx, cz: tpl.cz, rot: 0 });
 }
 
 // ---------- selection + actions ----------
 function select(it) {
   selected = it;
   pickerEl.hidden = !it || !editMode;
-  if (it) pickName.textContent = it.label;
+  if (it) { pickName.textContent = it.label; homeBtn.hidden = !it.home; }
   if (hovered === it) setHover(null);
   syncMarker();
 }
@@ -599,17 +689,24 @@ function putBack(it) {
   place(it, h.cx, h.cz, h.rot);
 }
 function resetLayout() {
-  cancelDrag();
-  for (const it of items) place(it, it.home.cx, it.home.cz, it.home.rot);
+  cancelDrag(); select(null); setHover(null);
+  for (const it of [...items]) removeItem(it);
+  spawnInitial();
 }
+function deletePiece(it) {
+  removeItem(it);
+  toast(`Removed ${it.label}. Add it back from the menu.`);
+}
+const syncGrid = () => { if (gridMesh) gridMesh.visible = editMode && showGridEl.checked; };
 function setEdit(on) {
   editMode = on;
   editToggle.setAttribute('aria-pressed', String(on));
   editToggle.textContent = on ? 'Done moving' : 'Move furniture';
-  resetBtn.hidden = editHelp.hidden = !on;
+  resetBtn.hidden = editHelp.hidden = editTools.hidden = !on;
+  if (on) catalogEl.open = true;
   hintEl.textContent = on ? EDIT_HINT : HINT;
   stageEl.classList.toggle('editing', on);
-  if (gridMesh) gridMesh.visible = on;
+  syncGrid();
   if (!on) { cancelDrag(); setHover(null); stageEl.classList.remove('over'); }
   select(on ? selected : null);
 }
@@ -688,6 +785,7 @@ window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === dr
 window.addEventListener('keydown', (e) => {
   if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if ((e.key === 'r' || e.key === 'R') && selected) { rotate(selected); e.preventDefault(); }
+  else if ((e.key === 'Delete' || e.key === 'Backspace') && selected) { deletePiece(selected); e.preventDefault(); }
   else if (e.key === 'Escape') { if (drag) cancelDrag(); else select(null); }
 });
 
@@ -695,7 +793,9 @@ editToggle.disabled = true;
 editToggle.onclick = () => setEdit(!editMode);
 resetBtn.onclick = resetLayout;
 document.getElementById('rotBtn').onclick = () => selected && rotate(selected);
-document.getElementById('homeBtn').onclick = () => selected && putBack(selected);
+homeBtn.onclick = () => selected && putBack(selected);
+document.getElementById('delBtn').onclick = () => selected && deletePiece(selected);
+showGridEl.addEventListener('change', syncGrid);
 document.getElementById('doneBtn').onclick = () => select(null);
 
 // ---------- load ----------
