@@ -24,6 +24,11 @@
       "src": "/",
       "has": [{ "type": "host", "value": "18aappold.weihong.dev" }],
       "dest": "/18aappold/index.html"
+    },
+    {
+      "src": "/",
+      "has": [{ "type": "host", "value": "443taieri.weihong.dev" }],
+      "dest": "/443taieri/index.html"
     }
   ]
 }
