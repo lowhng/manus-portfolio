@@ -105,7 +105,7 @@ kbd{font:500 10px/1 var(--f-data);margin-left:6px;padding:2px 4px;border-radius:
 
 <div id="topbar" class="float" role="toolbar" aria-label="Display">
   <button class="chip" id="roofBtn" aria-pressed="true">Roof &amp; ceilings</button>
-  <button class="chip" id="lblBtn" aria-pressed="true">Room labels</button>
+  <button class="chip" id="lblBtn" aria-pressed="false">Room labels</button>
 </div>
 
 <aside id="panel" aria-label="Model controls">
@@ -295,7 +295,7 @@ const PROC={
 const loader=document.getElementById('loader');
 let model; const covers=[];
 const roofBtn=document.getElementById('roofBtn'), lblBtn=document.getElementById('lblBtn');
-let roofOn=true, showLabels=true;
+let roofOn=true, showLabels=false;
 function setCovers(on){roofOn=on; roofBtn.setAttribute('aria-pressed',on); covers.forEach(o=>o.visible=on);}
 roofBtn.onclick=()=>setCovers(!roofOn);
 lblBtn.onclick=()=>{showLabels=!showLabels; lblBtn.setAttribute('aria-pressed',showLabels); updateLabelVis();};
