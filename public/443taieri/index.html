@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>18A Appold Street</title>
+<title>443 Taieri</title>
 <style>
 /* Layout: full-bleed 3D viewer; display toggles float top-centre; a drawing-sheet panel floats top-left (bottom sheet on phones) */
 :root{
@@ -104,30 +104,30 @@ kbd{font:500 10px/1 var(--f-data);margin-left:6px;padding:2px 4px;border-radius:
 <div id="loader">Loading the model…</div>
 
 <div id="topbar" class="float" role="toolbar" aria-label="Display">
-  <button class="chip" id="roofBtn" aria-pressed="true">Roof &amp; ceilings</button>
+  <button class="chip" id="roofBtn" aria-pressed="true">Roof</button>
   <button class="chip" id="lblBtn" aria-pressed="false">Room labels</button>
 </div>
 
 <aside id="panel" aria-label="Model controls">
   <div class="tb">
     <div>
-      <div class="eyebrow">Floor plan model · Dunedin</div>
-      <h1>18A Appold Street</h1>
+      <div class="eyebrow">Photo + LiDAR model · Dunedin</div>
+      <h1>443 Taieri</h1>
     </div>
     <button class="chip" id="infoBtn" aria-expanded="false" aria-controls="info">Room info</button>
   </div>
   <div id="info" hidden>
-    <p class="sum">Three-bedroom single-level home with a double garage, courtyard and spa room, inside its fenced section.</p>
+    <p class="sum">Three-bedroom brick bungalow and its section, modelled from photos and a LiDAR scan.</p>
     <div class="meta">
       <div><b>3</b><span>Bedrooms</span></div>
-      <div><b>11.3×21.0</b><span>Footprint m</span></div>
-      <div><b>183</b><span>Floor m²</span></div>
+      <div><b>1</b><span>Bathroom</span></div>
+      <div><b>13.0×8.0</b><span>Footprint m</span></div>
     </div>
     <section>
-      <h2>Rooms <span>· approx. from model</span></h2>
+      <h2>Rooms <span>· approx. from plan</span></h2>
       <ul id="rooms"></ul>
     </section>
-    <p class="note">Built from the Blender model's geometry. Turn off the roof to see inside. Lighting is approximated, so it won't match a Blender render exactly.</p>
+    <p class="note">Geometry is the real Blender model. Lighting and procedural textures are approximated, and grass and leaves are thinned for the web. Sizes are to wall centrelines, so slightly generous.</p>
   </div>
   <section>
     <h2>Views</h2>
@@ -145,7 +145,7 @@ kbd{font:500 10px/1 var(--f-data);margin-left:6px;padding:2px 4px;border-radius:
         <summary>Add furniture</summary>
         <div id="catalogList"></div>
       </details>
-      <p class="note" style="padding:0">Drag a piece to move it. It snaps to a 25 cm grid and to walls. Green means it fits, red means it doesn't. Indoor pieces stay indoors, outdoor pieces stay on the patio, paths and garden. Drag empty space to orbit.</p>
+      <p class="note" style="padding:0">Drag a piece to move it. It snaps to a 25 cm grid and to walls. Green means it fits, red means it doesn't. Drag empty space to orbit.</p>
     </div>
   </section>
 </aside>
@@ -168,128 +168,144 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 
-const ROOMS=[{"n":"Dining & living","x0":4.93,"y0":4.11,"x1":11.11,"y1":12.93,"a":45.7,"L":true,"lx":8.9,"ly":9.4},
-{"n":"Kitchen","x0":4.93,"y0":4.11,"x1":7.05,"y1":8.26,"a":8.8},
-{"n":"Bedroom 1","x0":2.31,"y0":0.21,"x1":6.71,"y1":4.02,"a":16.8},
-{"n":"Bedroom 2","x0":0.21,"y0":4.11,"x1":3.62,"y1":7.82,"a":12.7},
-{"n":"Bedroom 3","x0":0.21,"y0":7.91,"x1":3.62,"y1":10.92,"a":10.3},
-{"n":"Bathroom","x0":0.21,"y0":12.11,"x1":3.62,"y1":14.21,"a":7.2},
-{"n":"Ensuite","x0":0.21,"y0":0.21,"x1":2.22,"y1":2.32,"a":4.2},
-{"n":"WC","x0":0.21,"y0":11.01,"x1":2.72,"y1":12.02,"a":2.5},
-{"n":"Walk-in wardrobe","x0":0.21,"y0":2.41,"x1":2.22,"y1":4.02,"a":3.2},
-{"n":"Hall","x0":3.71,"y0":4.11,"x1":4.85,"y1":14.21,"a":11.5},
-{"n":"Entry","x0":6.15,"y0":13.02,"x1":7.51,"y1":14.87,"a":2.5},
-{"n":"Linen","x0":4.93,"y0":13.02,"x1":6.06,"y1":14.21,"a":1.3},
-{"n":"Garage & laundry","x0":0.21,"y0":14.3,"x1":5.99,"y1":20.81,"a":37.6}];
-// Blender cameras converted to three (x, z, -y); hfov in degrees
-const CAMS=[
- ["Living (sofas)",[6.3,1.45,-9.24],[8.575,1.1,-11.165],96.7],
- ["Living to TV",[10.3,1.5,-12.85],[8.081,1.315,-10.839],96.7],
- ["Dining & kitchen",[10.8,1.5,-4.74],[8.113,1.305,-6.059],96.7],
- ["Kitchen island",[8.2,1.55,-8.24],[6.096,1.164,-6.136],96.7],
- ["Bedroom 1",[6.45,1.55,-3.7],[4.638,1.088,-1.354],96.7],
- ["Bedroom 2",[3.35,1.55,-6.75],[1.038,0.982,-4.925],96.7],
- ["Bedroom 3",[3.4,1.55,-9.05],[0.648,0.929,-10.071],96.7],
- ["Bathroom",[3.15,1.6,-12.6],[0.437,1.008,-13.735],104.3],
- ["Garage",[5.6,1.7,-20.45],[3.768,1.367,-18.098],96.7],
- ["Courtyard",[10.9,1.6,1.3],[8.213,1.361,-0.013],84]];
-const CENTER=new THREE.Vector3(5.66,0,-10.51);
-const SITE=new THREE.Vector3(9.15,0,-10.6);
-// fence lines (three coords): only what sits inside these is shown
-const FENCE={x0:-2.05,x1:20.36,z0:-23.22,z1:2.1};
-// site context outside the fence that the page drops
-const OFFSITE=/^(Ground|Appold Street|Right-of-way to Appold St|Tree (NW|S|SE|W)|Norfolk pine \(neighbour\))$/;
+// Room centres and sizes from the floor plan (plan x -> three x, plan y -> three z), metres.
+const ROOMS=[
+  {n:'Lounge',    c:[4.32,6.17], w:4.58, d:3.69, size:'4.58 × 3.69 m'},
+  {n:'Dining',    c:[2.05,1.65], w:4.13, d:3.30, size:'4.13 × 3.30 m'},
+  {n:'Kitchen',   c:[5.60,1.80], w:2.40, d:2.60, size:'open plan'},
+  {n:'Entry',     c:[4.15,3.95], w:2.60, d:1.20, size:'open plan'},
+  {n:'Hall',      c:[8.65,3.10], w:3.00, d:1.20, size:'L-shaped'},
+  {n:'Bedroom 1', c:[11.07,6.17], w:3.76, d:3.69, size:'3.76 × 3.69 m'},
+  {n:'Bedroom 2', c:[11.57,1.70], w:2.75, d:3.39, size:'2.75 × 3.39 m'},
+  {n:'Bedroom 3', c:[7.90,6.17], w:2.58, d:3.69, size:'2.58 × 3.69 m'},
+  {n:'Bathroom',  c:[8.68,0.87], w:2.43, d:1.73, size:'2.43 × 1.73 m'},
+];
+const ROOF_NAMES=new Set(['Main roof','Roof (dark low roof, dining)','Soffit','Fascia','Spouting','Ridge cappings','TV aerial'].map(n=>THREE.PropertyBinding.sanitizeNodeName(n)));
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const stage=document.getElementById('stage');
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.AgXToneMapping; renderer.toneMappingExposure=1.15;
+renderer.toneMapping=THREE.AgXToneMapping; renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 stage.appendChild(renderer.domElement);
 const canvas=renderer.domElement;
 const scene=new THREE.Scene();
 const pmrem=new THREE.PMREMGenerator(renderer);
 scene.environment=pmrem.fromScene(new RoomEnvironment(),0.04).texture;
-scene.environmentIntensity=0.55;
-scene.add(new THREE.HemisphereLight(0xeef3ff,0x8a8070,0.9));
-const sunDir=new THREE.Vector3(-0.28,-0.574,0.77).normalize();
-const sun=new THREE.DirectionalLight(0xfff4e6,3.2);
-sun.position.copy(SITE).addScaledVector(sunDir,-45); sun.target.position.copy(SITE);
+scene.environmentIntensity=0.4;
+scene.add(new THREE.HemisphereLight(0xdfe9f5,0x4a5a3a,0.5));
+const sun=new THREE.DirectionalLight(0xfff6ea,3.6);
+const SUN_DIR=new THREE.Vector3(-0.3716,-0.6691,-0.6436).normalize();   // direction light travels
+const LOT_C=new THREE.Vector3(8.5,0,-3.5);
+sun.position.copy(LOT_C).addScaledVector(SUN_DIR,-60); sun.target.position.copy(LOT_C);
 sun.castShadow=true; sun.shadow.mapSize.set(4096,4096); sun.shadow.bias=-0.0004; sun.shadow.normalBias=0.02;
-const sc=sun.shadow.camera; sc.left=-20;sc.right=20;sc.top=20;sc.bottom=-20;sc.near=1;sc.far=100;
+Object.assign(sun.shadow.camera,{left:-26,right:26,top:26,bottom:-26,near:1,far:130});
 scene.add(sun,sun.target);
-// the section itself, cut to the fence lines
-const lawnMat=new THREE.MeshStandardMaterial({roughness:0.95}); lawnMat.color.setRGB(0.12,0.28,0.08);
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(FENCE.x1-FENCE.x0,FENCE.z1-FENCE.z0),lawnMat);
-ground.rotation.x=-Math.PI/2; ground.position.set((FENCE.x0+FENCE.x1)/2,-0.26,(FENCE.z0+FENCE.z1)/2); ground.receiveShadow=true; scene.add(ground);
 
-const camera=new THREE.PerspectiveCamera(40,1,0.05,600);
+const camera=new THREE.PerspectiveCamera(40,1,0.05,400);
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true; controls.dampingFactor=0.08; controls.maxPolarAngle=Math.PI*0.495;
-controls.maxDistance=80;
-controls.target.copy(CENTER);
+controls.maxDistance=140;
 
-// ---- procedural materials rebuilt from the Blender node values (linear colours) ----
-const GLSL_NOISE=`
-float h3(vec3 p){p=fract(p*0.3183099+.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
-float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.0-2.0*f);
- return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),
-            mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z);}
-float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<4;i++){s+=a*vn(p);p*=2.03;a*=.5;}return s;}
-float h2(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-`;
-function patch(mat,kind,u){
-  mat.color.set(0xffffff); mat.map=null;
-  mat.customProgramCacheKey=()=>kind+mat.name;
-  mat.onBeforeCompile=sh=>{
-    for(const k in u) sh.uniforms[k]={value:u[k]};
-    sh.vertexShader='varying vec3 vWP; varying vec3 vWN;\n'+sh.vertexShader.replace('#include <project_vertex>',
-      '#include <project_vertex>\n vWP=(modelMatrix*vec4(transformed,1.0)).xyz; vWN=normalize(mat3(modelMatrix)*objectNormal);');
-    const decl=Object.keys(u).map(k=>`uniform ${typeof u[k]==='number'?'float':'vec3'} ${k};`).join('\n');
-    let body;
-    if(kind==='brick') body=`
-      vec3 b=vec3(vWP.x,-vWP.z,vWP.y); vec3 n=abs(vec3(vWN.x,-vWN.z,vWN.y)); vec2 q;
-      if(n.z>0.7) q=b.xy; else q=vec2(n.x>n.y?b.y:b.x, b.z);
-      float row=floor(q.y/uRH); float off=(mod(row,uFreq)<0.5)?uOff*uBW:0.0;
-      float col=floor((q.x+off)/uBW);
-      vec2 f=vec2(fract((q.x+off)/uBW)*uBW, fract(q.y/uRH)*uRH);
-      float m=uMS; vec2 w=fwidth(q)*1.2+1e-4;
-      float edge=min(min(f.x,uBW-f.x),min(f.y,uRH-f.y));
-      float mort=1.0-smoothstep(m-w.x,m+w.x,edge);
-      vec3 c=mix(uC1,uC2,h2(vec2(col,row)));
-      c*=0.92+0.16*fbm(vec3(q*vec2(uGrain,3.0),col));
-      vec3 outc=mix(c,uM,mort);`;
-    else if(kind==='wood') body=`
-      vec3 b=vec3(vWP.x,-vWP.z,vWP.y);
-      float t=0.5+0.5*sin((b.y+b.z)*55.0+fbm(b*vec3(2.0,18.0,18.0))*6.0);
-      t=mix(t,fbm(b*vec3(1.5,30.0,30.0)),0.5);
-      vec3 outc=mix(uC0,uC1,t);`;
-    else body=`
-      vec3 b=vec3(vWP.x,-vWP.z,vWP.y);
-      float v=0.5+0.5*sin((b.x*0.8+b.y*1.3+b.z*0.6)*uFreqM+fbm(b*2.2)*7.0);
-      float t=clamp(v/uPos,0.0,1.0);
-      vec3 outc=mix(uC0,uC1,t);`;
-    sh.fragmentShader='varying vec3 vWP; varying vec3 vWN;\n'+decl+GLSL_NOISE+sh.fragmentShader.replace('#include <map_fragment>',
-      '#include <map_fragment>\n{'+body+'\n diffuseColor.rgb*=outc;}');
-  };
-  mat.needsUpdate=true;
+/* ---------- helpers ---------- */
+function half(h){
+  const s=(h&0x8000)?-1:1, e=(h>>10)&0x1f, f=h&0x3ff;
+  if(e===0) return s*Math.pow(2,-14)*(f/1024);
+  if(e===31) return f?NaN:s*Infinity;
+  return s*Math.pow(2,e-15)*(1+f/1024);
 }
-const v3=(a)=>new THREE.Vector3(...a);
-const PROC={
- 'Brick veneer':['brick',{uC1:v3([.36,.14,.07]),uC2:v3([.24,.09,.05]),uM:v3([.12,.10,.09]),uBW:.24,uRH:.086,uMS:.008,uOff:.5,uFreq:2,uGrain:6}],
- 'Tile floor grey':['brick',{uC1:v3([.2,.2,.2]),uC2:v3([.16,.16,.16]),uM:v3([.3,.3,.3]),uBW:.6,uRH:.6,uMS:.003,uOff:0,uFreq:2,uGrain:3}],
- 'Tile wall grey':['brick',{uC1:v3([.2,.2,.2]),uC2:v3([.15,.15,.16]),uM:v3([.3,.3,.3]),uBW:.6,uRH:.3,uMS:.003,uOff:.5,uFreq:2,uGrain:3}],
- 'Timber-look floor planks':['brick',{uC1:v3([.52,.43,.33]),uC2:v3([.44,.36,.27]),uM:v3([.3,.25,.2]),uBW:1.2,uRH:.18,uMS:.002,uOff:.5,uFreq:2,uGrain:1.5}],
- 'Dark timber':['wood',{uC0:v3([.08,.06,.05]),uC1:v3([.13,.10,.08])}],
- 'Light oak (bed legs)':['wood',{uC0:v3([.5,.38,.24]),uC1:v3([.6,.48,.32])}],
- 'Oak (coffee table)':['wood',{uC0:v3([.5,.32,.13]),uC1:v3([.62,.42,.18])}],
- 'Pine (bedroom)':['wood',{uC0:v3([.42,.2,.07]),uC1:v3([.55,.28,.1])}],
- 'Snake leaf':['wood',{uC0:v3([.03,.12,.03]),uC1:v3([.12,.3,.08])}],
- 'Marble benchtop':['marble',{uC0:v3([.5,.5,.52]),uC1:v3([.88,.88,.87]),uPos:.06,uFreqM:9}],
- 'Feature wallpaper (dark marble)':['marble',{uC0:v3([.28,.28,.29]),uC1:v3([.08,.08,.085]),uPos:.05,uFreqM:7}],
+const HT=new Float32Array(65536); for(let i=0;i<65536;i++) HT[i]=half(i);
+
+/* ---------- procedural material rebuilds (values copied from the Blender node trees, linear colour) ---------- */
+const GLSL_NOISE = `
+float h31(vec3 p){p=fract(p*0.3183099+0.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float vn(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.0-2.0*f);
+ return mix(mix(mix(h31(i),h31(i+vec3(1,0,0)),f.x),mix(h31(i+vec3(0,1,0)),h31(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h31(i+vec3(0,0,1)),h31(i+vec3(1,0,1)),f.x),mix(h31(i+vec3(0,1,1)),h31(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p,float oct,float r){float a=1.0,s=0.0,n=0.0;
+ for(int k=0;k<9;k++){if(float(k)>oct)break;s+=a*vn(p);n+=a;a*=r;p*=2.03;}
+ return clamp((s/n-0.5)*1.5+0.5,0.0,1.0);}
+float vor(vec3 p){vec3 i=floor(p),f=fract(p);float d=8.0;
+ for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++)for(int z=-1;z<=1;z++){
+  vec3 g=vec3(float(x),float(y),float(z));vec3 o=vec3(h31(i+g),h31(i+g+17.13),h31(i+g+31.71));
+  d=min(d,length(g+o-f));}
+ return d;}
+float vorAA(vec3 p){float fw=length(fwidth(p));return mix(vor(p),0.5,smoothstep(0.25,0.9,fw));}
+`;
+const v3 = c => `vec3(${c.map(x=>x.toFixed(4)).join(',')})`;
+function rampGLSL(stops, t){
+  // Blender linear colour ramp, clamped at the ends
+  let s = `vec3 rc=${v3(stops[0][1])};`;
+  for (let i = 1; i < stops.length; i++){
+    const [p0,c0] = stops[i-1], [p1,c1] = stops[i];
+    s += `rc=mix(rc,${v3(c1)},clamp((${t}-${p0.toFixed(3)})/${Math.max(p1-p0,1e-4).toFixed(3)},0.0,1.0));`;
+  }
+  return s;
+}
+// b = Blender-space world position (x, y, z) with z up
+const PROC = {
+  'Asphalt':      {k:'noise', s:60, d:4, ramp:[[0,[.035,.035,.04]],[.6,[.07,.07,.075]],[1,[.12,.12,.12]]]},
+  'Concrete':     {k:'noise', s:3, d:4, ramp:[[0,[.46,.46,.44]],[.5,[.56,.56,.54]],[1,[.64,.64,.62]]], vor:[60,.85]},
+  'Footpath concrete': {k:'noise', s:2.5, d:4, ramp:[[0,[.5,.49,.46]],[.5,[.62,.61,.58]],[1,[.7,.69,.66]]], vor:[60,.85]},
+  'Garden bed':   {k:'noise', s:6, d:4, ramp:[[0,[.06,.04,.03]],[.6,[.16,.1,.06]],[1,[.25,.17,.1]]], vor:[30,.45]},
+  'Gravel path':  {k:'noise', s:40, d:4, ramp:[[0,[.35,.33,.3]],[.5,[.5,.47,.43]],[1,[.66,.62,.55]]], vor:[45,.35]},
+  'Grass':        {k:'noise', s:.7, d:4, ramp:[[0,[.05,.14,.03]],[.45,[.11,.26,.05]],[.75,[.16,.3,.06]],[1,[.28,.3,.09]]]},
+  'Hedge':        {k:'noise', s:3, d:4, ramp:[[0,[.02,.07,.015]],[.5,[.05,.14,.03]],[1,[.1,.22,.05]]], vor:[14,.35]},
+  'Rhododendron': {k:'noise', s:3, d:4, ramp:[[0,[.03,.09,.02]],[.5,[.08,.2,.04]],[1,[.16,.28,.06]]], vor:[14,.35]},
+  'Tree canopy':  {k:'noise', s:3, d:4, ramp:[[0,[.02,.06,.015]],[.5,[.05,.13,.03]],[1,[.09,.19,.04]]], vor:[14,.35]},
+  'Sand':         {k:'noise', s:20, d:4, ramp:[[0,[.6,.52,.36]],[1,[.78,.7,.52]]]},
+  'Shed roof (rusty iron)': {k:'noise', s:3, d:8, ramp:[[.35,[.45,.45,.45]],[.5,[.42,.2,.08]],[.7,[.25,.1,.05]]]},
+  'Deck timber':  {k:'noise', s:3, d:8, m:[1.5,40,40], ramp:[[.3,[.22,.09,.04]],[.7,[.42,.19,.09]]]},
+  'Tree trunk':   {k:'noise', s:8, d:8, m:[6,6,.8], ramp:[[.3,[.08,.06,.04]],[.7,[.25,.19,.13]]]},
+  'Paling fence': {k:'fence'},
+  'Vinyl plank':  {k:'vinyl'},
+  'Brick':        {k:'brick'},
 };
+function procBody(name, cfg){
+  let g = `vec3 b=vec3(vWP.x,-vWP.z,vWP.y); vec3 col;`;
+  if (cfg.k === 'noise'){
+    const m = cfg.m || [1,1,1];
+    g += `float t=fbm(b*${v3(m)}*${cfg.s.toFixed(3)},${cfg.d.toFixed(1)},0.6);` + rampGLSL(cfg.ramp,'t') + `col=rc;`;
+    if (cfg.vor){ g += `float vv=clamp(vorAA(b*${cfg.vor[0].toFixed(2)}),0.0,1.0); col*=mix(1.0,${cfg.vor[1].toFixed(3)},vv);`; }
+  } else if (cfg.k === 'fence'){
+    g += `float t=fbm(b*vec3(30.0,30.0,1.5)*4.0,6.0,0.6);` + rampGLSL([[.3,[.26,.22,.18]],[.7,[.44,.39,.32]]],'t') +
+         `float f=fract((b.x+b.y)*10.0); float fw=fwidth((b.x+b.y)*10.0); float gap=1.0-0.9*(1.0-smoothstep(0.06-fw,0.06+fw,f));
+          col=rc*gap;`;
+  } else if (cfg.k === 'vinyl'){
+    g += `float n=b.x*3.0*20.0+4.0*(2.0*fbm(b*3.0,3.0,0.5)-1.0); float t=0.5-0.5*cos(n);` +
+         rampGLSL([[0,[.36,.32,.27]],[1,[.5,.45,.39]]],'t') + `col=rc;`;
+  } else if (cfg.k === 'brick'){
+    g += `
+    float bw=0.23, rh=0.086, ms=0.01; vec2 p=vec2(b.x+b.y, b.z);
+    float row=floor(p.y/rh); float off=(mod(row,2.0)<0.5)?bw*0.5:0.0;
+    float bn=floor((p.x+off)/bw); float x=(p.x+off)-bw*bn; float y=p.y-rh*row;
+    float tint=h31(vec3(bn,row,3.7));
+    vec3 bc=mix(vec3(0.60,0.22,0.09),vec3(0.50,0.17,0.07),tint);
+    float md=min(min(x,y),min(bw-x,rh-y)); float fw=fwidth(md)+1e-5;
+    float m=smoothstep(ms-fw,ms+fw,md);
+    vec3 a=mix(vec3(0.78,0.76,0.72),bc,m);
+    float nz=fbm(vec3(p*18.0,b.x*0.0),2.0,0.5);
+    vec3 ov=mix(2.0*a*nz, 1.0-2.0*(1.0-a)*(1.0-nz), step(0.5,a));
+    col=mix(a,ov,0.25);`;
+  }
+  return g;
+}
+function patchProcedural(mat){
+  const cfg = PROC[mat.name]; if (!cfg) return;
+  mat.color.setRGB(1,1,1);
+  mat.onBeforeCompile = sh => {
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
+      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWP=(modelMatrix*vec4(transformed,1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWP;\n' + GLSL_NOISE)
+      .replace('#include <color_fragment>', '#include <color_fragment>\n{' + procBody(mat.name, cfg) + ' diffuseColor.rgb*=col;}');
+  };
+  mat.customProgramCacheKey = () => 'proc:' + mat.name;
+  mat.needsUpdate = true;
+}
 
 // ---- top bar: roof + labels ----
 const loader=document.getElementById('loader');
@@ -300,36 +316,77 @@ function setCovers(on){roofOn=on; roofBtn.setAttribute('aria-pressed',on); cover
 roofBtn.onclick=()=>setCovers(!roofOn);
 lblBtn.onclick=()=>{showLabels=!showLabels; lblBtn.setAttribute('aria-pressed',showLabels); updateLabelVis();};
 
-function onModel(g){
-  model=g.scene; const seen=new Set();
-  for(const o of [...model.children]) if(OFFSITE.test(nm(o))) model.remove(o);
-  model.traverse(o=>{
-    if(!o.isMesh) return;
-    o.castShadow=true; o.receiveShadow=true;
-    const mats=Array.isArray(o.material)?o.material:[o.material];
-    for(const m of mats){
-      if(m.name==='Glass'||m.name==='Spa water'){m.transparent=true;m.opacity=0.2;m.depthWrite=false;m.transmission=0;o.castShadow=false;}
-      if(m.name==='Mirror'){m.metalness=1;m.roughness=0.04;}
-      if(m.name==='Chrome'||m.name==='Stainless steel'){m.metalness=1;m.roughness=0.18;}
-      if(seen.has(m)) continue; seen.add(m);
-      if(PROC[m.name]) patch(m,...PROC[m.name]);
+// ---- grass, hedge and tree leaves: instanced, transforms stored as half floats ----
+const SCATTER={"grass_blade":{"n":54353,"off":0,"verts":[[-0.005,0,0],[0.005,0,0],[0.003,0.045,-0.004],[-0.001,0.085,-0.008]],"tris":[0,1,2,0,2,3]},"leaf_hedge":{"n":46165,"off":1304472,"verts":[[0,0,0],[0.0175,0.004,-0.009],[0.035,0,0],[0.0175,0.004,0.009],[0.0175,0.008,0]],"tris":[0,1,4,1,2,4,2,3,4,3,0,4]},"leaf_rhodo":{"n":31986,"off":2412432,"verts":[[0,0,0],[0.0375,0.004,-0.013],[0.075,0,0],[0.0375,0.004,0.013],[0.0375,0.008,0]],"tris":[0,1,4,1,2,4,2,3,4,3,0,4]},"leaf_tree":{"n":33636,"off":3180096,"verts":[[0,0,0],[0.025,0.004,-0.015],[0.05,0,0],[0.025,0.004,0.015],[0.025,0.008,0]],"tris":[0,1,4,1,2,4,2,3,4,3,0,4]},"flower":{"n":529,"off":3987360,"verts":[[0,0.018,0],[0.018,0,0],[0,0,-0.018],[-0.018,0,0],[0,0,0.018]],"tris":[0,1,2,0,2,3,0,3,4,0,4,1]}};
+const LEAF={
+  grass_blade:{c0:[.06,.16,.03],c1:[.2,.33,.07],r:.6,shadow:false},
+  leaf_hedge:{c0:[.02,.08,.015],c1:[.09,.2,.04],r:.6,shadow:true},
+  leaf_rhodo:{c0:[.04,.12,.02],c1:[.16,.3,.06],r:.6,shadow:true},
+  leaf_tree:{c0:[.02,.07,.015],c1:[.1,.2,.04],r:.6,shadow:true},
+  flower:{c0:[.85,.45,.6],c1:[.95,.8,.85],r:.6,shadow:false},
+};
+function buildScatter(buf){
+  const u16=new Uint16Array(buf);
+  const m=new THREE.Matrix4(), col=new THREE.Color();
+  let rnd=12345; const rand=()=>(rnd=(rnd*16807)%2147483647)/2147483647;
+  for(const [k,info] of Object.entries(SCATTER)){
+    const g=new THREE.BufferGeometry();
+    g.setAttribute('position',new THREE.Float32BufferAttribute(info.verts.flat(),3));
+    g.setIndex(info.tris); g.computeVertexNormals();
+    const L=LEAF[k];
+    const mat=new THREE.MeshStandardMaterial({color:0xffffff,roughness:L.r,side:THREE.DoubleSide});
+    const mesh=new THREE.InstancedMesh(g,mat,info.n);
+    const base=info.off/2;
+    const c0=new THREE.Color().setRGB(...L.c0), c1=new THREE.Color().setRGB(...L.c1);
+    for(let i=0;i<info.n;i++){
+      const o=base+i*12, e=(j)=>HT[u16[o+j]];
+      m.set(e(0),e(1),e(2),e(3), e(4),e(5),e(6),e(7), e(8),e(9),e(10),e(11), 0,0,0,1);
+      mesh.setMatrixAt(i,m);
+      mesh.setColorAt(i,col.copy(c0).lerp(c1,rand()));
     }
+    mesh.castShadow=L.shadow; mesh.receiveShadow=true;
+    mesh.frustumCulled=false;
+    scene.add(mesh);
+  }
+}
+const scatterReq=fetch('/443taieri/scatter.bin').then(r=>{if(!r.ok) throw new Error(r.status); return r.arrayBuffer();});
+
+function onModel(g){
+  model=g.scene;
+  model.traverse(o=>{
+    if(ROOF_NAMES.has(o.name)) covers.push(o);
+    if(!o.isMesh) return;
+    const mats=Array.isArray(o.material)?o.material:[o.material];
+    let transparent=false;
+    mats.forEach(mt=>{
+      patchProcedural(mt);
+      if(mt.transparent||mt.opacity<1){transparent=true; mt.depthWrite=false;}
+      if(mt.name==='Lamp') mt.emissiveIntensity=Math.min(mt.emissiveIntensity,1.5);
+    });
+    o.castShadow=!transparent; o.receiveShadow=true;
   });
-  model.traverse(o=>{if(/^(Roof|Ridge[ _]cap|Fascia|Spouting|Soffit[ _]light|Ceiling|Downlight|Oyster[ _]light|Garage[ _]batten|Spa[ _]room[ _]ceiling|Spa[ _]room[ _]flat[ _]roof|Spa[ _]roof[ _]fascia|Spa[ _]room[ _]downlight)/.test(o.name)) covers.push(o);});
   scene.add(model);
   initFurniture(model);
+  scatterReq.then(buildScatter).catch(e=>console.error('Grass and leaves could not be loaded',e));
   loader.hidden=true; buildLabels(); go(VIEWS[0],true);
   renderer.setAnimationLoop(animate);
 }
 function fail(e){loader.hidden=false;loader.textContent='The model could not be loaded. Reload the page to try again.';console.error(e);}
-new GLTFLoader().load('/18aappold/model.glb',onModel,
+new GLTFLoader().load('/443taieri/model.glb',onModel,
   (e)=>{if(e.total) loader.textContent=`Loading the model… ${Math.round(e.loaded/e.total*100)}%`;},fail);
 
-// ---- views ----
+// ---- views (Blender cameras converted to three.js axes; hfov from lens + 36 mm sensor) ----
 const VIEWS=[
- {n:'Overview',pos:[34,24,12],tgt:[8,0,-10.5],fov:38,interior:false},
- {n:'Plan',pos:[9.15,48,-10.59],tgt:[9.15,0,-10.6],fov:38,interior:false,open:true},
- ...CAMS.map(([n,p,t,h])=>({n,pos:p,tgt:t,hfov:h,interior:true}))];
+  {n:'Overview',pos:[-16,24,34],tgt:[8,0,-3],hfov:55},
+  {n:'Plan',pos:[6.5,30,4.12],tgt:[6.5,0,4.1],hfov:50,open:true},
+  {n:'Front from street',pos:[-8,5,24],tgt:[-6.2822,4.4847,21.5951],hfov:61.93},
+  {n:'Street facade',pos:[7.4,0.95,16.9],tgt:[7.4,1.0513,13.9017],hfov:73.74},
+  {n:'Street corner',pos:[-0.9,0.95,14.5],tgt:[-0.0423,1.2518,11.6411],hfov:83.97},
+  {n:'Back yard',pos:[24,16,-30],tgt:[22.5712,14.6552,-27.7307],hfov:61.93},
+  {n:'From the gate',pos:[-1,1.5,-1.2],tgt:[1.3146,1.0371,-3.0516],hfov:90},
+  {n:'Cutaway',pos:[17,12,-9],tgt:[15.4254,10.2823,-7.1105],hfov:69.39,open:true},
+  {n:'Lounge',pos:[5.9,1.55,7.55],tgt:[3.2775,1.0893,6.1679],hfov:90,interior:true},
+];
 const vbox=document.getElementById('views');
 VIEWS.forEach((v,i)=>{const b=document.createElement('button');b.className='chip';b.textContent=v.n;b.setAttribute('aria-pressed',i===0);
   b.onclick=()=>go(v);v.btn=b;vbox.appendChild(b);});
@@ -341,34 +398,31 @@ function fovFor(v){
 function go(v,instant){
   curView=v; VIEWS.forEach(x=>x.btn&&x.btn.setAttribute('aria-pressed',x===v));
   interior=!!v.interior; updateLabelVis();
-  if(v.open||editMode) setCovers(false); else if(interior) setCovers(true);
+  setCovers(!(v.open||editMode));
   const to={p:new THREE.Vector3(...v.pos),t:new THREE.Vector3(...v.tgt),f:fovFor(v)};
-  controls.minDistance=interior?0.2:2;
+  controls.minDistance=interior?0.2:1;
   if(instant||reduce){camera.position.copy(to.p);controls.target.copy(to.t);camera.fov=to.f;camera.updateProjectionMatrix();fly=null;return;}
   fly={t0:performance.now(),p0:camera.position.clone(),t0v:controls.target.clone(),f0:camera.fov,to};
 }
 controls.addEventListener('start',()=>{fly=null;});
 function flyRoom(r){
-  const cx=(r.x0+r.x1)/2, cy=(r.y0+r.y1)/2, span=Math.max(r.x1-r.x0,r.y1-r.y0);
-  const d=Math.max(5,span*1.5);
-  go({n:r.n,pos:[cx+d*0.45,d*0.95,-cy+d*0.65],tgt:[cx,0.4,-cy],fov:45,interior:false,open:true});
+  const span=Math.max(r.w,r.d), d=span*1.25+2.2, t=[r.c[0],0.6,r.c[1]];
+  go({n:r.n,pos:[t[0]+d*0.55,d*1.05,t[2]+d*0.75],tgt:t,fov:45,open:true});
 }
 
 // ---- rooms list + labels ----
 const ul=document.getElementById('rooms'), lblLayer=document.getElementById('labels');
-const fmt=n=>n.toFixed(1);
 ROOMS.forEach(r=>{
-  const w=r.x1-r.x0, d=r.y1-r.y0, dims=r.L?'L-shaped':`${fmt(w)} × ${fmt(d)} m`;
-  const li=document.createElement('li'); li.innerHTML=`<button><span>${r.n}</span><span class="d">${dims}</span><span class="a">${r.a.toFixed(1)} m²</span></button>`;
+  const li=document.createElement('li'); li.innerHTML=`<button><span>${r.n}</span><span class="d"></span><span class="a">${r.size}</span></button>`;
   li.firstChild.onclick=()=>flyRoom(r); ul.appendChild(li);
 });
 const labels=[];
 function buildLabels(){
   ROOMS.forEach(r=>{
     const el=document.createElement('button'); el.className='lbl';
-    el.innerHTML=`${r.n}<small>${r.a.toFixed(1)} m²</small>`; el.onclick=()=>flyRoom(r);
+    el.innerHTML=`${r.n}<small>${r.size}</small>`; el.onclick=()=>flyRoom(r);
     lblLayer.appendChild(el);
-    labels.push({el,p:new THREE.Vector3(r.lx??(r.x0+r.x1)/2,0.15,-(r.ly??(r.y0+r.y1)/2))});
+    labels.push({el,p:new THREE.Vector3(r.c[0],0.15,r.c[1])});
   });
   updateLabelVis();
 }
@@ -390,58 +444,52 @@ addEventListener('resize',resize); resize();
 // ---------- furniture editing (same behaviour as ayanna.weihong.dev) ----------
 const GRID=0.25;    // snap step, metres
 const LIFT=0.1;     // how far a piece floats while held
-const TOL=0.05;     // overlap allowed (pieces in the model sit a few cm into skirting and walls)
+const TOL=0.08;     // overlap allowed (pieces in the model sit a few cm into skirting and walls)
 const MAGNET=0.12;  // pull flush to a wall or fixture within this distance
 const LEVEL=0.1;    // a piece only goes on floors within this height of where it started
 const TONE={idle:0x2c5d87,ok:0x4fbf5a,bad:0xe25b4c};
 // Movable pieces: the model node, its menu label, extra nodes that make up the body,
 // and things sitting on it that travel with it.
 const MOVE={
-  'Recliner sofa 3-seat':{label:'Recliner · 3-seat',ride:['Throw on sofa arm']},
-  'Recliner sofa 2-seat':{label:'Recliner · 2-seat'},
-  'Coffee table (oak)':{label:'Coffee table',ride:['Books (coffee table shelf)','Books (coffee table top)','Coffee table plant','Tray + candles','TV remote']},
-  'TV unit':{label:'TV unit',ride:['Books (TV unit shelf)','Photo frame 0','Photo frame 1','Photo frame 2','Vase (TV unit)']},
-  'Rug (living)':{label:'Rug · living'},
-  'Speaker tower 0':{label:'Speaker'}, 'Speaker tower 1':{label:'Speaker'},
-  'Plant shelf':{label:'Plant shelf',ride:['Plant (shelf top)','Plant (shelf top 2)']},
-  'Plant stand (by TV)':{label:'Plant · small'},
-  'Snake plant':{label:'Snake plant'}, 'Snake plant (corner)':{label:'Snake plant · tall'},
-  'Dining table (black glass)':{label:'Dining table',ride:['Table centrepiece','Table runner','Vase (dining)']},
-  'Dining plant (corner)':{label:'Plant · corner'},
-  'Bed 1 (queen)':{label:'Queen bed · four-poster'},
-  'Bedside 1L':{label:'Bedside table',ride:['Books (bedside 1L)']},
-  'Bedside 1R':{label:'Bedside table',ride:['Alarm clock']},
-  'Ottoman (end of bed)':{label:'Ottoman'},
-  'Armchair (cane) seat':{label:'Cane armchair',parts:['Armchair (cane) back']},
-  'Chest of drawers (pine)':{label:'Chest of drawers'},
-  'Laundry basket (wicker)':{label:'Laundry basket'},
-  'Bed 2 (double)':{label:'Double bed'},
-  'Desk (bed 2)':{label:'Desk'},
-  'Office chair':{label:'Office chair'},
-  'Hide rug (bed 2)':{label:'Rug · hide'},
-  'Bed 3 (queen)':{label:'Queen bed'},
-  'Bedside 3L':{label:'Bedside table · small'},
-  'Bedside 3R':{label:'Bedside table · small',ride:['Books (bedside 3R)']},
-  'Bathroom plant':{label:'Plant · bathroom'},
-  'BBQ (hooded)':{label:'BBQ'},
-  'Outdoor lounge (along bedroom)':{label:'Outdoor lounge',ride:['Outdoor accent cushion']},
-  'Outdoor lounge (facing north)':{label:'Outdoor lounge'},
-  'Outdoor table (glass top)':{label:'Outdoor table'},
-  'Bistro table':{label:'Bistro table'},
-  'Bistro chair A':{label:'Bistro chair'}, 'Bistro chair B':{label:'Bistro chair'},
-  'Bird bath':{label:'Bird bath'},
+  'Sofa':{label:'Sofa',parts:['Sofa cushions']},
+  'Recliners':{label:'Recliners · pair'},
+  'Armchair':{label:'Armchair',maxZ:5.7},   // angled at the fire: its box would clip the hearth
+  'Wicker chest':{label:'Wicker chest'},
+  'Blanket chest':{label:'Blanket chest'},
+  'Bookcase':{label:'Bookcase'},
+  "Child's chair":{label:"Child's chair"},
+  'Plant pot':{label:'Monstera',ride:['Monstera']},
+  'Toy kitchen':{label:'Toy kitchen'},
+  'Kitchen bin':{label:'Kitchen bin'},
+  'Queen bed base':{label:'Queen bed',parts:['Queen bed','Bookcase headboard']},
+  'Dresser':{label:'Dresser',parts:['Dresser mirror','Dresser mirror glass']},
+  'Tall drawers':{label:'Tall drawers'},
+  'TV table':{label:'TV table',ride:['TV (bedroom)']},
+  'Double bed base':{label:'Double bed',parts:['Double bed']},
+  'Desk':{label:'Desk',ride:['Monitor','Desk lamp']},
+  'Stool':{label:'Stool'},
+  'Keyboard stand':{label:'Keyboard',parts:['Keyboard']},
+  'Bookshelf (metal)':{label:'Bookshelf · metal'},
+  'Cube drawers':{label:'Cube drawers',parts:['Cube drawers (magenta)']},
+  'Plastic drawers':{label:'Plastic drawers'},
+  'Bunk bed':{label:'Bunk bed',parts:['Bunk bed mattress','Bunk bed rail','Ladder']},
+  'Bunk shelf tower':{label:'Shelf tower'},
+  'Timber drawers':{label:'Timber drawers'},
+  'Toy boxes':{label:'Toy boxes'},
+  'Tall white cabinet':{label:'Tall white cabinet'},
 };
-for(let i=0;i<8;i++) MOVE[`Dining chair ${i}`]={label:'Dining chair'};
-for(let i=0;i<3;i++) MOVE[`Bar stool ${i}`]={label:'Bar stool'};
-const FLOORS=/^(Floor - |Courtyard patio$|Entry path$|Front walkway$|Driveway \(asphalt\)$|Gravel garden|Lower path)/;
-const WALLS=/^(Interior|Exterior) walls$/;
-// never blocks: finishes on walls/ceilings, lights, roof, paving, labels
-const SKIP=/^(Floor - |Ceiling|Cornice|Skirting|Architrave|Downlight|Oyster|Soffit|Roof$|Ridge|Fascia|Spouting|Label |Curtains|Roman blind|LED strip|Courtyard patio|Entry path|Front walkway|Driveway \(|Gravel|Lower path|Slab|Spa room (floor mat|slab|ceiling|flat roof|downlight)|Spa roof|Garage mat|Garage batten|Heat pump|Projector|Attic|Feature wall|Bath tiles|Ensuite tiles|Splashback|Rain shower|Ensuite rain|Shower arm)/;
+// The floor is one L-shaped mesh, so its outline is given as rectangles (x0, z0, x1, z1)
+const FLOOR_RECTS=[[0,0,4.83,3.3],[4.83,0.94,6.61,3.3],[2.73,1.62,12.95,8.02],[7.77,0.94,12.95,1.62],[2.03,4.33,2.73,8.02]];
+const WALLS=/^Interior walls$/;
+// the floor outline is the limit at the outside walls (pieces are modelled a few cm into the lining)
+const OUTER=/^(Exterior wall lining|Exterior brick)$/;
+const HOUSE=new THREE.Box3(new THREE.Vector3(-0.2,-1,-0.2),new THREE.Vector3(13.2,3,8.3));
+// never blocks: finishes, lights, glass, and anything hung above head height
+const SKIP=/^(Floor|Carpet|Skirting|Architraves|Cornice|Curtain|Roller blinds|Window|Pendant|Cage shade|Porch light|Door frames|Interior doors|Downpipes|Chimney|Heat pump|Meter box|Pipe cover|Front landing|Front steps|Plinth|Frieze band)/;
 const NOPICK=/glass/i;
 // GLTFLoader turns spaces into underscores and strips . / : from node names
 const nm=o=>o.name.replace(/_/g,' ');
 const byName=(root,n)=>root.getObjectByName(THREE.PropertyBinding.sanitizeNodeName(n));
-const FOLIAGE=/foliage$/;   // leaves may overhang, so they don't count as footprint
 
 const items=[], solids=[], floors=[], pickables=[];
 let editMode=false, selected=null, hovered=null, drag=null, tap=null, hoverQueued=false;
@@ -613,12 +661,8 @@ function makeTemplate(root,name,spec){
   const body=[name,...(spec.parts||[])].map(n=>byName(root,n)).filter(Boolean);
   const riders=(spec.ride||[]).map(n=>byName(root,n)).filter(Boolean);
   const fp=new THREE.Box3();
-  for(const b of body) b.traverse(o=>{if(o.isMesh&&!FOLIAGE.test(nm(o))) fp.expandByObject(o);});
-  if(fp.isEmpty()) body.forEach(b=>fp.expandByObject(b));
-  // a few pieces are modelled pushed into a wall (bed 3's headboard by 8 cm): trim to the floor they stand on
-  const mid=fp.getCenter(new THREE.Vector3());
-  const on=floors.find(f=>Math.abs(f.max.y-fp.min.y)<LEVEL&&mid.x>=f.min.x&&mid.x<=f.max.x&&mid.z>=f.min.z&&mid.z<=f.max.z);
-  if(on){ fp.min.x=Math.max(fp.min.x,on.min.x); fp.max.x=Math.min(fp.max.x,on.max.x); fp.min.z=Math.max(fp.min.z,on.min.z); fp.max.z=Math.min(fp.max.z,on.max.z); }
+  body.forEach(b=>fp.expandByObject(b));
+  if(spec.maxZ) fp.max.z=Math.min(fp.max.z,spec.maxZ);
   const cx=(fp.min.x+fp.max.x)/2, cz=(fp.min.z+fp.max.z)/2;
   const node=new THREE.Group(); node.name=name;
   for(const o of [...body,...riders]){ root.remove(o); o.position.x-=cx; o.position.z-=cz; node.add(o); }   // local to a pivot at the footprint centre
@@ -629,7 +673,7 @@ function makeTemplate(root,name,spec){
     node,name,cx,cz,flat,level,floorY:fl.length?Math.max(...fl):level,label:spec.label,
     hx:(fp.max.x-fp.min.x)/2, hz:(fp.max.z-fp.min.z)/2,
     yLo:flat?level:fp.min.y+0.02, yHi:flat?level+0.01:fp.max.y,
-    chair:/^(Dining chair|Bar stool|Office chair|Bistro chair)/.test(name), table:/^(Dining table|Desk|Bistro table|Outdoor table)/.test(name),
+    chair:/^(Stool|Child's chair|Blanket chest)$/.test(name), table:/^(Desk|Recliners)$/.test(name),
   };
 }
 function spawn(tpl,cx,cz,rot,label,home){
@@ -653,13 +697,11 @@ function removeItem(it){
 
 // What the "Add furniture" menu offers: [model node, button label]
 const CATALOG=[
-  ['Living',[['Recliner sofa 3-seat','Recliner · 3-seat'],['Recliner sofa 2-seat','Recliner · 2-seat'],['Coffee table (oak)','Coffee table'],['TV unit','TV unit'],['Speaker tower 0','Speaker'],['Plant shelf','Plant shelf']]],
-  ['Dining',[['Dining table (black glass)','Dining table'],['Dining chair 0','Dining chair'],['Bar stool 0','Bar stool']]],
-  ['Bedroom',[['Bed 1 (queen)','Queen bed · four-poster'],['Bed 3 (queen)','Queen bed'],['Bed 2 (double)','Double bed'],['Bedside 1L','Bedside table'],['Bedside 3L','Bedside table · small'],
-    ['Chest of drawers (pine)','Chest of drawers'],['Ottoman (end of bed)','Ottoman'],['Armchair (cane) seat','Cane armchair'],['Desk (bed 2)','Desk'],['Office chair','Office chair'],['Laundry basket (wicker)','Laundry basket']]],
-  ['Outdoor',[['Outdoor lounge (facing north)','Outdoor lounge'],['Outdoor table (glass top)','Outdoor table'],['Bistro table','Bistro table'],['Bistro chair A','Bistro chair'],['BBQ (hooded)','BBQ'],['Bird bath','Bird bath']]],
-  ['Plants',[['Snake plant (corner)','Snake plant · tall'],['Snake plant','Snake plant'],['Dining plant (corner)','Plant · corner'],['Plant stand (by TV)','Plant · small'],['Bathroom plant','Plant · bathroom']]],
-  ['Rugs',[['Rug (living)','Rug · living'],['Hide rug (bed 2)','Rug · hide']]],
+  ['Living',[['Sofa','Sofa'],['Recliners','Recliners · pair'],['Armchair','Armchair'],['Bookcase','Bookcase'],['Wicker chest','Wicker chest'],['Blanket chest','Blanket chest'],['Plant pot','Monstera']]],
+  ['Bedroom',[['Queen bed base','Queen bed'],['Double bed base','Double bed'],['Bunk bed','Bunk bed'],['Dresser','Dresser'],['Tall drawers','Tall drawers'],['Timber drawers','Timber drawers'],
+    ['Plastic drawers','Plastic drawers'],['Cube drawers','Cube drawers'],['Tall white cabinet','Tall white cabinet'],['Bookshelf (metal)','Bookshelf · metal'],['Bunk shelf tower','Shelf tower'],['TV table','TV table']]],
+  ['Study & play',[['Desk','Desk'],['Stool','Stool'],['Keyboard stand','Keyboard'],["Child's chair","Child's chair"],['Toy kitchen','Toy kitchen'],['Toy boxes','Toy boxes']]],
+  ['Kitchen',[['Kitchen bin','Kitchen bin']]],
 ];
 function buildCatalog(){
   const list=document.getElementById('catalogList');
@@ -691,8 +733,7 @@ function addFromCatalog(src,name){
 function initFurniture(root){
   furnRoot=root;
   root.updateMatrixWorld(true);
-  const nodes=[...root.children];
-  for(const n of nodes) if(FLOORS.test(nm(n))) floors.push(new THREE.Box3().setFromObject(n));
+    for(const [x0,z0,x1,z1] of FLOOR_RECTS) floors.push(new THREE.Box3(new THREE.Vector3(x0,-0.05,z0),new THREE.Vector3(x1,0,z1)));
   for(const name in MOVE){
     if(!byName(root,name)) continue;
     const tpl=makeTemplate(root,name,MOVE[name]);
@@ -700,7 +741,13 @@ function initFurniture(root){
   }
   for(const node of [...root.children]){
     if(WALLS.test(nm(node))){ node.traverse(o=>{if(o.isMesh){wallBoxes(o); pickables.push(o);}}); continue; }
-    if(!SKIP.test(nm(node))) addSolid(node);   // fence, kitchen, bathroom fittings, wardrobes, car, garden
+    if(OUTER.test(nm(node))){ node.traverse(o=>{if(o.isMesh) pickables.push(o);}); continue; }
+    if(SKIP.test(nm(node))) continue;
+    // fixtures inside the house; merged finishes (curtains, frames) span the whole house, so leave those out
+    const b=new THREE.Box3().setFromObject(node);
+    if(b.isEmpty()||!HOUSE.containsBox(b)||b.max.y<0.03||b.min.y>1.8) continue;
+    if(b.max.x-b.min.x>3.2||b.max.z-b.min.z>3.2) continue;
+    addSolid(node);   // kitchen, laundry, bathroom fittings, fireplace, built-ins
   }
   spawnInitial();
   const levels={};
