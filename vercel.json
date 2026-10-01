@@ -19,6 +19,11 @@
       "src": "/",
       "has": [{ "type": "host", "value": "52francis.weihong.dev" }],
       "dest": "/52francis/index.html"
+    },
+    {
+      "src": "/",
+      "has": [{ "type": "host", "value": "18aappold.weihong.dev" }],
+      "dest": "/18aappold/index.html"
     }
   ]
 }
