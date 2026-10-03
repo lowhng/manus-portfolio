@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wei Hong Lo — Come over</title>
+    <meta
+      name="description"
+      content="A visit to my Dunedin apartment: consulting case studies, side projects, and research in mixed reality UX."
+    />
+    <link rel="canonical" href="https://demo.weihong.dev/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://demo.weihong.dev/" />
+    <meta property="og:title" content="Wei Hong Lo — Come over" />
+    <meta
+      property="og:description"
+      content="A visit to my Dunedin apartment: consulting, projects, and research — shown as a walk through the rooms."
+    />
+    <meta property="og:image" content="https://demo.weihong.dev/demo/og.svg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Wei Hong Lo — Come over" />
+    <meta
+      name="twitter:description"
+      content="A visit to my Dunedin apartment: consulting, projects, and research."
+    />
+    <meta name="twitter:image" content="https://demo.weihong.dev/demo/og.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      #root:empty {
+        min-height: 100vh;
+        background: #e6e9eb
+          url("/demo/floorplan-poster.svg") center / min(90vw, 900px) no-repeat;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/demo/main.tsx"></script>
+  </body>
+</html>

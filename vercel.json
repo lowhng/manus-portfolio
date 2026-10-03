@@ -29,6 +29,16 @@
       "src": "/",
       "has": [{ "type": "host", "value": "443taieri.weihong.dev" }],
       "dest": "/443taieri/index.html"
+    },
+    {
+      "src": "/",
+      "has": [{ "type": "host", "value": "demo.weihong.dev" }],
+      "dest": "/demo/index.html"
+    },
+    {
+      "src": "/services/?$",
+      "has": [{ "type": "host", "value": "demo.weihong.dev" }],
+      "dest": "/demo/index.html"
     }
   ]
 }

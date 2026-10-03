@@ -1,0 +1,430 @@
+:root {
+  --bg: #e6e9eb;
+  --bg-soft: #f5f3ee;
+  --panel: #fbfaf7;
+  --ink: #1f2326;
+  --muted: #646b70;
+  --line: #d6d9d8;
+  --accent: #b4532a;
+  --accent-soft: #e8c4b0;
+  --wall: #f7f5f0;
+  --hall: #e5e0d6;
+  --room: #d8d2c6;
+  --shadow: 0 8px 28px rgba(31, 35, 38, 0.08);
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --space: clamp(1rem, 2vw, 1.5rem);
+  --max: 72rem;
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #f0ebe3 0%, transparent 55%),
+    radial-gradient(900px 500px at 10% 20%, #e8eef1 0%, transparent 50%),
+    var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: #8f3f1f;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.demo-shell {
+  min-height: 100vh;
+}
+
+.scene-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.scene-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.scene-stage canvas.is-ready {
+  opacity: 1;
+}
+
+.scene-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8vh 6vw;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.scene-poster.is-hidden {
+  opacity: 0;
+}
+
+.content-rail {
+  position: relative;
+  z-index: 1;
+  margin-top: -100vh;
+  pointer-events: none;
+}
+
+/* First section sits over the sticky scene so intro text is readable on open */
+.content-rail .room-section:first-child {
+  padding-top: clamp(5rem, 12vh, 7rem);
+}
+
+.content-rail .room-section:first-child .room-card {
+  background: color-mix(in srgb, var(--panel) 96%, transparent);
+}
+
+.content-rail > * {
+  pointer-events: auto;
+}
+
+.room-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  padding-bottom: clamp(2rem, 6vh, 4rem);
+}
+
+.room-card {
+  width: min(100%, 28rem);
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.35rem 1.5rem 1.5rem;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.room-card.wide {
+  width: min(100%, 40rem);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.room-card h2 {
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.6rem;
+  line-height: 1.2;
+}
+
+.room-card p {
+  margin: 0;
+  color: var(--ink);
+}
+
+.room-card .lede {
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+
+.stack {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+
+.item {
+  border-top: 1px solid var(--line);
+  padding-top: 0.85rem;
+}
+
+.item h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.item p,
+.item li {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.plan-nav {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 5;
+  width: min(220px, calc(100vw - 2rem));
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+.plan-nav h2 {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.plan-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.plan-svg button,
+.plan-hotspot {
+  cursor: pointer;
+}
+
+.plan-hotspot {
+  fill: transparent;
+  stroke: transparent;
+}
+
+.plan-hotspot:hover,
+.plan-hotspot:focus-visible {
+  fill: color-mix(in srgb, var(--accent) 18%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.plan-hotspot.is-active {
+  fill: color-mix(in srgb, var(--accent) 28%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  pointer-events: none;
+}
+
+.topbar a,
+.topbar span {
+  pointer-events: auto;
+}
+
+.brand {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  backdrop-filter: blur(8px);
+}
+
+.top-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  backdrop-filter: blur(8px);
+}
+
+.top-link:hover {
+  color: var(--ink);
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.services-page {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 5rem 1.25rem 4rem;
+}
+
+.services-page h1 {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  margin: 0 0 0.5rem;
+}
+
+.services-page .sub {
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+.service-block {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.25rem 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.service-block.unavailable {
+  opacity: 0.72;
+}
+
+.service-block h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  padding: 0.65rem 0;
+  font-size: 0.95rem;
+}
+
+.price-row:first-of-type {
+  margin-top: 0.85rem;
+}
+
+.price {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0.35rem 0 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lede {
+  font-size: 1.15rem;
+}
+
+.fallback-page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 5rem 1.25rem 3rem;
+}
+
+.fallback-page .plan-inline {
+  margin: 1.5rem 0 2rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+@media (max-width: 767px) {
+  .scene-stage {
+    display: none;
+  }
+
+  .content-rail {
+    margin-top: 0;
+  }
+
+  .room-section {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+
+  .room-card {
+    width: 100%;
+    box-shadow: none;
+  }
+
+  .plan-nav {
+    position: sticky;
+    top: 0.75rem;
+    right: auto;
+    bottom: auto;
+    width: calc(100% - 2.5rem);
+    margin: 0.75rem 1.25rem 0;
+  }
+}
