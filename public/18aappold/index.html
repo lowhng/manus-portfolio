@@ -39,6 +39,8 @@ body{margin:0;background:linear-gradient(180deg,var(--sky-top),var(--sky-bot));c
   background:var(--sheet);border:1px solid var(--rule);border-radius:6px;box-shadow:0 6px 24px #0002}
 .tb{padding:14px 16px 12px;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:1fr auto;align-items:start;gap:4px 10px}
 .tb > div{display:grid;gap:4px}
+.tb .tbtns{display:flex;gap:6px}
+#menuBtn{display:none}
 .eyebrow{font:500 11px var(--f-data);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 h1{font:600 30px/1 var(--f-display);letter-spacing:.01em;margin:0;text-wrap:balance}
 .sum{margin:0;padding:12px 16px 0;color:var(--muted);line-height:1.45;font-size:13px}
@@ -92,6 +94,11 @@ kbd{font:500 10px/1 var(--f-data);margin-left:6px;padding:2px 4px;border-radius:
   #pickName{flex-basis:100%;text-align:center}
   kbd{display:none}
   #hint{display:none}
+  /* phones: the menu can fold down to just its title bar */
+  #menuBtn{display:inline-block}
+  #panel.collapsed > :not(.tb){display:none}
+  #panel.collapsed .tb{border-bottom:0}
+  #panel.collapsed #infoBtn{display:none}
 }
 @media (prefers-reduced-motion:reduce){#toast{transition:none}}
 </style>
@@ -114,7 +121,10 @@ kbd{font:500 10px/1 var(--f-data);margin-left:6px;padding:2px 4px;border-radius:
       <div class="eyebrow">Floor plan model · Dunedin</div>
       <h1>18A Appold Street</h1>
     </div>
-    <button class="chip" id="infoBtn" aria-expanded="false" aria-controls="info">Room info</button>
+    <div class="tbtns">
+      <button class="chip" id="infoBtn" aria-expanded="false" aria-controls="info">Room info</button>
+      <button class="chip" id="menuBtn" aria-expanded="true" aria-controls="panel">Hide menu</button>
+    </div>
   </div>
   <div id="info" hidden>
     <p class="sum">Three-bedroom single-level home with a double garage, courtyard and spa room, inside its fenced section.</p>
@@ -373,6 +383,10 @@ function buildLabels(){
   updateLabelVis();
 }
 function updateLabelVis(){lblLayer.hidden=!showLabels||interior;}
+
+// ---- phones: hide the whole menu ----
+const panel=document.getElementById('panel'), menuBtn=document.getElementById('menuBtn');
+menuBtn.onclick=()=>{const c=panel.classList.toggle('collapsed'); menuBtn.textContent=c?'Show menu':'Hide menu'; menuBtn.setAttribute('aria-expanded',!c);};
 
 // ---- room info: collapsed by default ----
 const info=document.getElementById('info'), infoBtn=document.getElementById('infoBtn');
