@@ -39,6 +39,16 @@
       "src": "/services/?$",
       "has": [{ "type": "host", "value": "demo.weihong.dev" }],
       "dest": "/demo/index.html"
+    },
+    {
+      "src": "/",
+      "has": [{ "type": "host", "value": "demo2.weihong.dev" }],
+      "dest": "/demo2/index.html"
+    },
+    {
+      "src": "/services/?$",
+      "has": [{ "type": "host", "value": "demo2.weihong.dev" }],
+      "dest": "/demo2/index.html"
     }
   ]
 }

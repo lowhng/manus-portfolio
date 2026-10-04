@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Ayanna Type E2 floor plan</title>
+  <desc id="desc">A softly rendered three-bedroom furnished apartment floor plan.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#242920" flood-opacity=".13"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="700" fill="#e8e6df"/>
+  <g transform="translate(325 56) scale(48)" filter="url(#shadow)">
+    <rect width="11.5" height="11.43" rx=".1" fill="#f8f6f0" stroke="#7c8578" stroke-width=".1"/>
+    <g fill="#dad8ce" stroke="#92998f" stroke-width=".055">
+      <rect x="1.92" width="1.37" height="2.74"/>
+      <rect x="0" y="2.74" width="3.29" height="5.1"/>
+      <rect x="1.65" y="7.06" width="1.64" height="2.74" fill="#cdd6d2"/>
+      <rect x="6.99" y="5.83" width="3.01" height="3.97"/>
+      <rect x="8.51" y="2.17" width="2.99" height="3.66"/>
+      <rect x="3.29" y="4.84" width="5.78" height="4.96"/>
+      <rect x="3.29" width="3.7" height="4.84"/>
+      <rect x="2.36" y="9.8" width="6.33" height="1.63" fill="#d6d0bf"/>
+    </g>
+    <g fill="#637356" opacity=".85">
+      <rect x="4.15" y="6.2" width="2.2" height=".9" rx=".12"/>
+      <rect x="4.7" y="7.55" width="1.4" height=".7" rx=".08"/>
+      <rect x=".5" y="4.1" width="2.1" height="1.55" rx=".08"/>
+      <rect x="7.35" y="6.65" width="2.1" height="1.45" rx=".08"/>
+      <rect x="9" y="3" width="2" height="1.4" rx=".08"/>
+    </g>
+    <g fill="#9d7456" opacity=".85">
+      <circle cx="5.4" cy="8.7" r=".5"/>
+      <rect x="4.1" y="1.1" width="2.2" height=".55" rx=".08"/>
+      <circle cx="3" cy="10.6" r=".25"/>
+      <circle cx="7.9" cy="10.6" r=".25"/>
+    </g>
+  </g>
+  <g font-family="Manrope,system-ui,sans-serif" fill="#242920">
+    <text x="68" y="84" font-size="18" letter-spacing="3" fill="#62685d">AYANNA · TYPE E2</text>
+    <text x="68" y="132" font-size="38" font-weight="700">A furnished portfolio tour</text>
+    <text x="68" y="168" font-size="18" fill="#62685d">Loading the detailed 3D home&</text>
+  </g>
+</svg>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#e8e6df"/>
+  <circle cx="1000" cy="80" r="380" fill="#f5efe5"/>
+  <g font-family="Manrope,system-ui,sans-serif" fill="#242920">
+    <text x="80" y="115" font-size="22" letter-spacing="4" fill="#637356">AYANNA · TYPE E2</text>
+    <text x="80" y="215" font-size="68" font-weight="700">Wei Hong Lo</text>
+    <text x="80" y="285" font-size="34" fill="#62685d">A furnished portfolio tour</text>
+  </g>
+  <g transform="translate(700 190) scale(29)">
+    <rect width="11.5" height="11.43" rx=".1" fill="#fbfaf6" stroke="#7c8578" stroke-width=".14"/>
+    <g fill="#dad8ce" stroke="#92998f" stroke-width=".08">
+      <rect x="1.92" width="1.37" height="2.74"/>
+      <rect x="0" y="2.74" width="3.29" height="5.1"/>
+      <rect x="1.65" y="7.06" width="1.64" height="2.74" fill="#cdd6d2"/>
+      <rect x="6.99" y="5.83" width="3.01" height="3.97"/>
+      <rect x="8.51" y="2.17" width="2.99" height="3.66"/>
+      <rect x="3.29" y="4.84" width="5.78" height="4.96"/>
+      <rect x="3.29" width="3.7" height="4.84"/>
+      <rect x="2.36" y="9.8" width="6.33" height="1.63" fill="#d6d0bf"/>
+    </g>
+  </g>
+</svg>

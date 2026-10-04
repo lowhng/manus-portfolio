@@ -7,6 +7,7 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 // Root index.html = current www portfolio (static).
 // demo/index.html = apartment portfolio React app for demo.weihong.dev.
+// demo2/index.html = furnished Ayanna portfolio for demo2.weihong.dev.
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -23,6 +24,7 @@ export default defineConfig({
       input: {
         main: path.resolve(rootDir, "index.html"),
         demo: path.resolve(rootDir, "demo/index.html"),
+        demo2: path.resolve(rootDir, "demo2/index.html"),
       },
     },
   },
