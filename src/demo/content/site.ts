@@ -62,6 +62,24 @@ export const site = {
       body: "I design and build tools for messy real-world problems.",
     },
     {
+      id: "bathroom",
+      title: "The model",
+      eyebrow: "Bathroom",
+      body: "A LiDAR-derived apartment model, translated into an interactive Three.js walkthrough.",
+    },
+    {
+      id: "bedroom1",
+      title: "Experience",
+      eyebrow: "Bedroom 1",
+      body: "Roles across utilities transformation, business analysis, UX, and AR research.",
+    },
+    {
+      id: "bedroom2",
+      title: "Research",
+      eyebrow: "Bedroom 2",
+      body: "PhD research in AR for on-site sports spectating, and AR headset widget placement.",
+    },
+    {
       id: "study",
       title: "Consulting",
       eyebrow: "Study",
@@ -71,13 +89,7 @@ export const site = {
       id: "living",
       title: "Side projects",
       eyebrow: "Living / Dining",
-      body: "Things I ship on the side: products, LiDAR models, and AR experiments.",
-    },
-    {
-      id: "bedroom2",
-      title: "Research",
-      eyebrow: "Bedroom 2",
-      body: "PhD research in AR for on-site sports spectating, and AR headset widget placement.",
+      body: "Things I ship on the side: products, internal tools, and AR experiments.",
     },
     {
       id: "kitchen",

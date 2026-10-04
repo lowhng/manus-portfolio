@@ -2,6 +2,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 -0.5 16.5 8.5" role="img" aria-label="Floor plan of my Dunedin apartment">
   <rect width="100%" height="100%" fill="#e6e9eb"/>
   <g transform="translate(0.2 0.2)">
+  <path d="M0.97,1.45 L2.71,1.45 L2.71,3.97 L0.00,3.97 L0.00,2.37 Z" fill="#cdd8de" stroke="#9aa2a8" stroke-width="0.06"/>
+  <path d="M0.00,3.97 L3.72,3.97 L3.72,7.21 L0.00,7.21 Z" fill="#d8d2c6" stroke="#9aa2a8" stroke-width="0.06"/>
   <path d="M4.64,3.96 L5.47,3.38 L8.22,3.38 L8.22,7.21 L4.64,7.21 Z" fill="#d8d2c6" stroke="#9aa2a8" stroke-width="0.06"/>
   <path d="M5.85,3.38 L6.53,2.76 L7.25,2.76 L7.25,2.32 L8.22,2.32 L8.22,3.38 Z" fill="#b9b2a5" stroke="#9aa2a8" stroke-width="0.06"/>
   <path d="M8.22,1.79 L10.98,1.79 L10.98,5.27 L8.22,5.27 Z" fill="#cdd8de" stroke="#9aa2a8" stroke-width="0.06"/>
@@ -9,7 +11,9 @@
   <path d="M10.98,0.00 L15.04,0.00 L15.04,7.16 L10.98,7.16 Z" fill="#d8d2c6" stroke="#9aa2a8" stroke-width="0.06"/>
   <path d="M2.71,2.47 L3.63,2.47 L3.63,2.37 L4.54,2.37 L4.54,1.45 L6.19,1.45 L6.19,0.00 L10.98,0.00 L10.98,1.79 L8.22,1.79 L8.22,2.32 L7.25,2.32 L7.25,2.76 L6.53,2.76 L5.85,3.38 L5.47,3.38 L4.64,3.96 L2.71,3.96 Z" fill="#e5e0d6" stroke="#9aa2a8" stroke-width="0.06"/>
   <rect x="5.9" y="0.15" width="0.55" height="1.1" fill="#b4532a"/>
-  <text x="6.528" y="5.464" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Research</text>
+  <text x="1.354" y="2.805" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Bathroom</text>
+  <text x="1.857" y="5.658" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Bedroom 1</text>
+  <text x="6.528" y="5.464" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Bedroom 2</text>
   <text x="7.398" y="3.124" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Storage</text>
   <text x="9.594" y="3.482" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Kitchen</text>
   <text x="9.594" y="6.257" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="0.35" fill="#1f2326">Study</text>

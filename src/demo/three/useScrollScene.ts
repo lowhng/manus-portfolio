@@ -75,35 +75,36 @@ export function useScrollScene(
         const scene = sceneRef.current;
         if (!scene) return;
         if (visible && tabVisible) {
-          const els = sectionIds
-            .map((id) => document.getElementById(`room-${id}`))
-            .filter((el): el is HTMLElement => !!el);
+          const sections = sectionIds.flatMap((id) => {
+            const element = document.getElementById(`room-${id}`);
+            return element ? [{ id, element }] : [];
+          });
 
           if (options.reducedMotion) {
             scene.setWallHeight(2.5);
           } else if (flyToRef.current) {
             const kf = keyframeForSection(flyToRef.current);
             scene.setWallHeight(kf.wallHeight);
-            scene.setCamera(kf.position, kf.target, false);
+            scene.setCamera(kf.position, kf.target, kf.fov, false);
           } else {
             const progress = scrollProgressFromSections(
-              els,
+              sections,
               window.scrollY,
               window.innerHeight,
             );
             const frame = interpolatePath(progress);
             scene.setWallHeight(frame.wallHeight);
-            scene.setCamera(frame.position, frame.target, false);
+            scene.setCamera(frame.position, frame.target, frame.fov, false);
 
             let best: StoryRoomId = "hallway";
             let bestDist = Infinity;
             const focus = window.scrollY + window.innerHeight * 0.35;
-            for (const el of els) {
-              const mid = el.offsetTop + el.offsetHeight * 0.35;
+            for (const { id, element } of sections) {
+              const mid = element.offsetTop + element.offsetHeight * 0.35;
               const d = Math.abs(mid - focus);
               if (d < bestDist) {
                 bestDist = d;
-                best = el.id.replace("room-", "") as StoryRoomId;
+                best = id;
               }
             }
             setActiveRoom(best);

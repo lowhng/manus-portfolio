@@ -22,8 +22,19 @@ export function FloorPlanNav({ activeRoom, onSelect, compact }: Props) {
       id: r.id,
       name: r.label,
       poly: geo?.poly ?? null,
+      labelPosition: geo?.label ?? null,
     };
   });
+  const planLabels: Partial<Record<StoryRoomId, string>> = {
+    hallway: "Hall",
+    bathroom: "Bath",
+    bedroom1: "Bed 1",
+    bedroom2: "Bed 2",
+    study: "Study",
+    living: "Living",
+    kitchen: "Kitchen",
+    storage: "Store",
+  };
 
   return (
     <nav className="plan-nav" aria-label="Apartment floor plan">
@@ -35,6 +46,41 @@ export function FloorPlanNav({ activeRoom, onSelect, compact }: Props) {
         aria-label="Rooms in my Dunedin apartment"
       >
         <rect x="0" y="0" width="15.3" height="7.5" fill="#e5e0d6" rx="0.1" />
+        <g aria-hidden="true">
+          {navRooms.map((room) => {
+            if (room.id === "contact" || !room.poly) return null;
+            return (
+              <path
+                key={`base-${room.id}`}
+                className="plan-room"
+                d={polyToPath(room.poly)}
+              />
+            );
+          })}
+          <rect className="plan-entry" x="5.9" y="0.15" width="0.55" height="1.1" />
+          {navRooms.map((room) => {
+            if (
+              room.id === "contact" ||
+              !room.labelPosition ||
+              !planLabels[room.id]
+            ) {
+              return null;
+            }
+            return (
+              <text
+                key={`label-${room.id}`}
+                className="plan-label"
+                x={room.labelPosition[0]}
+                y={room.labelPosition[1]}
+              >
+                {planLabels[room.id]}
+              </text>
+            );
+          })}
+          <text className="plan-label plan-entry-label" x="6.18" y="0.12">
+            Entry
+          </text>
+        </g>
         {navRooms.map((room) => {
           if (room.id === "contact") {
             return (
