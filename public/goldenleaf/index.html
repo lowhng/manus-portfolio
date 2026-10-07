@@ -659,7 +659,7 @@ document.getElementById('delBtn').onclick = () => selected && deletePiece(select
 showGridEl.addEventListener('change', syncGrid);
 document.getElementById('doneBtn').onclick = () => select(null);
 
-// ---------- load the Ayanna model and keep only its furniture ----------
+// ---------- load the furniture (copied out of the Ayanna model by scripts/extract_furniture.py) ----------
 function onModel(gltf) {
   const root = gltf.scene;
   root.updateMatrixWorld(true);
@@ -689,7 +689,7 @@ function onFail(err) {
   editToggle.textContent = 'Furniture failed to load';
   console.error(err);
 }
-fetch('/ayanna/ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); }).then((b64) => {
+fetch('/shared/furniture.txt').then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); }).then((b64) => {
   const bin = atob(b64.trim()); const buf = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
   new GLTFLoader().parse(buf.buffer, '', onModel, onFail);
