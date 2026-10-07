@@ -236,6 +236,32 @@ button {
   display: block;
 }
 
+.plan-room {
+  fill: var(--room);
+  stroke: #9aa2a8;
+  stroke-width: 0.06;
+  pointer-events: none;
+}
+
+.plan-entry {
+  fill: var(--accent);
+  pointer-events: none;
+}
+
+.plan-label {
+  fill: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.38px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.plan-entry-label {
+  font-size: 0.34px;
+  dominant-baseline: auto;
+}
+
 .plan-svg button,
 .plan-hotspot {
   cursor: pointer;
@@ -248,15 +274,15 @@ button {
 
 .plan-hotspot:hover,
 .plan-hotspot:focus-visible {
-  fill: color-mix(in srgb, var(--accent) 18%, transparent);
+  fill: transparent;
   stroke: var(--accent);
-  stroke-width: 1.5;
+  stroke-width: 0.14;
 }
 
 .plan-hotspot.is-active {
-  fill: color-mix(in srgb, var(--accent) 28%, transparent);
+  fill: transparent;
   stroke: var(--accent);
-  stroke-width: 1.5;
+  stroke-width: 0.16;
 }
 
 .topbar {

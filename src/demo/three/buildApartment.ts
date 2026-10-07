@@ -27,6 +27,7 @@ export type ApartmentScene = {
   setCamera: (
     position: THREE.Vector3,
     target: THREE.Vector3,
+    fov: number,
     immediate?: boolean,
   ) => void;
   getCamera: () => THREE.PerspectiveCamera;
@@ -230,6 +231,8 @@ export function createApartmentScene(
   let curTarget = new THREE.Vector3(CX, 0, CZ);
   let goalPos = curPos.clone();
   let goalTarget = curTarget.clone();
+  let curFov = camera.fov;
+  let goalFov = camera.fov;
   camera.position.copy(curPos);
   camera.lookAt(curTarget);
 
@@ -240,15 +243,20 @@ export function createApartmentScene(
   function setCamera(
     position: THREE.Vector3,
     target: THREE.Vector3,
+    fov: number,
     immediate = false,
   ) {
     goalPos.copy(position);
     goalTarget.copy(target);
+    goalFov = fov;
     if (immediate) {
       curPos.copy(position);
       curTarget.copy(target);
+      curFov = fov;
       camera.position.copy(curPos);
       camera.lookAt(curTarget);
+      camera.fov = curFov;
+      camera.updateProjectionMatrix();
     }
   }
 
@@ -261,8 +269,13 @@ export function createApartmentScene(
   function render() {
     curPos.lerp(goalPos, 0.08);
     curTarget.lerp(goalTarget, 0.08);
+    curFov = THREE.MathUtils.lerp(curFov, goalFov, 0.08);
     camera.position.copy(curPos);
     camera.lookAt(curTarget);
+    if (Math.abs(camera.fov - curFov) > 0.01) {
+      camera.fov = curFov;
+      camera.updateProjectionMatrix();
+    }
     renderer.render(scene, camera);
   }
 
