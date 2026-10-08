@@ -161,26 +161,48 @@ function addWallSeg(x0, y0, x1, y1, h = U.wallH, t = U.wallT) {
   scene.add(mesh);
 }
 
+const glassMat = new THREE.MeshStandardMaterial({
+  color: 0xb7d4e4, transparent: true, opacity: 0.32, roughness: 0.08, metalness: 0, depthWrite: false,
+});
+function addGlass(x0, y0, x1, y1) {
+  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+  if (len < 0.05) return;
+  const h0 = 0.12, h1 = U.wallH;
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, h1 - h0, 0.02), glassMat);
+  mesh.position.set((x0 + x1) / 2, (h0 + h1) / 2, -(y0 + y1) / 2);
+  mesh.rotation.y = -Math.atan2(dy, dx);
+  mesh.castShadow = false;
+  mesh.receiveShadow = true;
+  scene.add(mesh);
+}
+function floorMatFor(name) {
+  const out = /balcony|a\/?c|ledge/i.test(name);
+  const wet = /bath|kitchen|yard|foyer/i.test(name);
+  return out ? floorOut : wet ? floorWet : floorDry;
+}
+function addFloor(box, name) {
+  const [x0, y0, x1, y1] = box;
+  if (x1 - x0 < 0.05 || y1 - y0 < 0.05) return;
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, y1 - y0), floorMatFor(name));
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.set((x0 + x1) / 2, 0.001, -(y0 + y1) / 2);
+  floor.receiveShadow = true;
+  scene.add(floor);
+}
 function buildShell() {
-  const W = U.width, D = U.depth, t = U.wallT;
-  // Outer shell
-  addWallSeg(0, 0, W, 0);
-  addWallSeg(0, D, W, D);
-  addWallSeg(0, 0, 0, D);
-  addWallSeg(W, 0, W, D);
-  for (const [x0, y0, x1, y1] of U.walls || []) addWallSeg(x0, y0, x1, y1);
-
-  for (const r of U.rooms) {
-    const [x0, y0, x1, y1] = r.box;
-    const wet = /bath|kitchen|yard|foyer/i.test(r.name);
-    const out = /balcony/i.test(r.name);
-    const mat = out ? floorOut : wet ? floorWet : floorDry;
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, y1 - y0), mat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.set((x0 + x1) / 2, 0.001, -(y0 + y1) / 2);
-    floor.receiveShadow = true;
-    scene.add(floor);
+  const W = U.width, D = U.depth;
+  // Rectangular outer shell unless the unit supplies its own footprint (Type A).
+  if (!U.explicitWalls) {
+    addWallSeg(0, 0, W, 0);
+    addWallSeg(0, D, W, D);
+    addWallSeg(0, 0, 0, D);
+    addWallSeg(W, 0, W, D);
   }
+  for (const seg of U.walls || []) addWallSeg(seg[0], seg[1], seg[2], seg[3], seg[4]);
+  for (const [x0, y0, x1, y1] of U.windows || []) addGlass(x0, y0, x1, y1);
+
+  const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
+  for (const r of floorRects) addFloor(r.box, r.name || '');
 }
 buildShell();
 
@@ -269,8 +291,17 @@ function spawn(name, x, y, rot = 0, sx = 1, sz = 1) {
   if (!tpl) { console.warn('Missing furniture:', name); return; }
   const pivot = new THREE.Group();
   const clone = tpl.node.clone(true);
-  if (sx !== 1 || sz !== 1) clone.scale.set(sx, 1, sz);
-  pivot.add(clone);
+  // Scale a wrapper. The template centres itself with a translation; scaling
+  // that same object multiplies the offset. Kitchen_Run's mesh sits 6.55 m
+  // off the node origin, so sx 0.32 used to walk it several metres off the pivot.
+  if (sx !== 1 || sz !== 1) {
+    const scaled = new THREE.Group();
+    scaled.scale.set(sx, 1, sz);
+    scaled.add(clone);
+    pivot.add(scaled);
+  } else {
+    pivot.add(clone);
+  }
   pivot.position.set(x, 0, -y);
   pivot.rotation.y = -rot * Math.PI / 2;
   scene.add(pivot);
@@ -403,13 +434,28 @@ for (const v of VIEWS) {
   chipEls[v.id] = b; viewsEl.appendChild(b);
 }
 
+function roomMetrics(r) {
+  const parts = (U.floors || []).filter((f) => f.name === r.name);
+  if (parts.length > 1) {
+    const area = parts.reduce((s, f) => {
+      const [x0, y0, x1, y1] = f.box;
+      return s + Math.max(0, x1 - x0) * Math.max(0, y1 - y0);
+    }, 0);
+    return { label: `${area.toFixed(1)} m²` };
+  }
+  const box = parts.length === 1 ? parts[0].box : r.box;
+  const [x0, y0, x1, y1] = box;
+  const w = x1 - x0, h = y1 - y0;
+  return { label: `${w.toFixed(1)} × ${h.toFixed(1)} m · ${(w * h).toFixed(1)} m²`, w, h };
+}
 const roomsEl = document.getElementById('rooms');
 for (const r of U.rooms) {
   const [x0, y0, x1, y1] = r.box;
   const w = x1 - x0, h = y1 - y0;
+  const metrics = roomMetrics(r);
   const li = document.createElement('li');
   const b = document.createElement('button');
-  b.innerHTML = `<span>${r.name}</span><span class="dim">${w.toFixed(1)} × ${h.toFixed(1)} m · ${(w * h).toFixed(1)} m²</span>`;
+  b.innerHTML = `<span>${r.name}</span><span class="dim">${metrics.label}</span>`;
   b.onclick = () => {
     const m = Math.max(w, h);
     const tgt = B(r.c[0], r.c[1], 0.3);
@@ -442,11 +488,12 @@ function resize() {
 }
 new ResizeObserver(resize).observe(stage);
 resize();
-goView(VIEWS[0], true);
+const params = new URLSearchParams(location.search);
+const startView = VIEWS.find((v) => v.id === params.get('view')) || VIEWS[0];
+goView(startView, true);
 
 // embed mode
 const root = document.documentElement;
-const params = new URLSearchParams(location.search);
 if (root.classList.contains('embed')) {
   const gate = document.getElementById('gate'), fsBtn = document.getElementById('fsBtn');
   if (gate && matchMedia('(pointer:coarse)').matches) gate.querySelector('span').textContent = 'Tap to explore in 3D';

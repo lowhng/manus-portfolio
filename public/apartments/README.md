@@ -51,10 +51,12 @@ Sofa, Armchair, Coffee_Table, TV_Unit, Dining_Table + chairs, Master/Bed1/Bed2 b
 - Circular nightstands on the plans → reused rectangular Ayanna bedsides
 - Square ottomans on Types B/D → reused Armchair (same scale-ish seat)
 - Kitchen_Run is 4.82 m long → scaled down per unit (~0.65–0.72)
-- Exact door/window openings not modelled (solid wall shell with plan-traced partitions)
+- Door slabs are not modelled. Type A cuts openings where the plan stroke breaks; Types B–D are still a solid shell with plan-traced partitions
 
 ### Accuracy
 - Outer dimensions taken from plan millimetre labels (±~2%)
 - Interior walls traced by eye from the plan drawings (±10–15% on room sizes)
 - Furniture placement follows plan drawings; scale adjusted so pieces fit room boxes
 - Not a survey-grade BIM model — treat as a layout guide
+
+**Type A** was retraced from `type-a-650sf.png` at the printed 8850 × 8470 mm arrows (those tips land on the outer-wall centre lines). Wall thickness in the model is the drawn stroke (~200 mm), not a surveyed build-up, so the outer faces sit about one stroke outside the labelled centre lines. North windows and the balcony slider are gaps in the stroke; the east dining windows are legend marks on a continuous stroke, so they are glass in a low sill. The study-to-hall opening and the foyer inner door are as wide as the drawn gaps. The master-to-hall link has a door swing and no wall stroke, so it is left open. An orthographic overlay of the wall centre lines on the plan is the check; it is a layout guide, not BIM. Types B, C, and D are unchanged.
