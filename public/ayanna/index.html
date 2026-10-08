@@ -92,7 +92,37 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .body{display:flex;flex-direction:column;gap:16px}
 @media (prefers-reduced-motion:reduce){.lbl,#toast{transition:none}}
+
+/* ---------- embed mode (?embed=1) ---------- */
+#gate,#fsBtn{display:none}
+.embed #hint{display:none}
+.embed #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
+.embed #panel.collapsed .body,.embed #panel.collapsed .meta{display:none}
+.embed #panel.collapsed{width:auto;padding:10px 12px}
+.embed #panel.collapsed .head{align-items:center}
+.embed #panel.collapsed h1{font-size:16px;margin:4px 0 0}
+@media (max-width:640px){.embed #panel.collapsed{right:auto}}
+.embed #panel{max-width:calc(100% - 32px)}
+.embed #picker{max-width:calc(100% - 128px)}
+.embed.noui #panel{display:none}
+.embed #fsBtn{display:grid;place-items:center;position:fixed;top:12px;right:12px;width:36px;height:36px;padding:0;border:1px solid var(--panel-line);border-radius:10px;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.embed #fsBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.embed.locked #gate{display:grid;place-items:center;position:fixed;inset:0;width:100%;border:0;padding:0;background:transparent;touch-action:pan-x pan-y}
+#gate span{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:11px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#gate:hover span{transform:translateY(-1px)}
+.embed.locked #panel,.embed.locked #picker{pointer-events:none}
+.embed:fullscreen #fsBtn .enter,.embed:not(:fullscreen) #fsBtn .exit{display:none}
 </style>
+<script>
+// Read embed options before first paint so the page never flashes the full UI inside an iframe.
+{
+  const q = new URLSearchParams(location.search), root = document.documentElement;
+  if (q.get('embed') === '1') root.classList.add('embed', 'locked');
+  if (q.get('ui') === '0') root.classList.add('noui');
+  const t = q.get('theme');
+  if (t === 'light' || t === 'dark') root.dataset.theme = t;
+}
+</script>
 
 <div id="stage"></div>
 <div id="labels"></div>
@@ -144,6 +174,11 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
   <button class="chip" id="doneBtn" aria-label="Deselect" title="Deselect (Esc)">✕</button>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
+<button id="gate" aria-label="Explore the 3D model"><span>Click to explore in 3D</span></button>
+<button id="fsBtn" aria-label="Full screen" title="Full screen">
+  <svg class="enter" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  <svg class="exit" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+</button>
 
 <script type="importmap">
 {"imports":{
@@ -406,13 +441,16 @@ collapseBtn.onclick = () => {
   const c = panel.classList.toggle('collapsed');
   collapseBtn.textContent = c ? 'Show' : 'Hide';
   collapseBtn.setAttribute('aria-expanded', String(!c));
+  resize();
 };
 
 // ---------- resize ----------
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
   renderer.setSize(w, h, false);
-  const s = w > 640 ? Math.min(165, w * 0.15) : 0;
+  // shift the framing right to clear the side panel, but only while it is open
+  const panelOpen = !document.documentElement.classList.contains('noui') && !panel.classList.contains('collapsed');
+  const s = w > 640 && panelOpen ? Math.min(165, w * 0.15) : 0;
   camera.aspect = (w + 2 * s) / h;
   if (s) camera.setViewOffset(w + 2 * s, h, 0, 0, w, h); else camera.clearViewOffset();
   if (!anim && currentView && chipEls[currentView.id]?.getAttribute('aria-pressed') === 'true') camera.fov = vfovFrom(currentView);
@@ -420,7 +458,30 @@ function resize() {
 }
 new ResizeObserver(resize).observe(stage);
 resize();
-goView(VIEWS[0], true);
+const params = new URLSearchParams(location.search);
+goView(VIEWS.find((v) => v.id === params.get('view')) || VIEWS[0], true);
+
+// ---------- embed mode ----------
+// Inside an iframe the model starts "locked" behind a click-to-explore layer, so wheel and touch
+// scroll the host page instead of zooming the model until the visitor opts in.
+const root = document.documentElement;
+if (root.classList.contains('embed')) {
+  const gate = document.getElementById('gate'), fsBtn = document.getElementById('fsBtn');
+  if (matchMedia('(pointer:coarse)').matches) gate.firstChild.textContent = 'Tap to explore in 3D';
+  gate.onclick = () => root.classList.remove('locked');
+  // lock again once the embed has scrolled out of the host page's view
+  new IntersectionObserver(([en]) => {
+    if (!en.isIntersecting && !document.fullscreenElement) root.classList.add('locked');
+  }).observe(stage);
+  if (params.get('panel') !== 'open') collapseBtn.click();
+  fsBtn.onclick = () => {
+    if (document.fullscreenElement) { document.exitFullscreen(); return; }
+    if (document.fullscreenEnabled) { root.classList.remove('locked'); root.requestFullscreen(); return; }
+    // iPhone Safari has no element fullscreen: open the full page in a new tab instead
+    const u = new URL(location.href); u.searchParams.delete('embed');
+    window.open(u.href, '_blank', 'noopener');
+  };
+}
 
 // ---------- furniture editing ----------
 const GRID = 0.25;    // snap step, metres
