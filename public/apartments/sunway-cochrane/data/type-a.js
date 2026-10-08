@@ -47,7 +47,7 @@ window.UNIT = {
     { name: 'Hall', box: [1.98, 3.78, 5.72, 4.86] },
     { name: 'Living', box: [5.72, 4.05, 8.73, 7.36] },
     { name: 'Dining', box: [5.72, 2.18, 8.73, 4.05] },
-    { name: 'Dining', box: [6.90, 0.82, 8.73, 2.18] },
+    { name: 'Passage', box: [6.90, 0.82, 8.73, 2.18] },
     { name: 'Kitchen', box: [3.70, 0.12, 6.90, 2.16] },
     { name: 'Bath', box: [2.22, 2.18, 5.48, 3.56] },
     { name: 'Foyer', box: [7.02, 0.12, 8.73, 0.58] },
