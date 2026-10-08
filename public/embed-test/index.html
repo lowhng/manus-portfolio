@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embed Test Page</title>
+<style>
+  :root { --bg: #ffffff; --ink: #1d1d1f; --soft: #6e6e73; --line: #e5e5ea; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111113; --ink: #f2f2f4; --soft: #9a9aa0; --line: #2a2a2e; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Georgia, serif; }
+  header { border-bottom: 1px solid var(--line); padding: 14px 16px; font: 600 15px system-ui, sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 120px; }
+  h1 { font-size: 32px; line-height: 1.2; margin: 0 0 12px; }
+  h2 { font: 600 13px system-ui, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--soft); margin: 56px 0 12px; }
+  p { color: var(--soft); max-width: 62ch; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 720px) { .row { grid-template-columns: 1fr; } }
+  code { font: 13px ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<header>Example Developer Co. — a stand-in for the client's site</header>
+<main>
+  <h1>Ayanna Residences, Type E2</h1>
+  <p>This page pretends to be a client's website. Scroll past each embed to check the page still scrolls normally, then click into one to explore it.
+     Embed source: <code id="srcLabel"></code></p>
+
+  <h2>1 · Full width, 16:9</h2>
+  <div class="slot" data-ratio="16/9"></div>
+
+  <p>Some body copy between embeds, so you can check that the mouse wheel and touch scrolling keep moving the page when the pointer is over a locked embed.</p>
+
+  <h2>2 · Side by side with text, 4:3</h2>
+  <div class="row">
+    <div class="slot" data-ratio="4/3" data-params="panel=closed"></div>
+    <p>A smaller embed next to copy, which is how many property pages lay things out. The info panel starts collapsed and the framing re-centres.</p>
+  </div>
+
+  <h2>3 · Model only, plan view, dark theme</h2>
+  <div class="slot" data-ratio="16/9" data-params="ui=0&view=plan&theme=dark"></div>
+
+  <h2>4 · Tall, mobile-shaped (360 × 640)</h2>
+  <div class="slot" data-width="360px" data-ratio="9/16"></div>
+</main>
+
+<script>
+  // Defaults to the Ayanna page deployed alongside this one; ?src=<url> points every embed elsewhere
+  // (e.g. ?src=http://localhost:5173/ayanna/index.html from 127.0.0.1 to test a cross-origin embed).
+  const src = new URLSearchParams(location.search).get('src') || '../ayanna/index.html';
+  document.getElementById('srcLabel').textContent = new URL(src, location.href).href;
+  if (location.protocol === 'file:') {
+    document.querySelector('main').insertAdjacentHTML('afterbegin',
+      '<p style="color:#c0392b"><strong>Opened from disk:</strong> the model can\'t load over file://. Run the dev server and open /embed-test/ from it instead.</p>');
+  }
+  for (const slot of document.querySelectorAll('.slot')) {
+    const u = new URL(src, location.href);
+    u.searchParams.set('embed', '1');
+    new URLSearchParams(slot.dataset.params || '').forEach((v, k) => u.searchParams.set(k, v));
+    // This markup is exactly the snippet a client would paste.
+    slot.innerHTML = `
+<div style="position:relative;width:100%;max-width:${slot.dataset.width || '100%'};aspect-ratio:${slot.dataset.ratio}">
+  <iframe src="${u.href}" title="Ayanna E2 Home – interactive 3D model" loading="lazy" allow="fullscreen"
+          style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px"></iframe>
+</div>`;
+  }
+</script>
+</body>
+</html>
