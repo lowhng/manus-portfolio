@@ -58,31 +58,46 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .body{display:flex;flex-direction:column;gap:16px}
 @media (max-width:640px){
-  #panel{top:auto;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:14px;gap:12px}
+  #panel{top:auto;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:12px 14px;gap:10px}
   #panel.collapsed .body{display:none}
   #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
   h1{font-size:18px}
   #hint{display:none}
+  .foot{display:none}
+}
+/* Short 16:9 frames (the embed page is ~960×540): keep the collapsed title
+   card at the top-left, and dock the open panel to the bottom so the unit stays visible. */
+@media (max-height:620px){
+  #panel:not(.collapsed){top:auto;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:12px 14px;gap:10px}
+  #panel:not(.collapsed) .meta,#panel:not(.collapsed) .foot{display:none}
+  #hint{display:none}
+  h1{font-size:16px}
 }
 #gate,#fsBtn{display:none}
 .embed #hint{display:none}
-.embed #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
+.embed #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;flex:none}
 .embed #panel.collapsed .body,.embed #panel.collapsed .meta{display:none}
-.embed #panel.collapsed{width:auto;padding:10px 12px}
+.embed #panel.collapsed{width:auto;max-width:calc(100% - 72px);padding:10px 12px}
+.embed #panel.collapsed .head{align-items:center}
 .embed #panel.collapsed h1{font-size:16px;margin:4px 0 0}
+@media (max-width:640px){.embed #panel.collapsed{right:auto}}
+.embed #panel{max-width:calc(100% - 24px)}
 .embed.noui #panel{display:none}
-.embed #fsBtn{display:grid;place-items:center;position:fixed;top:12px;right:12px;width:36px;height:36px;padding:0;border:1px solid var(--panel-line);border-radius:10px;background:var(--panel)}
+.embed #fsBtn{display:grid;place-items:center;position:fixed;top:12px;right:12px;width:36px;height:36px;padding:0;border:1px solid var(--panel-line);border-radius:10px;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:inherit}
 .embed #fsBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .embed.locked #gate{display:grid;place-items:center;position:fixed;inset:0;width:100%;border:0;padding:0;background:transparent;touch-action:pan-x pan-y}
-#gate span{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:11px 16px;border-radius:999px}
+#gate span{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:11px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#gate:hover span{transform:translateY(-1px)}
 .embed.locked #panel{pointer-events:none}
 .embed:fullscreen #fsBtn .enter,.embed:not(:fullscreen) #fsBtn .exit{display:none}
+.opts{display:flex;flex-direction:column;gap:8px}
 
 </style>
 <script>
 {
   const q = new URLSearchParams(location.search), root = document.documentElement;
-  if (q.get('embed') === '1') root.classList.add('embed', 'locked');
+  if (q.get('embed') === '1') root.classList.add('embed');
+  if (q.get('embed') === '1' && q.get('explore') !== '1') root.classList.add('locked');
   if (q.get('ui') === '0') root.classList.add('noui');
   const t = q.get('theme');
   if (t === 'light' || t === 'dark') root.dataset.theme = t;
@@ -112,8 +127,16 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
       <h2>Rooms · traced from plan</h2>
       <ul class="rooms" id="rooms"></ul>
     </div>
-    <label class="toggle"><input type="checkbox" id="showLabels" checked> Show room labels</label>
-    <div class="foot">Walls traced from the floor plan at the printed 8850 × 8470 mm scale. Dollhouse cutaway so the rooms read from above. Furniture from the Ayanna library, placed where the plan draws it. Source: <a href="https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf" target="_blank" rel="noopener">brochure</a>.</div>
+    <div class="sec">
+      <h2>Model</h2>
+      <div class="opts">
+        <label class="toggle"><input type="checkbox" id="showDoors" checked> Show doors</label>
+        <label class="toggle"><input type="checkbox" id="openDoors" checked> Open doors</label>
+        <label class="toggle"><input type="checkbox" id="cutaway" checked> Cutaway walls</label>
+        <label class="toggle"><input type="checkbox" id="showLabels" checked> Show room labels</label>
+      </div>
+    </div>
+    <div class="foot">Walls traced from the floor plan at the printed 8850 × 8470 mm scale. Ceiling is 2.5 m; cutaway is on so the rooms still read from above. Doors follow the drawn swings. Source: <a href="https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf" target="_blank" rel="noopener">brochure</a>.</div>
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>

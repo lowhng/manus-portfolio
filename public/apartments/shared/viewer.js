@@ -10,6 +10,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const U = window.UNIT;
 if (!U) throw new Error('UNIT data missing');
 
+const params = new URLSearchParams(location.search);
 const B = (x, y, z = 0) => new THREE.Vector3(x, z, -y);
 
 // ---------- materials (Ayanna patches) ----------
@@ -150,30 +151,52 @@ patch(floorDry, ...PATCHES['Floor Timber']);
 patch(floorWet, ...PATCHES['Floor Wet Tile']);
 patch(floorOut, ...PATCHES['Floor Outdoor']);
 
-function addWallSeg(x0, y0, x1, y1, h = U.wallH, t = U.wallT) {
+const wallGroup = new THREE.Group();
+const glassGroup = new THREE.Group();
+const doorGroup = new THREE.Group();
+scene.add(wallGroup, glassGroup, doorGroup);
+const matLeaf = new THREE.MeshStandardMaterial({ color: 0xe9e3d6, roughness: 0.72 });
+const matEntry = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.58 });
+const doorPivots = [];
+// Cutaway is the default wherever a unit publishes a lower cut height (Type A).
+// walls=full raises that unit to its ceiling. Units without cutH ignore the flag.
+let cutawayOn = U.cutH != null && params.get('walls') !== 'full';
+let doorsShown = params.get('doors') !== '0';
+let doorsOpen = params.get('doors') !== 'closed';
+doorGroup.visible = doorsShown;
+
+function emptyGroup(g) {
+  for (const child of [...g.children]) {
+    child.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+    g.remove(child);
+  }
+}
+function ceilingNow() {
+  return cutawayOn && U.cutH != null ? U.cutH : U.wallH;
+}
+function addWallSeg(x0, y0, x1, y1, h, t = U.wallT, yBase = 0) {
   const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
-  if (len < 0.05) return;
+  if (len < 0.02 || h < 0.02) return;
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, h, t), wallMat);
-  mesh.position.set((x0 + x1) / 2, h / 2, -(y0 + y1) / 2);
+  mesh.position.set((x0 + x1) / 2, yBase + h / 2, -(y0 + y1) / 2);
   mesh.rotation.y = -Math.atan2(dy, dx);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  scene.add(mesh);
+  wallGroup.add(mesh);
 }
 
 const glassMat = new THREE.MeshStandardMaterial({
   color: 0xb7d4e4, transparent: true, opacity: 0.32, roughness: 0.08, metalness: 0, depthWrite: false,
 });
-function addGlass(x0, y0, x1, y1) {
+function addGlass(x0, y0, x1, y1, sill, head) {
   const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
-  if (len < 0.05) return;
-  const h0 = 0.12, h1 = U.wallH;
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, h1 - h0, 0.02), glassMat);
-  mesh.position.set((x0 + x1) / 2, (h0 + h1) / 2, -(y0 + y1) / 2);
+  if (len < 0.05 || head - sill < 0.05) return;
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, head - sill, 0.02), glassMat);
+  mesh.position.set((x0 + x1) / 2, (sill + head) / 2, -(y0 + y1) / 2);
   mesh.rotation.y = -Math.atan2(dy, dx);
   mesh.castShadow = false;
   mesh.receiveShadow = true;
-  scene.add(mesh);
+  glassGroup.add(mesh);
 }
 function floorMatFor(name) {
   const out = /balcony|a\/?c|ledge/i.test(name);
@@ -189,18 +212,64 @@ function addFloor(box, name) {
   floor.receiveShadow = true;
   scene.add(floor);
 }
+function addHeader(x0, y0, x1, y1, ceiling) {
+  const head = U.windowHead ?? 2.1;
+  if (ceiling <= head + 0.02) return;
+  addWallSeg(x0, y0, x1, y1, ceiling - head, U.wallT, head);
+}
+function addDoorLeaf(d, ceiling) {
+  const w = d.w;
+  const doorH = U.doorH ?? 2;
+  const leafH = Math.min(doorH, Math.max(0.2, ceiling - 0.02));
+  const theta = Math.atan2(d.dy, d.dx);
+  const swing = (d.swing || 1) * THREE.MathUtils.degToRad(80);
+  const pivot = new THREE.Group();
+  pivot.position.set(d.x, 0, -d.y);
+  const leaf = new THREE.Mesh(new THREE.BoxGeometry(w, leafH, 0.04), d.kind === 'entry' ? matEntry : matLeaf);
+  leaf.position.set(w / 2, leafH / 2, 0);
+  leaf.castShadow = true;
+  leaf.receiveShadow = true;
+  pivot.add(leaf);
+  pivot.userData.closed = theta;
+  pivot.userData.open = theta + swing;
+  pivot.rotation.y = doorsOpen ? pivot.userData.open : pivot.userData.closed;
+  doorGroup.add(pivot);
+  doorPivots.push(pivot);
+  if (ceiling > doorH + 0.02) {
+    addWallSeg(d.x, d.y, d.x + d.dx * w, d.y + d.dy * w, ceiling - doorH, U.wallT, doorH);
+  }
+}
+let shellBuilt = false;
 function buildShell() {
+  const ceiling = ceilingNow();
+  emptyGroup(wallGroup);
+  emptyGroup(glassGroup);
+  emptyGroup(doorGroup);
+  doorPivots.length = 0;
   const W = U.width, D = U.depth;
   // Rectangular outer shell unless the unit supplies its own footprint (Type A).
   if (!U.explicitWalls) {
-    addWallSeg(0, 0, W, 0);
-    addWallSeg(0, D, W, D);
-    addWallSeg(0, 0, 0, D);
-    addWallSeg(W, 0, W, D);
+    addWallSeg(0, 0, W, 0, ceiling);
+    addWallSeg(0, D, W, D, ceiling);
+    addWallSeg(0, 0, 0, D, ceiling);
+    addWallSeg(W, 0, W, D, ceiling);
   }
-  for (const seg of U.walls || []) addWallSeg(seg[0], seg[1], seg[2], seg[3], seg[4]);
-  for (const [x0, y0, x1, y1] of U.windows || []) addGlass(x0, y0, x1, y1);
-
+  for (const seg of U.walls || []) {
+    const explicit = seg[4];
+    const h = explicit != null ? Math.min(explicit, ceiling) : ceiling;
+    addWallSeg(seg[0], seg[1], seg[2], seg[3], h);
+    if (explicit != null) addHeader(seg[0], seg[1], seg[2], seg[3], ceiling);
+  }
+  for (const win of U.windows || []) {
+    const [x0, y0, x1, y1, sill] = win;
+    const h0 = sill != null ? sill : 0.12;
+    const head = Math.min(U.windowHead ?? ceiling, ceiling);
+    addGlass(x0, y0, x1, y1, h0, head);
+    if (sill == null) addHeader(x0, y0, x1, y1, ceiling);
+  }
+  for (const d of U.doors || []) addDoorLeaf(d, ceiling);
+  if (shellBuilt) return;
+  shellBuilt = true;
   const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
   for (const r of floorRects) addFloor(r.box, r.name || '');
 }
@@ -279,7 +348,13 @@ function applyPatches(root) {
       const p = PATCHES[m.name];
       if (p && !m.userData.patched) { patch(m, p[0], p[1]); m.userData.patched = true; }
       if (m.transparent || m.transmission > 0) transparent = true;
-      if (m.name === 'Shower Glass') { m.transmission = 0; m.transparent = true; m.opacity = 0.12; m.roughness = 0.05; }
+      if (m.name === 'Shower Glass') {
+        m.transmission = 0; m.transparent = true; m.opacity = 0.32; m.roughness = 0.05;
+        m.metalness = 0; m.color.set(0xd7e7ef); m.depthWrite = false;
+      }
+      if (m.name === 'Black Metal') { m.color.set(0x3a3d42); m.metalness = 0.55; m.roughness = 0.42; }
+      if (m.name === 'Brushed Steel') { m.color.set(0xc5c9ce); m.metalness = 0.92; m.roughness = 0.22; }
+      if (m.name === 'Dark Steel') { m.color.set(0x1c1e22); m.metalness = 0.8; m.roughness = 0.32; }
       if (m.name === 'Glass') { m.depthWrite = false; }
     }
     o.castShadow = !transparent;
@@ -467,6 +542,30 @@ for (const r of U.rooms) {
 }
 
 document.getElementById('showLabels')?.addEventListener('change', (ev) => { showLabels = ev.target.checked; syncLabels(); });
+const showDoorsEl = document.getElementById('showDoors');
+const openDoorsEl = document.getElementById('openDoors');
+const cutawayEl = document.getElementById('cutaway');
+if (showDoorsEl) {
+  if (!(U.doors || []).length) showDoorsEl.closest('label').hidden = true;
+  showDoorsEl.checked = doorsShown;
+  showDoorsEl.addEventListener('change', () => {
+    doorsShown = showDoorsEl.checked;
+    doorGroup.visible = doorsShown;
+  });
+}
+if (openDoorsEl) {
+  if (!(U.doors || []).length) openDoorsEl.closest('label').hidden = true;
+  openDoorsEl.checked = doorsOpen;
+  openDoorsEl.addEventListener('change', () => { doorsOpen = openDoorsEl.checked; });
+}
+if (cutawayEl) {
+  if (U.cutH == null) cutawayEl.closest('label').hidden = true;
+  cutawayEl.checked = cutawayOn;
+  cutawayEl.addEventListener('change', () => {
+    cutawayOn = cutawayEl.checked;
+    buildShell();
+  });
+}
 const panel = document.getElementById('panel');
 const collapseBtn = document.getElementById('collapse');
 collapseBtn?.addEventListener('click', () => {
@@ -476,11 +575,14 @@ collapseBtn?.addEventListener('click', () => {
   resize();
 });
 
+function panelDocked() {
+  return matchMedia('(max-width: 640px), (max-height: 620px)').matches;
+}
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
   renderer.setSize(w, h, false);
   const panelOpen = !document.documentElement.classList.contains('noui') && !panel.classList.contains('collapsed');
-  const s = w > 640 && panelOpen ? Math.min(165, w * 0.15) : 0;
+  const s = w > 640 && panelOpen && !panelDocked() ? Math.min(165, w * 0.15) : 0;
   camera.aspect = (w + 2 * s) / h;
   if (s) camera.setViewOffset(w + 2 * s, h, 0, 0, w, h); else camera.clearViewOffset();
   if (!anim && currentView && chipEls[currentView.id]?.getAttribute('aria-pressed') === 'true') camera.fov = vfovFrom(currentView);
@@ -488,7 +590,6 @@ function resize() {
 }
 new ResizeObserver(resize).observe(stage);
 resize();
-const params = new URLSearchParams(location.search);
 const startView = VIEWS.find((v) => v.id === params.get('view')) || VIEWS[0];
 goView(startView, true);
 
@@ -510,7 +611,14 @@ if (root.classList.contains('embed')) {
   });
 }
 
+let doorClock = performance.now();
 renderer.setAnimationLoop((now) => {
+  const dt = Math.min(0.05, (now - doorClock) / 1000);
+  doorClock = now;
+  for (const pivot of doorPivots) {
+    const target = doorsOpen ? pivot.userData.open : pivot.userData.closed;
+    pivot.rotation.y = THREE.MathUtils.damp(pivot.rotation.y, target, 8, dt);
+  }
   stepAnim(now);
   controls.update();
   renderer.render(scene, camera);

@@ -11,6 +11,10 @@
 // Openings are the gaps in the strokes (bedroom windows, balcony slider, doors).
 // East dining windows are legend marks 3 and 4; the stroke there is continuous,
 // so those are glass set in a cut wall rather than a missing stroke.
+// Ceiling matches Ayanna (2.5 m). The viewer starts in cutaway (cutH) so the
+// plan still reads from above; full height is a toggle. Door leaves follow
+// the drawn swings. The master/study arc sits under marker 8, so that hinge
+// (opening east into the study) is a judgment.
 //
 // explicitWalls: the footprint is not a rectangle (master notch, kitchen notch,
 // balcony / A/C ledge). Do not add the viewer's rectangular shell.
@@ -25,7 +29,10 @@ window.UNIT = {
   sourceUrl: 'https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf',
   width: 8.85,
   depth: 8.47,
-  wallH: 1.05,
+  wallH: 2.5,
+  cutH: 1.05,
+  doorH: 2.0,
+  windowHead: 2.1,
   wallT: 0.20,
   explicitWalls: true,
   rooms: [
@@ -65,10 +72,12 @@ window.UNIT = {
     [4.85, 7.47, 6.45, 7.47],
     [8.55, 7.47, 8.95, 7.47],
     // East wall. Dining windows (legend 3 and 4) sit above a sill — the plan
-    // stroke is continuous there, so the footprint stays solid.
-    [8.85, -0.10, 8.85, 2.50],
-    [8.85, 2.50, 8.85, 4.00, 0.42],
-    [8.85, 4.00, 8.85, 8.57],
+    // stroke is continuous there — with a full-height pier between them.
+    [8.85, -0.10, 8.85, 2.52],
+    [8.85, 2.52, 8.85, 3.13, 0.42],
+    [8.85, 3.13, 8.85, 3.32],
+    [8.85, 3.32, 8.85, 3.98, 0.42],
+    [8.85, 3.98, 8.85, 8.57],
     // Balcony + A/C ledge (north of the living / study)
     [5.04, 8.47, 8.95, 8.47],
     [5.14, 7.37, 5.14, 8.57],
@@ -111,9 +120,27 @@ window.UNIT = {
     [3.17, 7.47, 4.83, 7.47],
     // Living to balcony slider
     [6.47, 7.47, 8.53, 7.47],
-    // Dining east windows (markers 4 then 3)
-    [8.85, 3.32, 8.85, 3.98],
-    [8.85, 2.52, 8.85, 3.13],
+    // Dining east windows (markers 4 then 3). Fifth value is the sill.
+    [8.85, 3.32, 8.85, 3.98, 0.42],
+    [8.85, 2.52, 8.85, 3.13, 0.42],
+  ],
+  // Hinge (x, y), closed direction (dx, dy), width, swing +1 = counter-clockwise
+  // in plan. Leaves are 40 mm, Ayanna colours, and swing 80°.
+  doors: [
+    // Entrance, south wall. Arc is north of the wall, so it swings into the foyer.
+    { x: 7.60, y: 0, dx: 1, dy: 0, w: 0.90, swing: 1, kind: 'entry' },
+    // Foyer inner door. Arc sits north and to the east; hinge is the west jamb.
+    { x: 7.43, y: 0.70, dx: 1, dy: 0, w: 1.20, swing: 1, kind: 'room' },
+    // Master / study. Marker 8 covers the arc; hinged south, opening east into the study.
+    { x: 2.90, y: 5.76, dx: 0, dy: 1, w: 0.80, swing: -1, kind: 'room' },
+    // Master / hall. Swing is drawn inside the master; no wall stroke across the opening.
+    { x: 2.90, y: 4.67, dx: 0, dy: -1, w: 0.80, swing: -1, kind: 'room' },
+    // Study / hall. Open leaf drawn against the east wall, arc north of the threshold.
+    { x: 5.45, y: 4.77, dx: -1, dy: 0, w: 1.10, swing: -1, kind: 'room' },
+    // Bath, left leaf. Arc south of the wall, more ink on the east half, hinge west.
+    { x: 3.34, y: 3.67, dx: 1, dy: 0, w: 0.78, swing: -1, kind: 'room' },
+    // Bath, right leaf. More ink on the west half, hinge east, swings south.
+    { x: 5.40, y: 3.67, dx: -1, dy: 0, w: 0.78, swing: 1, kind: 'room' },
   ],
   // [asset, x, y, rotQuarters, sx?, sz?]
   // rot 0: local +X stays plan +x, local +Z goes to plan -y. Each +1 is 90° clockwise from above.
@@ -126,7 +153,7 @@ window.UNIT = {
   // Positions are the drawn symbol centres on the plan, in metres.
   furniture: [
     // Master — queen drawn x 0.16–2.10, y 4.95–6.93, head on the west; wardrobe on the south wall
-    ['Master_Bed', 1.15, 5.94, 0, 0.90, 0.96],
+    ['Master_Bed', 1.15, 6.18, 0, 0.90, 0.96],
     ['Master_Wardrobe', 1.09, 3.48, 3, 1, 0.77],
     // Study — single bed x 3.06–4.92, y 6.20–7.29, head on the west; desk under it; wardrobe on the south wall
     ['Bed2_Bed', 3.99, 6.88, 2, 0.85, 0.53],

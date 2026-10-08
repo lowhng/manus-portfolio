@@ -51,7 +51,7 @@ Sofa, Armchair, Coffee_Table, TV_Unit, Dining_Table + chairs, Master/Bed1/Bed2 b
 - Circular nightstands on the plans → reused rectangular Ayanna bedsides
 - Square ottomans on Types B/D → reused Armchair (same scale-ish seat)
 - Kitchen_Run is 4.82 m long → scaled down per unit (~0.65–0.72)
-- Door slabs are not modelled. Type A cuts openings where the plan stroke breaks; Types B–D are still a solid shell with plan-traced partitions
+- Type A has door leaves (show / open toggles) and a 2.5 m ceiling with a cutaway toggle. Types B–D are still a solid shell with plan-traced partitions and no door slabs
 
 ### Accuracy
 - Outer dimensions taken from plan millimetre labels (±~2%)
@@ -59,4 +59,4 @@ Sofa, Armchair, Coffee_Table, TV_Unit, Dining_Table + chairs, Master/Bed1/Bed2 b
 - Furniture placement follows plan drawings; scale adjusted so pieces fit room boxes
 - Not a survey-grade BIM model — treat as a layout guide
 
-**Type A** was retraced from `type-a-650sf.png` at the printed 8850 × 8470 mm arrows (those tips land on the outer-wall centre lines). Wall thickness in the model is the drawn stroke (~200 mm), not a surveyed build-up, so the outer faces sit about one stroke outside the labelled centre lines. North windows and the balcony slider are gaps in the stroke; the east dining windows are legend marks on a continuous stroke, so they are glass in a low sill. The study-to-hall opening and the foyer inner door are as wide as the drawn gaps. The master-to-hall link has a door swing and no wall stroke, so it is left open. An orthographic overlay of the wall centre lines on the plan is the check; it is a layout guide, not BIM. Types B, C, and D are unchanged.
+**Type A** was retraced from `type-a-650sf.png` at the printed 8850 × 8470 mm arrows (those tips land on the outer-wall centre lines). Wall thickness in the model is the drawn stroke (~200 mm), not a surveyed build-up, so the outer faces sit about one stroke outside the labelled centre lines. North windows and the balcony slider are gaps in the stroke; the east dining windows are legend marks on a continuous stroke, so they are glass in a low sill with a pier between them. The study-to-hall opening and the foyer inner door are as wide as the drawn gaps. The master-to-hall link has a swing and no wall stroke. Door leaves use Ayanna’s slab (40 mm, cream, terracotta at the entry) and swing 80° the way each arc points; the master/study arc is hidden by marker 8, so that leaf opening east into the study is a judgment. Ceiling height is Ayanna’s 2.5 m. The page opens with cutaway walls (1.05 m) so the dollhouse view still reads; turn cutaway off for the full shell, which adds window headers and door lintels. An orthographic overlay of the wall centre lines on the plan is the check; it is a layout guide, not BIM. Types B, C, and D data are unchanged. The shared viewer’s scale wrapper, and a lighter reading of brushed steel and shower glass, also apply when those units load.
