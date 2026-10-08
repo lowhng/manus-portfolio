@@ -90,7 +90,15 @@ const PATCHES = {
 
 // ---------- renderer / scene ----------
 const stage = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+} catch (err) {
+  const el = document.getElementById('loadtxt');
+  if (el) el.textContent = 'WebGL is not available in this browser — cannot render the 3D model.';
+  console.error(err);
+  throw err;
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.AgXToneMapping;
@@ -287,16 +295,43 @@ function onFurniture(gltf) {
 }
 
 const loadtxt = document.getElementById('loadtxt');
-fetch('/shared/furniture.txt')
-  .then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })
-  .then((b64) => {
-    const bin = atob(b64.trim());
-    const buf = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-    new GLTFLoader().parse(buf.buffer, '', onFurniture, (e) => { console.error(e); loadtxt.textContent = 'Furniture failed to load.'; });
-  })
-  .catch((e) => { console.error(e); loadtxt.textContent = 'Furniture failed to load.'; });
-
+const loaderEl = document.getElementById('loader');
+function furnitureFailed(err) {
+  console.error(err);
+  if (loadtxt) loadtxt.textContent = 'Furniture failed to load. Walls still shown — refresh to retry.';
+  // Keep the banner visible briefly so the failure is obvious, then clear it
+  setTimeout(() => { if (loaderEl) loaderEl.hidden = true; }, 2500);
+}
+// Resolve furniture relative to the site root; also try a path relative to this page as fallback
+// Prefer site-root absolute path; fall back to a path relative to this HTML page
+const furnitureUrls = [
+  '/shared/furniture.txt',
+  new URL('../../shared/furniture.txt', location.href).pathname,
+];
+function loadFurniture(urls) {
+  const url = urls[0];
+  if (!url) { furnitureFailed(new Error('no furniture url')); return; }
+  fetch(url)
+    .then((r) => { if (!r.ok) throw new Error(`${r.status} ${url}`); return r.text(); })
+    .then((b64) => {
+      const bin = atob(b64.trim());
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      new GLTFLoader().parse(buf.buffer, '', onFurniture, furnitureFailed);
+    })
+    .catch((e) => {
+      console.warn(e);
+      if (urls.length > 1) loadFurniture(urls.slice(1));
+      else furnitureFailed(e);
+    });
+}
+loadFurniture(furnitureUrls);
+// Safety: never leave the loader up forever (e.g. hung network)
+setTimeout(() => {
+  if (loaderEl && !loaderEl.hidden && loadtxt?.textContent?.includes('Loading')) {
+    furnitureFailed(new Error('furniture load timed out'));
+  }
+}, 20000);
 // ---------- labels / views / UI ----------
 const labelsEl = document.getElementById('labels');
 const labelNodes = U.rooms.map((r) => {
