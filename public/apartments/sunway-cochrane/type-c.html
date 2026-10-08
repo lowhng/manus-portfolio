@@ -1,11 +1,13 @@
 <!doctype html>
-<html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Sunway Cochrane Type B — 3D Model</title>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sunway Cochrane Type C — 3D Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-:root{color-scheme:light;box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413;overflow:hidden}
-:root{
+/* shared Ayanna-style chrome — see public/ayanna/index.html */
+:root{color-scheme:light;box-sizing:border-box;
   --sky-top:#dfe7ee; --sky-bottom:#f3f2ee;
   --panel:rgba(252,251,248,.86); --panel-line:rgba(60,66,56,.14);
   --ink:#23271f; --ink-soft:#5b6154; --ink-faint:#8a8f82;
@@ -22,8 +24,8 @@ body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;ba
   --accent:#a3b394; --accent-ink:#1b1e19; --chip:#353933; --chip-hover:#41463e;
   --label-bg:rgba(248,246,240,.9); --label-ink:#23271f;
 }}
-html,body{height:100%}
-body{background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom));color:var(--ink);font-family:var(--sans)}
+html,body{height:100%;margin:0}
+body{background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom));color:var(--ink);font-family:var(--sans);overflow:hidden}
 #stage{position:fixed;inset:0}
 #stage canvas{display:block;width:100%;height:100%;touch-action:none}
 #labels{position:fixed;inset:0;pointer-events:none}
@@ -33,14 +35,15 @@ body{background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom));color:v
 .eyebrow{font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
 h1{margin:6px 0 4px;font-size:22px;font-weight:700}
 .meta{font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.meta a{color:var(--accent)}
 .sec{display:flex;flex-direction:column;gap:8px}
 .sec h2{margin:0;font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:0;background:var(--chip);border-radius:8px;padding:7px 10px;font-size:12.5px;font-weight:600;cursor:pointer}
+.chip{border:0;background:var(--chip);border-radius:8px;padding:7px 10px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;color:inherit}
 .chip:hover{background:var(--chip-hover)}
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .rooms{margin:0;padding:0;list-style:none}
-.rooms button{width:100%;display:flex;justify-content:space-between;border:0;background:none;padding:7px 4px;border-top:1px solid var(--panel-line);text-align:left;cursor:pointer;font-size:13px;font-weight:500}
+.rooms button{width:100%;display:flex;justify-content:space-between;border:0;background:none;padding:7px 4px;border-top:1px solid var(--panel-line);text-align:left;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit;color:inherit}
 .rooms li:first-child button{border-top:0}
 .rooms button:hover{color:var(--accent)}
 .dim{font:400 11.5px var(--mono);color:var(--ink-faint);white-space:nowrap}
@@ -52,6 +55,8 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
 #loader div{font:500 12px var(--mono);color:var(--ink-soft)}
 #loader[hidden]{display:none}
 #collapse{display:none}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.body{display:flex;flex-direction:column;gap:16px}
 @media (max-width:640px){
   #panel{top:auto;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:14px;gap:12px}
   #panel.collapsed .body{display:none}
@@ -59,17 +64,25 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
   h1{font-size:18px}
   #hint{display:none}
 }
+#gate,#fsBtn{display:none}
 .embed #hint{display:none}
-.embed #panel{max-width:calc(100% - 32px)}
+.embed #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
 .embed #panel.collapsed .body,.embed #panel.collapsed .meta{display:none}
 .embed #panel.collapsed{width:auto;padding:10px 12px}
 .embed #panel.collapsed h1{font-size:16px;margin:4px 0 0}
 .embed.noui #panel{display:none}
+.embed #fsBtn{display:grid;place-items:center;position:fixed;top:12px;right:12px;width:36px;height:36px;padding:0;border:1px solid var(--panel-line);border-radius:10px;background:var(--panel)}
+.embed #fsBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.embed.locked #gate{display:grid;place-items:center;position:fixed;inset:0;width:100%;border:0;padding:0;background:transparent;touch-action:pan-x pan-y}
+#gate span{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:11px 16px;border-radius:999px}
+.embed.locked #panel{pointer-events:none}
+.embed:fullscreen #fsBtn .enter,.embed:not(:fullscreen) #fsBtn .exit{display:none}
+
 </style>
 <script>
 {
   const q = new URLSearchParams(location.search), root = document.documentElement;
-  if (q.get('embed') === '1') root.classList.add('embed');
+  if (q.get('embed') === '1') root.classList.add('embed', 'locked');
   if (q.get('ui') === '0') root.classList.add('noui');
   const t = q.get('theme');
   if (t === 'light' || t === 'dark') root.dataset.theme = t;
@@ -77,17 +90,16 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
 </script>
 </head>
 <body>
-
 <div id="stage"></div>
 <div id="labels"></div>
-<div id="loader"><div>Loading model…</div></div>
+<div id="loader"><div id="loadtxt">Loading furniture…</div></div>
 
-<aside id="panel">
+<aside id="panel" aria-label="Model controls">
   <div class="head">
     <div>
       <div class="eyebrow">Sunway Cochrane · Cheras</div>
       <h1>Type C unit</h1>
-      <div class="meta">2+1 bedrooms · 2 bathrooms · 872 sqft built-up. Model based on developer floor plan.</div>
+      <div class="meta">2+1 bedrooms · 2 bathrooms · 872 sqft built-up. Furnished with Ayanna-style pieces.</div>
     </div>
     <button id="collapse" aria-expanded="true">Hide</button>
   </div>
@@ -101,10 +113,15 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
       <ul class="rooms" id="rooms"></ul>
     </div>
     <label class="toggle"><input type="checkbox" id="showLabels" checked> Show room labels</label>
-    <div class="foot">Dimensions estimated from floor plan. Furniture placement conceptual.</div>
+    <div class="foot">Dimensions traced from the developer floor plan (±10%). Furniture from the Ayanna library, scaled to fit. Source: <a href="https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf" target="_blank" rel="noopener">brochure</a>.</div>
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>
+<button id="gate" aria-label="Explore the 3D model"><span>Click to explore in 3D</span></button>
+<button id="fsBtn" aria-label="Full screen" title="Full screen">
+  <svg class="enter" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  <svg class="exit" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+</button>
 
 <script type="importmap">
 {"imports":{
@@ -112,300 +129,6 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
   "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
 }}
 </script>
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-
-const B = (x, y, z = 0) => new THREE.Vector3(x, z, -y);
-
-const ROOMS = [
-  { name: 'Living / Dining / Kitchen', c: [3.4, 2.4], box: [0, 0, 6.8, 4.8], rect: true },
-  { name: 'Master Bedroom', c: [2.0, 7.5], box: [0, 5.6, 4.0, 9.4], rect: true },
-  { name: 'Bedroom 2', c: [5.5, 7.6], box: [3.8, 6.0, 7.2, 9.2], rect: true },
-  { name: 'Study', c: [6.2, 4.8], box: [5.0, 3.7, 7.4, 5.9], rect: true },
-  { name: 'Master Bathroom', c: [1.0, 5.5], box: [0, 4.4, 2.2, 6.6], rect: true },
-  { name: 'Bathroom', c: [5.4, 5.4], box: [4.4, 4.5, 6.4, 6.3], rect: true }
-];
-
-const CENTER = B(3.75, 4.75, 0);
-const VIEWS = [
-  { id: 'overview', name: 'Overview', pos: B(1, -6, 13), tgt: B(3.75, 4.75, 0), fov: 40, labels: true },
-  { id: 'plan', name: 'Plan', pos: B(3.75, 4.75, 18), tgt: B(3.75, 4.75, 0), fov: 35, labels: true },
-  { id: 'living', name: 'Living area', pos: new THREE.Vector3(3.4, 1.5, -2.4), tgt: new THREE.Vector3(3.4, 1.2, -5.8), hfov: 96 }
-];
-
-const stage = document.getElementById('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.AgXToneMapping;
-renderer.toneMappingExposure = 1.15;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-stage.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-const pmrem = new THREE.PMREMGenerator(renderer);
-scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
-scene.environmentIntensity = 0.55;
-
-const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 200);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.maxPolarAngle = Math.PI * 0.495;
-controls.maxDistance = 45;
-
-const e = new THREE.Euler(0.8726646, 0.1745329, -2.7925267, 'XYZ');
-const d = new THREE.Vector3(0, 0, -1).applyEuler(e);
-const sunDir = new THREE.Vector3(d.x, d.z, -d.y).normalize();
-const sun = new THREE.DirectionalLight(0xfff3e2, 3.2);
-sun.position.copy(CENTER).addScaledVector(sunDir, -25);
-sun.target.position.copy(CENTER);
-sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
-Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 60 });
-sun.shadow.bias = -0.0004;
-sun.shadow.normalBias = 0.02;
-scene.add(sun, sun.target);
-scene.add(new THREE.HemisphereLight(0xdbe6ff, 0xb9ab95, 0.9));
-
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(60, 60),
-  new THREE.ShadowMaterial({ opacity: 0.18 })
-);
-ground.rotation.x = -Math.PI / 2;
-ground.position.set(CENTER.x, -0.052, CENTER.z);
-ground.receiveShadow = true;
-scene.add(ground);
-
-function buildApartment() {
-  const group = new THREE.Group();
-  
-  const floorMat = new THREE.MeshStandardMaterial({ 
-    color: 0xd4c8b0,
-    roughness: 0.8,
-    metalness: 0.0
-  });
-  const wallMat = new THREE.MeshStandardMaterial({ 
-    color: 0xf5f3ed,
-    roughness: 0.9,
-    metalness: 0.0
-  });
-
-  ROOMS.forEach(room => {
-    const [x0, y0, x1, y1] = room.box;
-    const w = x1 - x0, d = y1 - y0;
-    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-    
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(w, d),
-      floorMat
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.set(cx, 0, -cy);
-    floor.receiveShadow = true;
-    group.add(floor);
-  });
-
-  const wallHeight = 2.8;
-  const wallThickness = 0.15;
-  const [x0, y0, x1, y1] = [0, 0, 7.5, 9.5];
-  const walls = [
-    { pos: [(x0+x1)/2, wallHeight/2, -y0-wallThickness/2], size: [x1-x0, wallHeight, wallThickness] },
-    { pos: [(x0+x1)/2, wallHeight/2, -y1+wallThickness/2], size: [x1-x0, wallHeight, wallThickness] },
-    { pos: [x0+wallThickness/2, wallHeight/2, -(y0+y1)/2], size: [wallThickness, wallHeight, y1-y0] },
-    { pos: [x1-wallThickness/2, wallHeight/2, -(y0+y1)/2], size: [wallThickness, wallHeight, y1-y0] }
-  ];
-
-  walls.forEach(({ pos, size }) => {
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(...size), wallMat);
-    wall.position.set(...pos);
-    wall.castShadow = true;
-    wall.receiveShadow = true;
-    group.add(wall);
-  });
-
-  const interiorWalls = [
-    { pos: [3.8, wallHeight/2, -4.5], size: [0.12, wallHeight, 1.0] },
-    { pos: [3.1, wallHeight/2, -5.25], size: [1.4, wallHeight, 0.12] }
-  ];
-
-  interiorWalls.forEach(({ pos, size }) => {
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(...size), wallMat);
-    wall.position.set(...pos);
-    wall.castShadow = true;
-    wall.receiveShadow = true;
-    group.add(wall);
-  });
-
-  return group;
-}
-
-const apartment = buildApartment();
-scene.add(apartment);
-
-const labelsEl = document.getElementById('labels');
-const labelNodes = ROOMS.map((r) => {
-  const el = document.createElement('div');
-  el.className = 'lbl';
-  el.textContent = r.name;
-  labelsEl.appendChild(el);
-  return { el, p: B(r.c[0], r.c[1], 0.1) };
-});
-
-function placeLabels() {
-  const w = stage.clientWidth, h = stage.clientHeight;
-  for (const L of labelNodes) {
-    const tmp = L.p.clone().project(camera);
-    const vis = tmp.z < 1 && Math.abs(tmp.x) < 1.1 && Math.abs(tmp.y) < 1.1;
-    L.el.style.display = vis ? '' : 'none';
-    if (vis) {
-      L.el.style.left = `${(tmp.x * .5 + .5) * w}px`;
-      L.el.style.top = `${(-tmp.y * .5 + .5) * h}px`;
-    }
-  }
-}
-
-let anim = null, interior = false, showLabels = true;
-
-function vfovFrom(v) {
-  const aspect = camera.aspect;
-  if (v.hfov) {
-    const vf = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(v.hfov) / 2) / aspect);
-    return Math.min(THREE.MathUtils.radToDeg(vf), 95);
-  }
-  return aspect < 0.8 ? v.fov * 1.5 : v.fov;
-}
-
-function flyTo(pos, tgt, fov, instant = false) {
-  if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    camera.position.copy(pos);
-    controls.target.copy(tgt);
-    camera.fov = fov;
-    camera.updateProjectionMatrix();
-    controls.update();
-    return;
-  }
-  anim = {
-    t0: performance.now(),
-    dur: 1100,
-    p0: camera.position.clone(),
-    t0v: controls.target.clone(),
-    f0: camera.fov,
-    p1: pos.clone(),
-    t1: tgt.clone(),
-    f1: fov
-  };
-}
-
-function stepAnim(now) {
-  if (!anim) return;
-  let k = Math.min(1, (now - anim.t0) / anim.dur);
-  const s = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-  camera.position.lerpVectors(anim.p0, anim.p1, s);
-  controls.target.lerpVectors(anim.t0v, anim.t1, s);
-  camera.fov = anim.f0 + (anim.f1 - anim.f0) * s;
-  camera.updateProjectionMatrix();
-  if (k >= 1) anim = null;
-}
-
-controls.addEventListener('start', () => { anim = null; setActive(null); });
-
-const viewsEl = document.getElementById('views');
-const chipEls = {};
-let currentView = VIEWS[0];
-
-function setActive(id) {
-  for (const k in chipEls) chipEls[k].setAttribute('aria-pressed', String(k === id));
-}
-
-function syncLabels() {
-  labelsEl.classList.toggle('off', !showLabels || interior);
-}
-
-function goView(v, instant) {
-  currentView = v;
-  setActive(v.id);
-  interior = !!v.hfov;
-  syncLabels();
-  controls.maxPolarAngle = v.hfov ? Math.PI * 0.95 : Math.PI * 0.495;
-  flyTo(v.pos, v.tgt, vfovFrom(v), instant);
-}
-
-for (const v of VIEWS) {
-  const b = document.createElement('button');
-  b.className = 'chip';
-  b.textContent = v.name;
-  b.setAttribute('aria-pressed', 'false');
-  b.onclick = () => goView(v);
-  chipEls[v.id] = b;
-  viewsEl.appendChild(b);
-}
-
-const roomsEl = document.getElementById('rooms');
-for (const r of ROOMS) {
-  const [x0, y0, x1, y1] = r.box;
-  const w = x1 - x0, h = y1 - y0;
-  const li = document.createElement('li');
-  const b = document.createElement('button');
-  const dim = `${w.toFixed(1)} × ${h.toFixed(1)} m · ${(w * h).toFixed(1)} m²`;
-  b.innerHTML = `<span>${r.name}</span><span class="dim">${dim}</span>`;
-  b.onclick = () => {
-    const m = Math.max(w, h);
-    const tgt = B(r.c[0], r.c[1], 0.3);
-    const pos = B(r.c[0] - m * 0.15, r.c[1] - (m * 0.9 + 2.2), m * 1.2 + 3.2);
-    controls.maxPolarAngle = Math.PI * 0.495;
-    setActive(null);
-    interior = false;
-    syncLabels();
-    flyTo(pos, tgt, camera.aspect < 0.8 ? 60 : 45);
-  };
-  li.appendChild(b);
-  roomsEl.appendChild(li);
-}
-
-document.getElementById('showLabels').addEventListener('change', (ev) => {
-  showLabels = ev.target.checked;
-  syncLabels();
-});
-
-const panel = document.getElementById('panel');
-const collapseBtn = document.getElementById('collapse');
-collapseBtn.onclick = () => {
-  const c = panel.classList.toggle('collapsed');
-  collapseBtn.textContent = c ? 'Show' : 'Hide';
-  collapseBtn.setAttribute('aria-expanded', String(!c));
-  resize();
-};
-
-function resize() {
-  const w = stage.clientWidth, h = stage.clientHeight;
-  renderer.setSize(w, h, false);
-  const panelOpen = !document.documentElement.classList.contains('noui') && !panel.classList.contains('collapsed');
-  const s = w > 640 && panelOpen ? Math.min(165, w * 0.15) : 0;
-  camera.aspect = (w + 2 * s) / h;
-  if (s) camera.setViewOffset(w + 2 * s, h, 0, 0, w, h);
-  else camera.clearViewOffset();
-  if (!anim && currentView && chipEls[currentView.id]?.getAttribute('aria-pressed') === 'true') {
-    camera.fov = vfovFrom(currentView);
-  }
-  camera.updateProjectionMatrix();
-}
-
-new ResizeObserver(resize).observe(stage);
-resize();
-goView(VIEWS[0], true);
-
-document.getElementById('loader').hidden = true;
-
-renderer.setAnimationLoop((now) => {
-  stepAnim(now);
-  controls.update();
-  renderer.render(scene, camera);
-  placeLabels();
-});
-</script>
+<script src="./data/type-c.js"></script>
+<script type="module" src="../shared/viewer.js"></script>
 </body></html>
