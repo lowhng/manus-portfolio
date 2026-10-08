@@ -125,7 +125,8 @@ window.UNIT = {
     [8.85, 2.52, 8.85, 3.13, 0.42],
   ],
   // Hinge (x, y), closed direction (dx, dy), width, swing +1 = counter-clockwise
-  // in plan. Leaves are 40 mm, Ayanna colours, and swing 80°.
+  // in plan. Leaves are 40 mm. Entry is terracotta; room leaves are a warm slab
+  // so they separate from the cutaway walls. They rest 65° open.
   doors: [
     // Entrance, south wall. Arc is north of the wall, so it swings into the foyer.
     { x: 7.60, y: 0, dx: 1, dy: 0, w: 0.90, swing: 1, kind: 'entry' },

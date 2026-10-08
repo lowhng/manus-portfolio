@@ -155,7 +155,8 @@ const wallGroup = new THREE.Group();
 const glassGroup = new THREE.Group();
 const doorGroup = new THREE.Group();
 scene.add(wallGroup, glassGroup, doorGroup);
-const matLeaf = new THREE.MeshStandardMaterial({ color: 0xe9e3d6, roughness: 0.72 });
+const matLeaf = new THREE.MeshStandardMaterial({ color: 0xd4c4ae, roughness: 0.7 });
+const matHandle = new THREE.MeshStandardMaterial({ color: 0x2c2e32, roughness: 0.35, metalness: 0.65 });
 const matEntry = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.58 });
 const doorPivots = [];
 // Cutaway is the default wherever a unit publishes a lower cut height (Type A).
@@ -222,14 +223,18 @@ function addDoorLeaf(d, ceiling) {
   const doorH = U.doorH ?? 2;
   const leafH = Math.min(doorH, Math.max(0.2, ceiling - 0.02));
   const theta = Math.atan2(d.dy, d.dx);
-  const swing = (d.swing || 1) * THREE.MathUtils.degToRad(80);
+  // 65° rather than Ayanna's interior 80°: from the dollhouse camera an 80° leaf is edge-on.
+  const swing = (d.swing || 1) * THREE.MathUtils.degToRad(65);
   const pivot = new THREE.Group();
   pivot.position.set(d.x, 0, -d.y);
   const leaf = new THREE.Mesh(new THREE.BoxGeometry(w, leafH, 0.04), d.kind === 'entry' ? matEntry : matLeaf);
   leaf.position.set(w / 2, leafH / 2, 0);
   leaf.castShadow = true;
   leaf.receiveShadow = true;
-  pivot.add(leaf);
+  const handle = new THREE.Mesh(new THREE.BoxGeometry(0.025, Math.min(0.14, leafH * 0.18), 0.025), matHandle);
+  handle.position.set(w - 0.07, leafH * 0.52, 0.028);
+  handle.castShadow = true;
+  pivot.add(leaf, handle);
   pivot.userData.closed = theta;
   pivot.userData.open = theta + swing;
   pivot.rotation.y = doorsOpen ? pivot.userData.open : pivot.userData.closed;
@@ -348,14 +353,30 @@ function applyPatches(root) {
       const p = PATCHES[m.name];
       if (p && !m.userData.patched) { patch(m, p[0], p[1]); m.userData.patched = true; }
       if (m.transparent || m.transmission > 0) transparent = true;
-      if (m.name === 'Shower Glass') {
-        m.transmission = 0; m.transparent = true; m.opacity = 0.32; m.roughness = 0.05;
-        m.metalness = 0; m.color.set(0xd7e7ef); m.depthWrite = false;
-      }
-      if (m.name === 'Black Metal') { m.color.set(0x3a3d42); m.metalness = 0.55; m.roughness = 0.42; }
-      if (m.name === 'Brushed Steel') { m.color.set(0xc5c9ce); m.metalness = 0.92; m.roughness = 0.22; }
-      if (m.name === 'Dark Steel') { m.color.set(0x1c1e22); m.metalness = 0.8; m.roughness = 0.32; }
       if (m.name === 'Glass') { m.depthWrite = false; }
+    }
+    // Clone, so the shared Black Metal / Brushed Steel materials on other pieces stay as authored.
+    if (/Shower_Glass$/.test(o.name)) {
+      const m = o.material.clone();
+      m.transmission = 0; m.transparent = true; m.opacity = 0.28; m.roughness = 0.04;
+      m.metalness = 0; m.color.set(0xe4f1f6); m.depthWrite = false; m.name = 'Shower Glass Clear';
+      o.material = m;
+    }
+    if (/Shower_(Profile|RainHead)$/.test(o.name)) {
+      const m = o.material.clone();
+      m.color.set(0x8d9399); m.metalness = 0.72; m.roughness = 0.32; m.name = 'Shower Frame';
+      o.material = m;
+    }
+    if (o.name === 'Fridge_Body' || o.name === 'Fridge_Doors') {
+      const m = o.material.clone();
+      m.color.set(o.name === 'Fridge_Doors' ? 0xd7dde4 : 0xb4bcc4);
+      m.metalness = 0.94; m.roughness = o.name === 'Fridge_Doors' ? 0.16 : 0.28;
+      o.material = m;
+    }
+    if (o.name === 'Fridge_Handles') {
+      const m = o.material.clone();
+      m.color.set(0x141618); m.metalness = 0.88; m.roughness = 0.22;
+      o.material = m;
     }
     o.castShadow = !transparent;
     o.receiveShadow = true;
