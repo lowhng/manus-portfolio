@@ -16,36 +16,41 @@ window.UNIT = {
   wallT: 0.12,
   // Rooms: box [x0,y0,x1,y1], label centre [cx,cy]
   rooms: [
-    { name: 'Master Bedroom', c: [1.85, 6.55], box: [0.12, 4.55, 3.70, 8.35] },
+    { name: 'Master Bedroom', c: [1.85, 6.55], box: [0.12, 4.70, 3.70, 8.35] },
     { name: 'Study', c: [4.55, 6.55], box: [3.70, 4.90, 5.55, 8.35] },
-    { name: 'Living', c: [7.15, 6.40], box: [5.55, 4.40, 8.73, 7.55] },
+    { name: 'Living', c: [7.15, 6.20], box: [5.55, 4.20, 8.73, 7.55] },
     { name: 'Balcony', c: [7.40, 8.00], box: [5.95, 7.55, 8.73, 8.35] },
-    { name: 'Dining / Kitchen', c: [6.80, 2.40], box: [4.40, 0.12, 8.73, 4.40] },
-    { name: 'Bathroom', c: [2.20, 2.55], box: [0.12, 0.12, 3.55, 4.55] },
+    { name: 'Dining', c: [6.50, 3.20], box: [4.40, 2.00, 8.73, 4.20] },
+    { name: 'Kitchen', c: [6.20, 0.95], box: [3.70, 0.12, 8.73, 2.00] },
+    { name: 'Bathroom', c: [1.70, 2.90], box: [0.12, 1.70, 3.30, 4.40] },
+    { name: 'Hall', c: [3.90, 3.30], box: [3.30, 2.00, 4.40, 4.70] },
     { name: 'Foyer', c: [7.80, 0.70], box: [7.00, 0.12, 8.73, 1.40] },
   ],
   // Interior wall segments [x0,y0,x1,y1] (excludes outer shell, which is auto-built)
   walls: [
-    // Master / bath divider (horizontal)
-    [0.12, 4.55, 3.70, 4.55],
-    // Master / study (vertical), door gap ~0.9
+    // Master south / bath north
+    [0.12, 4.70, 3.70, 4.70],
+    // Master / study (vertical), door gap
     [3.70, 5.80, 3.70, 8.35],
-    [3.70, 4.55, 3.70, 4.90],
-    // Study south wall
+    [3.70, 4.70, 3.70, 4.90],
+    // Study south
     [3.70, 4.90, 5.55, 4.90],
     // Study / living
     [5.55, 4.90, 5.55, 8.35],
-    // Living south (open to dining — partial)
-    [5.55, 4.40, 5.55, 4.90],
-    // Hall spine between bath and kitchen
-    [3.55, 0.12, 3.55, 2.80],
-    [3.55, 3.70, 3.55, 4.55],
-    // Bath north (toward master) already at y=4.55
-    // Kitchen / foyer partial
+    // Living / dining open edge
+    [5.55, 4.20, 5.55, 4.90],
+    // Bath east / hall
+    [3.30, 1.70, 3.30, 4.40],
+    // Bath south
+    [0.12, 1.70, 3.30, 1.70],
+    // Kitchen / dining divide (partial open)
+    [3.70, 2.00, 5.50, 2.00],
+    // Hall / kitchen
+    [3.70, 0.12, 3.70, 2.00],
+    // Kitchen / foyer
     [7.00, 1.40, 8.73, 1.40],
-    // Balcony divider
+    // Balcony
     [5.95, 7.55, 8.73, 7.55],
-    // AC ledge wall left of balcony
     [5.55, 7.55, 5.95, 7.55],
     [5.55, 7.55, 5.55, 8.35],
   ],
@@ -81,9 +86,9 @@ window.UNIT = {
     ['Fridge', 7.55, 0.55, 0],
     ['Kitchen_Decor', 5.90, 0.55, 0, 0.55, 1],
     // Bathroom
-    ['Bath1_Vanity', 0.55, 3.60, 1],
-    ['Bath1_Toilet', 0.55, 2.40, 1],
-    ['Bath1_Shower', 0.70, 0.90, 0],
+    ['Bath1_Vanity', 0.55, 3.70, 1],
+    ['Bath1_Toilet', 0.55, 2.70, 1],
+    ['Bath1_Shower', 2.50, 2.20, 0],
     // Foyer
     ['Shoe_Cabinet', 8.30, 0.90, 3],
     // Balcony
