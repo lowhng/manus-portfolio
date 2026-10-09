@@ -49,6 +49,8 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
 .dim{font:400 11.5px var(--mono);color:var(--ink-faint);white-space:nowrap}
 .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft)}
 .toggle input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.legend{font-size:11.5px;color:var(--ink-soft);margin-top:2px}
+.opts{display:flex;flex-wrap:wrap;gap:6px 14px}
 .foot{font-size:11px;color:var(--ink-faint);line-height:1.5}
 #hint{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:400 11px var(--mono);color:var(--ink-soft);background:var(--panel);border:1px solid var(--panel-line);padding:8px 10px;border-radius:8px}
 #loader{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none}
@@ -58,45 +60,38 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .body{display:flex;flex-direction:column;gap:16px}
 @media (max-width:640px){
-  #panel{top:auto;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:12px 14px;gap:10px}
+  #panel{top:auto;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:14px;gap:12px}
   #panel.collapsed .body{display:none}
   #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
   h1{font-size:18px}
   #hint{display:none}
-  .foot{display:none}
 }
-/* Short 16:9 frames (the embed page is ~960×540): keep the collapsed title
-   card at the top-left, and dock the open panel to the bottom so the unit stays visible. */
+#gate,#fsBtn{display:none}
+.embed #hint{display:none}
+.embed #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
+.embed #panel.collapsed .body,.embed #panel.collapsed .meta{display:none}
+.embed #panel.collapsed{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto;left:12px;right:auto;width:auto;max-width:calc(100% - 72px);padding:10px 12px}
+.embed #panel.collapsed .head{align-items:center}
+.embed #panel.collapsed h1{font-size:16px;margin:4px 0 0}
 @media (max-height:620px){
   #panel:not(.collapsed){top:auto;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));width:auto;max-height:46%;padding:12px 14px;gap:10px}
   #panel:not(.collapsed) .meta,#panel:not(.collapsed) .foot{display:none}
   #hint{display:none}
   h1{font-size:16px}
 }
-#gate,#fsBtn{display:none}
-.embed #hint{display:none}
-.embed #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;flex:none}
-.embed #panel.collapsed .body,.embed #panel.collapsed .meta{display:none}
-.embed #panel.collapsed{top:calc(12px + env(safe-area-inset-top,0px));bottom:auto;left:12px;right:auto;width:auto;max-width:calc(100% - 72px);padding:10px 12px}
-.embed #panel.collapsed .head{align-items:center}
-.embed #panel.collapsed h1{font-size:16px;margin:4px 0 0}
-@media (max-width:640px){.embed #panel.collapsed{right:auto}}
-.embed #panel{max-width:calc(100% - 24px)}
-.embed.noui #panel{display:none}
-.embed #fsBtn{display:grid;place-items:center;position:fixed;top:12px;right:12px;width:36px;height:36px;padding:0;border:1px solid var(--panel-line);border-radius:10px;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:inherit}
-.embed #fsBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.embed.locked #gate{display:grid;place-items:center;position:fixed;inset:0;width:100%;border:0;padding:0;background:transparent;touch-action:pan-x pan-y}
-#gate span{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:11px 16px;border-radius:999px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
-#gate:hover span{transform:translateY(-1px)}
-.embed.locked #panel{pointer-events:none}
-.embed:fullscreen #fsBtn .enter,.embed:not(:fullscreen) #fsBtn .exit{display:none}
-.opts{display:flex;flex-wrap:wrap;gap:6px 14px}
 @media (max-height:420px){
   #panel:not(.collapsed){max-height:78%;padding:8px 10px;gap:8px}
   #panel:not(.collapsed) .roomsec,#panel:not(.collapsed) .meta,#panel:not(.collapsed) .foot{display:none}
   #panel:not(.collapsed) h1{font-size:15px;margin:2px 0 0}
   .eyebrow{font-size:9px}
 }
+.embed.noui #panel{display:none}
+.embed #fsBtn{display:grid;place-items:center;position:fixed;top:12px;right:12px;width:36px;height:36px;padding:0;border:1px solid var(--panel-line);border-radius:10px;background:var(--panel)}
+.embed #fsBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.embed.locked #gate{display:grid;place-items:center;position:fixed;inset:0;width:100%;border:0;padding:0;background:transparent;touch-action:pan-x pan-y}
+#gate span{display:flex;align-items:center;gap:8px;font:600 13px/1 var(--sans);color:var(--label-ink);background:var(--label-bg);padding:11px 16px;border-radius:999px}
+.embed.locked #panel{pointer-events:none}
+.embed:fullscreen #fsBtn .enter,.embed:not(:fullscreen) #fsBtn .exit{display:none}
 
 </style>
 <script>
@@ -120,6 +115,7 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
     <div>
       <div class="eyebrow">Sunway Cochrane · Cheras</div>
       <h1>Type A unit</h1>
+      <div class="legend" id="hackNote" hidden>Tinted walls can be removed</div>
       <div class="meta">1+1 bedroom · 1 bathroom · 650 sqft built-up. Furnished with Ayanna-style pieces.</div>
     </div>
     <button id="collapse" aria-expanded="true">Hide</button>
@@ -134,7 +130,7 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
       <div class="opts">
         <label class="toggle"><input type="checkbox" id="showDoors" checked> Doors</label>
         <label class="toggle"><input type="checkbox" id="openDoors" checked> Open</label>
-        <label class="toggle"><input type="checkbox" id="cutaway" checked> Cutaway</label>
+        <label class="toggle"><input type="checkbox" id="lowWalls"> Lower walls</label>
         <label class="toggle"><input type="checkbox" id="showLabels" checked> Labels</label>
       </div>
     </div>
@@ -142,7 +138,7 @@ h1{margin:6px 0 4px;font-size:22px;font-weight:700}
       <h2>Rooms · traced from plan</h2>
       <ul class="rooms" id="rooms"></ul>
     </div>
-    <div class="foot">Walls traced from the floor plan at the printed 8850 × 8470 mm scale. Ceiling is 2.5 m; cutaway is on so the rooms still read from above. Doors follow the drawn swings. Source: <a href="https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf" target="_blank" rel="noopener">brochure</a>.</div>
+    <div class="foot">Walls traced from the floor plan. Ceiling is 2.5 m; lower walls drops the cut to 1.05 m. Tinted walls can be removed. Doors follow the drawn swings. Source: <a href="https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf" target="_blank" rel="noopener">brochure</a>.</div>
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>

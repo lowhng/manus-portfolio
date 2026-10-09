@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sunway Cochrane — Wei Hong's Portfolio</title>
+<style>
+  :root { --bg: #ffffff; --ink: #1d1d1f; --soft: #6e6e73; --line: #e5e5ea; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #111113; --ink: #f2f2f4; --soft: #9a9aa0; --line: #2a2a2e; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Georgia, serif; }
+  header { border-bottom: 1px solid var(--line); padding: 14px 16px; font: 600 15px system-ui, sans-serif; }
+  header a { color: inherit; text-decoration: none; }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 120px; }
+  h1 { font-size: 32px; line-height: 1.2; margin: 0 0 12px; }
+  h2 { font: 600 13px system-ui, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: var(--soft); margin: 48px 0 12px; }
+  h2 a { color: inherit; text-decoration: none; }
+  h2 a:hover { text-decoration: underline; }
+  p { color: var(--soft); max-width: 62ch; }
+  .slot {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #f3f1ec;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  @media (prefers-color-scheme: dark) { .slot { background: #1c1e1b; } }
+  .slot img, .slot iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 12px;
+  }
+  .slot img { object-fit: contain; }
+  .slot.live img { visibility: hidden; }
+</style>
+</head>
+<body>
+<header><a href="../index.html">Apartment Models</a></header>
+<main>
+  <h1>Sunway Cochrane</h1>
+  <p>Cheras, Kuala Lumpur. Four unit types from the sales-gallery plans. One model runs at a time; the others wait as floor plans until you scroll to them. Click a model to explore it.</p>
+
+  <h2><a href="type-a.html">Type A</a> · 1+1 bedroom · 1 bath · 650 sqft</h2>
+  <div class="slot" data-src="type-a.html?embed=1" data-title="Type A, 650 square feet">
+    <img src="type-a-650sf.png" alt="Type A floor plan">
+  </div>
+
+  <h2><a href="type-b.html">Type B</a> · 2 bedrooms · 2 baths · 732 sqft</h2>
+  <div class="slot" data-src="type-b.html?embed=1" data-title="Type B, 732 square feet">
+    <img src="type-b-732sf.png" alt="Type B floor plan">
+  </div>
+
+  <h2><a href="type-c.html">Type C</a> · 2+1 bedrooms · 2 baths · 872 sqft</h2>
+  <div class="slot" data-src="type-c.html?embed=1" data-title="Type C, 872 square feet">
+    <img src="type-c-872sf.png" alt="Type C floor plan">
+  </div>
+
+  <h2><a href="type-d.html">Type D</a> · 3 bedrooms · 2 baths · 1001 sqft</h2>
+  <div class="slot" data-src="type-d.html?embed=1" data-title="Type D, 1001 square feet">
+    <img src="type-d-1001sf.png" alt="Type D floor plan">
+  </div>
+</main>
+<script>
+  const ratios = new Map();
+  let active = null;
+  function activate(slot) {
+    if (!slot || slot === active) return;
+    if (active) {
+      active.querySelector('iframe')?.remove();
+      active.classList.remove('live');
+    }
+    active = slot;
+    slot.classList.add('live');
+    const frame = document.createElement('iframe');
+    frame.src = slot.dataset.src;
+    frame.title = slot.dataset.title;
+    frame.allow = 'fullscreen';
+    slot.appendChild(frame);
+  }
+  const slots = [...document.querySelectorAll('.slot')];
+  const io = new IntersectionObserver((entries) => {
+    for (const entry of entries) ratios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
+    let best = null;
+    let bestRatio = 0;
+    for (const slot of slots) {
+      const ratio = ratios.get(slot) || 0;
+      if (ratio > bestRatio) { best = slot; bestRatio = ratio; }
+    }
+    if (best) activate(best);
+  }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
+  for (const slot of slots) io.observe(slot);
+</script>
+</body>
+</html>

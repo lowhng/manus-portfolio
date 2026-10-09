@@ -13,7 +13,7 @@ Four unit types from Sunway Cochrane (Cheras, KL):
 | Type C | 2+1 | 2 | 872 | [type-c.html](sunway-cochrane/type-c.html) |
 | Type D | 3 | 2 | 1001 | [type-d.html](sunway-cochrane/type-d.html) |
 
-[View catalogue →](index.html)
+[View catalogue →](index.html) · [All four types →](sunway-cochrane/index.html)
 
 ## Architecture
 
@@ -51,7 +51,7 @@ Sofa, Armchair, Coffee_Table, TV_Unit, Dining_Table + chairs, Master/Bed1/Bed2 b
 - Circular nightstands on the plans → reused rectangular Ayanna bedsides
 - Square ottomans on Types B/D → reused Armchair (same scale-ish seat)
 - Kitchen_Run is 4.82 m long → scaled down per unit (~0.65–0.72)
-- Type A has door leaves (show / open toggles) and a 2.5 m ceiling with a cutaway toggle. Types B–D are still a solid shell with plan-traced partitions and no door slabs
+- All four types have door leaves (show / open toggles) and a 2.5 m ceiling. Walls open at full height; Lower walls drops them to 1.05 m. A pink hammer on the plan marks a wall that can be removed, drawn here in a warm tint.
 
 ### Accuracy
 - Outer dimensions taken from plan millimetre labels (±~2%)
@@ -59,4 +59,4 @@ Sofa, Armchair, Coffee_Table, TV_Unit, Dining_Table + chairs, Master/Bed1/Bed2 b
 - Furniture placement follows plan drawings; scale adjusted so pieces fit room boxes
 - Not a survey-grade BIM model — treat as a layout guide
 
-**Type A** walls are centreline runs. Each opening is an offset and a width along its run (`door`, `window`, or `opening`). The viewer cuts the opening out of that run, sizes the door leaf to it, and snaps any end within 5 cm onto the neighbouring centreline so the 200 mm boxes overlap at corners and T-junctions. `node scripts/check_walls.mjs` fails if an end is unattached, an opening has no type, a leaf width differs from its opening, or openings overlap or run past the wall. Thickness is the drawn stroke (~200 mm). North windows and the balcony slider are gaps in the stroke; the east dining windows are glass in a low sill. The master/hall leaf is the swing drawn in the hall, filling the opening down to the bath pier. Leaves swing 65° and, in the cutaway, are clipped to the 1.05 m cut. The master/study arc is under marker 8, so that hinge is a judgment. The page opens with cutaway walls; turn cutaway off for the 2.5 m shell. Types B, C, and D stay on the old segment list and still render. The scale wrapper still applies when they load. Fridge and shower colours are cloned onto those meshes only.
+**Type A** walls are centreline runs. Each opening is an offset and a width along its run (`door`, `window`, or `opening`). The viewer cuts the opening out of that run, sizes the door leaf to it, and snaps any end within 5 cm onto the neighbouring centreline so the 200 mm boxes overlap at corners and T-junctions. `node scripts/check_walls.mjs` fails if an end is unattached, an opening has no type, a leaf width differs from its opening, or openings overlap or run past the wall. Thickness is the drawn stroke (~200 mm). North windows and the balcony slider are gaps in the stroke; the east dining windows are glass in a low sill. The master/hall leaf is the swing drawn in the hall, filling the opening down to the bath pier. Leaves swing 65° and, in the cutaway, are clipped to the 1.05 m cut. The pink hammer by marker 8 is a hackable wall, not a door, so the master/study partition is solid and tinted. Walls open at full height (2.5 m); ?walls=low or the Lower walls toggle drops them to 1.05 m, and door leaves are clipped to that cut. Types B, C, and D use the same centreline runs, including one hackable wall each where the plan draws a hammer. All four sit on one page at sunway-cochrane/index.html, with a single live model. Fridge and shower colours are cloned onto those meshes only.

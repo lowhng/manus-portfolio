@@ -12,10 +12,11 @@
 // door leaf to its opening. Ends meet on the centreline; the viewer snaps
 // anything within 5 cm and overlaps the boxes, so the data has no overshoot.
 // East dining windows are legend marks 3 and 4 on a continuous stroke, so
-// they keep a sill. Ceiling matches Ayanna (2.5 m). The viewer starts in
-// cutaway (cutH). The master/study arc sits under marker 8, so that hinge
-// (opening east into the study) is a judgment. The master/hall leaf is the
-// swing measured in the hall: hinge on the bath pier, closing down onto it.
+// they keep a sill. Ceiling matches Ayanna (2.5 m). Walls open at full height;
+// Lower walls drops them to cutH. The pink hammer by
+// marker 8 marks the master/study partition as hackable, not a door, so that
+// run is a solid tinted wall. The master/hall leaf is the swing measured in
+// the hall: hinge on the bath pier, closing down onto it.
 //
 // explicitWalls: the footprint is not a rectangle (master notch, kitchen notch,
 // balcony / A/C ledge). Do not add the viewer's rectangular shell.
@@ -82,10 +83,8 @@ window.UNIT = {
     { x0: 5.14, y0: 8.47, x1: 8.85, y1: 8.47 },
     { x0: 5.14, y0: 7.47, x1: 5.14, y1: 8.47 },
     { x0: 6.33, y0: 7.47, x1: 6.33, y1: 8.47 },
-    // Master / study partition. Marker 8 covers the arc; hinge at the south jamb.
-    { x0: 2.90, y0: 4.77, x1: 2.90, y1: 7.47, openings: [
-      { at: 0.85, w: 1.08, type: 'door', hinge: 'start', swing: -1 },
-    ] },
+    // Master / study partition. The hammer means this wall can be removed.
+    { x0: 2.90, y0: 4.77, x1: 2.90, y1: 7.47, hackable: true },
     // Study south wall, then the door into the hall (hinge on the living wall).
     { x0: 2.90, y0: 4.77, x1: 5.60, y1: 4.77, openings: [
       { at: 1.60, w: 1.10, type: 'door', hinge: 'end', swing: -1 },
@@ -162,7 +161,7 @@ window.UNIT = {
     { kind: 'ottoman', x: 7.60, y: 4.40, rot: 0.5 },
   ],
   views: [
-    { id: 'overview', name: 'Overview', pos: [0.4, -2.2, 10.5], tgt: [4.4, 4.3, 0.3], fov: 38 },
+    { id: 'overview', name: 'Overview', pos: [-1.6, -3.6, 14.5], tgt: [4.3, 4.0, 0.4], fov: 34 },
     { id: 'plan', name: 'Plan', pos: [4.42, 4.24, 17], tgt: [4.42, 4.24, 0], fov: 40 },
     { id: 'living', name: 'Living', pos: [7.2, 3.4, 1.45], tgt: [7.2, 6.1, 0.9], hfov: 78 },
     { id: 'master', name: 'Master bedroom', pos: [1.3, 3.8, 1.45], tgt: [1.4, 6.0, 0.9], hfov: 78 },

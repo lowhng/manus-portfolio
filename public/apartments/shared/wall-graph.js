@@ -7,6 +7,9 @@
  *     sill, head,          // windows
  *     hinge: 'start'|'end', swing: 1|-1, kind }  // doors
  *
+ * `hackable: true` tints the whole run (a wall the plan marks with a hammer,
+ * removable). `hackable: [{ at, w }]` tints only those stretches of the run.
+ *
  * Ends within SNAP_M of another run are slid along their own centreline onto
  * that run. Solids then extend half the joined thickness past the joint so
  * the boxes overlap and close corners and T-junctions. Door leaves are cut
@@ -63,6 +66,7 @@ function cloneRuns(unit) {
       len,
       // Openings stay tied to the authored start until ends have been snapped.
       openings: (w.openings || []).map((o) => ({ ...o })),
+      hackable: w.hackable === true ? true : (w.hackable || []).map((h) => ({ ...h })),
       anchorX: w.x0,
       anchorY: w.y0,
       s0: 0,
@@ -130,6 +134,13 @@ function pointAt(run, s) {
   };
 }
 
+function spanHackable(run, a, b) {
+  if (run.hackable === true) return true;
+  const ranges = Array.isArray(run.hackable) ? run.hackable : [];
+  const mid = (Math.max(a, 0) + Math.min(b, run.len)) / 2;
+  return ranges.some((h) => mid >= h.at - 1e-3 && mid <= h.at + h.w + 1e-3);
+}
+
 function spanEnds(run, a, b) {
   const p = pointAt(run, a);
   const q = pointAt(run, b);
@@ -171,21 +182,22 @@ export function buildWallGraph(unit, opts = {}) {
         if (b >= run.len - 1e-4 && run.join1) b += run.join1.t / 2;
         const seg = spanEnds(run, a, b);
         if (Math.hypot(seg.x1 - seg.x0, seg.y1 - seg.y0) > 0.01) {
-          segments.push({ ...seg, h: ceiling, yBase: 0, role: 'solid' });
+          segments.push({ ...seg, h: ceiling, yBase: 0, role: 'solid', hackable: spanHackable(run, a, b) });
         }
         continue;
       }
       const box = spanEnds(run, a, b);
+      const hackable = spanHackable(run, a, b);
       if (span.kind === 'window') {
         const sill = span.op.sill ?? 0.12;
         const head = span.op.head ?? windowHead;
         if (sill > 0.02) {
-          segments.push({ ...box, h: Math.min(sill, ceiling), yBase: 0, role: 'sill' });
+          segments.push({ ...box, h: Math.min(sill, ceiling), yBase: 0, role: 'sill', hackable });
         }
         const g1 = Math.min(head, ceiling);
         if (g1 > sill + 0.02) glass.push({ ...box, sill, head: g1 });
         if (ceiling > head + 0.02) {
-          segments.push({ ...box, h: ceiling - head, yBase: head, role: 'header' });
+          segments.push({ ...box, h: ceiling - head, yBase: head, role: 'header', hackable });
         }
       } else if (span.kind === 'door' || span.kind === 'opening' || span.kind === 'open') {
         if (span.kind === 'door') {
@@ -206,7 +218,7 @@ export function buildWallGraph(unit, opts = {}) {
           });
         }
         if (ceiling > doorH + 0.02) {
-          segments.push({ ...box, h: ceiling - doorH, yBase: doorH, role: 'lintel' });
+          segments.push({ ...box, h: ceiling - doorH, yBase: doorH, role: 'lintel', hackable });
         }
       }
     }

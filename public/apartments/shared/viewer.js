@@ -145,6 +145,8 @@ scene.add(ground);
 
 // ---------- build shell ----------
 const wallMat = new THREE.MeshStandardMaterial({ color: 0xf5f3ed, roughness: 0.9, metalness: 0 });
+// Hammer on the plan: the wall can be removed. A warm tint, still plaster.
+const wallMatHack = new THREE.MeshStandardMaterial({ color: 0xecd3b4, roughness: 0.88, metalness: 0 });
 const floorDry = new THREE.MeshStandardMaterial({ color: 0xd4c8b0, roughness: 0.85 });
 const floorWet = new THREE.MeshStandardMaterial({ color: 0xb8b9b8, roughness: 0.5 });
 const floorOut = new THREE.MeshStandardMaterial({ color: 0x8a8680, roughness: 0.9 });
@@ -160,9 +162,9 @@ const matLeaf = new THREE.MeshStandardMaterial({ color: 0xd4c4ae, roughness: 0.7
 const matHandle = new THREE.MeshStandardMaterial({ color: 0x2c2e32, roughness: 0.35, metalness: 0.65 });
 const matEntry = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.58 });
 const doorPivots = [];
-// Cutaway is the default wherever a unit publishes a lower cut height (Type A).
-// walls=full raises that unit to its ceiling. Units without cutH ignore the flag.
-let cutawayOn = U.cutH != null && params.get('walls') !== 'full';
+// Full ceiling is the default. walls=low (or walls=cut) drops to cutH.
+// walls=full is accepted and stays at the ceiling.
+let wallsLow = U.cutH != null && (params.get('walls') === 'low' || params.get('walls') === 'cut');
 let doorsShown = params.get('doors') !== '0';
 let doorsOpen = params.get('doors') !== 'closed';
 doorGroup.visible = doorsShown;
@@ -174,12 +176,12 @@ function emptyGroup(g) {
   }
 }
 function ceilingNow() {
-  return cutawayOn && U.cutH != null ? U.cutH : U.wallH;
+  return wallsLow && U.cutH != null ? U.cutH : U.wallH;
 }
-function addWallSeg(x0, y0, x1, y1, h, t = U.wallT, yBase = 0) {
+function addWallSeg(x0, y0, x1, y1, h, t = U.wallT, yBase = 0, hackable = false) {
   const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
   if (len < 0.02 || h < 0.02) return;
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, h, t), wallMat);
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, h, t), hackable ? wallMatHack : wallMat);
   mesh.position.set((x0 + x1) / 2, yBase + h / 2, -(y0 + y1) / 2);
   mesh.rotation.y = -Math.atan2(dy, dx);
   mesh.castShadow = true;
@@ -257,7 +259,7 @@ function buildShell() {
   if (unitUsesRuns(U)) {
     const graph = buildWallGraph(U, { ceiling, doorH: U.doorH, windowHead: U.windowHead });
     if (graph.issues.length) console.warn(graph.issues.join('\n'));
-    for (const seg of graph.segments) addWallSeg(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t, seg.yBase || 0);
+    for (const seg of graph.segments) addWallSeg(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t, seg.yBase || 0, !!seg.hackable);
     for (const g of graph.glass) addGlass(g.x0, g.y0, g.x1, g.y1, g.sill, g.head);
     for (const d of graph.leaves) addDoorLeaf(d, ceiling, false);
   } else {
@@ -575,7 +577,7 @@ for (const r of U.rooms) {
 document.getElementById('showLabels')?.addEventListener('change', (ev) => { showLabels = ev.target.checked; syncLabels(); });
 const showDoorsEl = document.getElementById('showDoors');
 const openDoorsEl = document.getElementById('openDoors');
-const cutawayEl = document.getElementById('cutaway');
+const cutawayEl = document.getElementById('lowWalls') || document.getElementById('cutaway');
 const hasDoors = unitUsesRuns(U)
   ? (U.walls || []).some((w) => (w.openings || []).some((o) => o.type === 'door'))
   : (U.doors || []).length > 0;
@@ -594,11 +596,16 @@ if (openDoorsEl) {
 }
 if (cutawayEl) {
   if (U.cutH == null) cutawayEl.closest('label').hidden = true;
-  cutawayEl.checked = cutawayOn;
+  cutawayEl.checked = wallsLow;
   cutawayEl.addEventListener('change', () => {
-    cutawayOn = cutawayEl.checked;
+    wallsLow = cutawayEl.checked;
     buildShell();
   });
+}
+const hackNote = document.getElementById('hackNote');
+if (hackNote) {
+  const hack = unitUsesRuns(U) && (U.walls || []).some((w) => w.hackable);
+  hackNote.hidden = !hack;
 }
 const panel = document.getElementById('panel');
 const collapseBtn = document.getElementById('collapse');
