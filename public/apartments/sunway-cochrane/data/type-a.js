@@ -7,14 +7,15 @@
 //   sx = 8.850 / (1807.5 - 1033) m/px
 //   sy = 8.470 / (880 - 139) m/px
 // Origin is the bottom-left outer-wall centerline. +x right, +y toward the balcony.
-// Wall segments are those centerlines. Thickness matches the drawn stroke (~200 mm).
-// Openings are the gaps in the strokes (bedroom windows, balcony slider, doors).
-// East dining windows are legend marks 3 and 4; the stroke there is continuous,
-// so those are glass set in a cut wall rather than a missing stroke.
-// Ceiling matches Ayanna (2.5 m). The viewer starts in cutaway (cutH) so the
-// plan still reads from above; full height is a toggle. Door leaves follow
-// the drawn swings. The master/study arc sits under marker 8, so that hinge
-// (opening east into the study) is a judgment.
+// Each wall is one centreline run. Openings are offsets along that run
+// (type door, window, or opening). The viewer cuts them out and sizes each
+// door leaf to its opening. Ends meet on the centreline; the viewer snaps
+// anything within 5 cm and overlaps the boxes, so the data has no overshoot.
+// East dining windows are legend marks 3 and 4 on a continuous stroke, so
+// they keep a sill. Ceiling matches Ayanna (2.5 m). The viewer starts in
+// cutaway (cutH). The master/study arc sits under marker 8, so that hinge
+// (opening east into the study) is a judgment. The master/hall leaf is the
+// swing measured in the hall: hinge on the bath pier, closing down onto it.
 //
 // explicitWalls: the footprint is not a rectangle (master notch, kitchen notch,
 // balcony / A/C ledge). Do not add the viewer's rectangular shell.
@@ -61,87 +62,63 @@ window.UNIT = {
     { name: 'Balcony', box: [6.45, 7.58, 8.73, 8.36] },
     { name: 'A/C ledge', box: [5.26, 7.58, 6.22, 8.36] },
   ],
-  // Centerlines [x0,y0,x1,y1]. Ends that meet another wall overshoot by 0.10 m
-  // so the 0.20 m boxes close the corner. Door jambs are not overshot.
+  // Centreline runs. `at` is metres from (x0, y0). hinge start|end is which
+  // jamb the leaf hangs from. swing +1 is counter-clockwise in plan.
   walls: [
-    // West wall of the master (stops at the south wall — exterior notch below)
-    [0.00, 2.95, 0.00, 7.57],
-    // North wall of master / study / living, broken for windows and the balcony slider
-    [-0.10, 7.47, 0.34, 7.47],
-    [2.70, 7.47, 3.15, 7.47],
-    [4.85, 7.47, 6.45, 7.47],
-    [8.55, 7.47, 8.95, 7.47],
-    // East wall. Dining windows (legend 3 and 4) sit above a sill — the plan
-    // stroke is continuous there — with a full-height pier between them.
-    [8.85, -0.10, 8.85, 2.52],
-    [8.85, 2.52, 8.85, 3.13, 0.42],
-    [8.85, 3.13, 8.85, 3.32],
-    [8.85, 3.32, 8.85, 3.98, 0.42],
-    [8.85, 3.98, 8.85, 8.57],
-    // Balcony + A/C ledge (north of the living / study)
-    [5.04, 8.47, 8.95, 8.47],
-    [5.14, 7.37, 5.14, 8.57],
-    [6.33, 7.37, 6.33, 8.57],
-    // Master / study partition, door between the two segments
-    [2.90, 6.70, 2.90, 7.57],
-    [2.90, 4.67, 2.90, 5.62],
-    // Study south wall (tan stroke), stops at the door to the hall
-    [2.80, 4.77, 4.24, 4.77],
-    // Study / living wall, and the bath's east wall below the hall opening
-    [5.60, 4.70, 5.60, 7.57],
-    [5.60, 1.97, 5.60, 3.77],
-    // Master south wall and the return that closes the bath's west side
-    [-0.10, 3.05, 2.20, 3.05],
-    [2.10, 1.97, 2.10, 3.77],
-    // Bath north, two door openings
-    [2.00, 3.67, 3.34, 3.67],
-    [4.12, 3.67, 4.62, 3.67],
-    [5.40, 3.67, 5.70, 3.67],
-    // Bath south
-    [2.00, 2.07, 5.70, 2.07],
-    // Kitchen left wall, up to the bath
-    [3.58, -0.10, 3.58, 2.17],
-    // Exterior notch at the kitchen's lower-left
-    [3.15, -0.10, 3.15, 0.72],
-    [3.05, 0.62, 3.68, 0.62],
-    // South wall: kitchen, then foyer with the entrance door
-    [3.05, 0.00, 7.00, 0.00],
-    [6.80, 0.00, 7.60, 0.00],
-    [8.50, 0.00, 8.95, 0.00],
-    // Foyer west and north (inner door)
-    [6.90, -0.10, 6.90, 0.80],
-    [6.80, 0.70, 7.43, 0.70],
-    [8.63, 0.70, 8.95, 0.70],
-  ],
-  windows: [
-    // Master bedroom window (stroke gap under marker 7)
-    [0.36, 7.47, 2.68, 7.47],
-    // Study window (marker 7)
-    [3.17, 7.47, 4.83, 7.47],
-    // Living to balcony slider
-    [6.47, 7.47, 8.53, 7.47],
-    // Dining east windows (markers 4 then 3). Fifth value is the sill.
-    [8.85, 3.32, 8.85, 3.98, 0.42],
-    [8.85, 2.52, 8.85, 3.13, 0.42],
-  ],
-  // Hinge (x, y), closed direction (dx, dy), width, swing +1 = counter-clockwise
-  // in plan. Leaves are 40 mm. Entry is terracotta; room leaves are a warm slab
-  // so they separate from the cutaway walls. They rest 65° open.
-  doors: [
-    // Entrance, south wall. Arc is north of the wall, so it swings into the foyer.
-    { x: 7.60, y: 0, dx: 1, dy: 0, w: 0.90, swing: 1, kind: 'entry' },
-    // Foyer inner door. Arc sits north and to the east; hinge is the west jamb.
-    { x: 7.43, y: 0.70, dx: 1, dy: 0, w: 1.20, swing: 1, kind: 'room' },
-    // Master / study. Marker 8 covers the arc; hinged south, opening east into the study.
-    { x: 2.90, y: 5.76, dx: 0, dy: 1, w: 0.80, swing: -1, kind: 'room' },
-    // Master / hall. Swing is drawn inside the master; no wall stroke across the opening.
-    { x: 2.90, y: 4.67, dx: 0, dy: -1, w: 0.80, swing: -1, kind: 'room' },
-    // Study / hall. Open leaf drawn against the east wall, arc north of the threshold.
-    { x: 5.45, y: 4.77, dx: -1, dy: 0, w: 1.10, swing: -1, kind: 'room' },
-    // Bath, left leaf. Arc south of the wall, more ink on the east half, hinge west.
-    { x: 3.34, y: 3.67, dx: 1, dy: 0, w: 0.78, swing: -1, kind: 'room' },
-    // Bath, right leaf. More ink on the west half, hinge east, swings south.
-    { x: 5.40, y: 3.67, dx: -1, dy: 0, w: 0.78, swing: 1, kind: 'room' },
+    // West wall of the master, from the south wall up to the north wall.
+    { x0: 0, y0: 3.05, x1: 0, y1: 7.47 },
+    // North wall. Windows are the stroke gaps; the balcony slider is the third.
+    { x0: 0, y0: 7.47, x1: 8.85, y1: 7.47, openings: [
+      { at: 0.36, w: 2.32, type: 'window', sill: 0.12, head: 2.1 },
+      { at: 3.17, w: 1.66, type: 'window', sill: 0.12, head: 2.1 },
+      { at: 6.47, w: 2.06, type: 'window', sill: 0.12, head: 2.1 },
+    ] },
+    // East wall. Dining windows keep the sill under legend marks 3 and 4.
+    { x0: 8.85, y0: 0, x1: 8.85, y1: 8.47, openings: [
+      { at: 2.52, w: 0.61, type: 'window', sill: 0.42, head: 2.1 },
+      { at: 3.32, w: 0.66, type: 'window', sill: 0.42, head: 2.1 },
+    ] },
+    // Balcony and A/C ledge, north of the living room.
+    { x0: 5.14, y0: 8.47, x1: 8.85, y1: 8.47 },
+    { x0: 5.14, y0: 7.47, x1: 5.14, y1: 8.47 },
+    { x0: 6.33, y0: 7.47, x1: 6.33, y1: 8.47 },
+    // Master / study partition. Marker 8 covers the arc; hinge at the south jamb.
+    { x0: 2.90, y0: 4.77, x1: 2.90, y1: 7.47, openings: [
+      { at: 0.85, w: 1.08, type: 'door', hinge: 'start', swing: -1 },
+    ] },
+    // Study south wall, then the door into the hall (hinge on the living wall).
+    { x0: 2.90, y0: 4.77, x1: 5.60, y1: 4.77, openings: [
+      { at: 1.60, w: 1.10, type: 'door', hinge: 'end', swing: -1 },
+    ] },
+    // Master / hall door. The drawn swing closes onto the bath pier at x=4.40.
+    { x0: 4.40, y0: 3.67, x1: 4.40, y1: 4.77, openings: [
+      { at: 0, w: 0.93, type: 'door', hinge: 'end', swing: -1 },
+    ] },
+    // Study / living wall, and the bath's east wall below the hall.
+    { x0: 5.60, y0: 4.77, x1: 5.60, y1: 7.47 },
+    { x0: 5.60, y0: 2.07, x1: 5.60, y1: 3.67 },
+    // Master south wall.
+    { x0: 0, y0: 3.05, x1: 2.10, y1: 3.05 },
+    // Bath. Two doors in the north wall, arcs into the room.
+    { x0: 2.10, y0: 2.07, x1: 2.10, y1: 3.67 },
+    { x0: 2.10, y0: 3.67, x1: 5.60, y1: 3.67, openings: [
+      { at: 1.24, w: 0.78, type: 'door', hinge: 'start', swing: -1 },
+      { at: 2.52, w: 0.78, type: 'door', hinge: 'end', swing: 1 },
+    ] },
+    { x0: 2.10, y0: 2.07, x1: 5.60, y1: 2.07 },
+    // Kitchen left wall, and the exterior notch at its lower-left.
+    { x0: 3.58, y0: 0, x1: 3.58, y1: 2.07 },
+    { x0: 3.15, y0: 0, x1: 3.15, y1: 0.62 },
+    { x0: 3.15, y0: 0.62, x1: 3.58, y1: 0.62 },
+    // South wall, entrance door swinging into the foyer.
+    { x0: 3.15, y0: 0, x1: 8.85, y1: 0, openings: [
+      { at: 4.45, w: 0.90, type: 'door', hinge: 'start', swing: 1, kind: 'entry' },
+    ] },
+    // Foyer west wall and the inner door.
+    { x0: 6.90, y0: 0, x1: 6.90, y1: 0.70 },
+    { x0: 6.90, y0: 0.70, x1: 8.85, y1: 0.70, openings: [
+      { at: 0.53, w: 1.20, type: 'door', hinge: 'start', swing: 1 },
+    ] },
   ],
   // [asset, x, y, rotQuarters, sx?, sz?]
   // rot 0: local +X stays plan +x, local +Z goes to plan -y. Each +1 is 90° clockwise from above.

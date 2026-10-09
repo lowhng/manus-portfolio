@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { buildWallGraph, unitUsesRuns } from './wall-graph.js';
 
 const U = window.UNIT;
 if (!U) throw new Error('UNIT data missing');
@@ -218,10 +219,11 @@ function addHeader(x0, y0, x1, y1, ceiling) {
   if (ceiling <= head + 0.02) return;
   addWallSeg(x0, y0, x1, y1, ceiling - head, U.wallT, head);
 }
-function addDoorLeaf(d, ceiling) {
+function addDoorLeaf(d, ceiling, withLintel) {
   const w = d.w;
   const doorH = U.doorH ?? 2;
-  const leafH = Math.min(doorH, Math.max(0.2, ceiling - 0.02));
+  // Flush with the cut. A taller leaf reads as floating above the dollhouse walls.
+  const leafH = Math.min(doorH, ceiling);
   const theta = Math.atan2(d.dy, d.dx);
   // 65° rather than Ayanna's interior 80°: from the dollhouse camera an 80° leaf is edge-on.
   const swing = (d.swing || 1) * THREE.MathUtils.degToRad(65);
@@ -232,7 +234,7 @@ function addDoorLeaf(d, ceiling) {
   leaf.castShadow = true;
   leaf.receiveShadow = true;
   const handle = new THREE.Mesh(new THREE.BoxGeometry(0.025, Math.min(0.14, leafH * 0.18), 0.025), matHandle);
-  handle.position.set(w - 0.07, leafH * 0.52, 0.028);
+  handle.position.set(Math.max(0.08, w - 0.07), leafH * 0.52, 0.028);
   handle.castShadow = true;
   pivot.add(leaf, handle);
   pivot.userData.closed = theta;
@@ -240,7 +242,7 @@ function addDoorLeaf(d, ceiling) {
   pivot.rotation.y = doorsOpen ? pivot.userData.open : pivot.userData.closed;
   doorGroup.add(pivot);
   doorPivots.push(pivot);
-  if (ceiling > doorH + 0.02) {
+  if (withLintel && ceiling > doorH + 0.02) {
     addWallSeg(d.x, d.y, d.x + d.dx * w, d.y + d.dy * w, ceiling - doorH, U.wallT, doorH);
   }
 }
@@ -252,27 +254,35 @@ function buildShell() {
   emptyGroup(doorGroup);
   doorPivots.length = 0;
   const W = U.width, D = U.depth;
-  // Rectangular outer shell unless the unit supplies its own footprint (Type A).
-  if (!U.explicitWalls) {
-    addWallSeg(0, 0, W, 0, ceiling);
-    addWallSeg(0, D, W, D, ceiling);
-    addWallSeg(0, 0, 0, D, ceiling);
-    addWallSeg(W, 0, W, D, ceiling);
+  if (unitUsesRuns(U)) {
+    const graph = buildWallGraph(U, { ceiling, doorH: U.doorH, windowHead: U.windowHead });
+    if (graph.issues.length) console.warn(graph.issues.join('\n'));
+    for (const seg of graph.segments) addWallSeg(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t, seg.yBase || 0);
+    for (const g of graph.glass) addGlass(g.x0, g.y0, g.x1, g.y1, g.sill, g.head);
+    for (const d of graph.leaves) addDoorLeaf(d, ceiling, false);
+  } else {
+    // Rectangular outer shell unless the unit supplies its own footprint.
+    if (!U.explicitWalls) {
+      addWallSeg(0, 0, W, 0, ceiling);
+      addWallSeg(0, D, W, D, ceiling);
+      addWallSeg(0, 0, 0, D, ceiling);
+      addWallSeg(W, 0, W, D, ceiling);
+    }
+    for (const seg of U.walls || []) {
+      const explicit = seg[4];
+      const h = explicit != null ? Math.min(explicit, ceiling) : ceiling;
+      addWallSeg(seg[0], seg[1], seg[2], seg[3], h);
+      if (explicit != null) addHeader(seg[0], seg[1], seg[2], seg[3], ceiling);
+    }
+    for (const win of U.windows || []) {
+      const [x0, y0, x1, y1, sill] = win;
+      const h0 = sill != null ? sill : 0.12;
+      const head = Math.min(U.windowHead ?? ceiling, ceiling);
+      addGlass(x0, y0, x1, y1, h0, head);
+      if (sill == null) addHeader(x0, y0, x1, y1, ceiling);
+    }
+    for (const d of U.doors || []) addDoorLeaf(d, ceiling, true);
   }
-  for (const seg of U.walls || []) {
-    const explicit = seg[4];
-    const h = explicit != null ? Math.min(explicit, ceiling) : ceiling;
-    addWallSeg(seg[0], seg[1], seg[2], seg[3], h);
-    if (explicit != null) addHeader(seg[0], seg[1], seg[2], seg[3], ceiling);
-  }
-  for (const win of U.windows || []) {
-    const [x0, y0, x1, y1, sill] = win;
-    const h0 = sill != null ? sill : 0.12;
-    const head = Math.min(U.windowHead ?? ceiling, ceiling);
-    addGlass(x0, y0, x1, y1, h0, head);
-    if (sill == null) addHeader(x0, y0, x1, y1, ceiling);
-  }
-  for (const d of U.doors || []) addDoorLeaf(d, ceiling);
   if (shellBuilt) return;
   shellBuilt = true;
   const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
@@ -566,8 +576,11 @@ document.getElementById('showLabels')?.addEventListener('change', (ev) => { show
 const showDoorsEl = document.getElementById('showDoors');
 const openDoorsEl = document.getElementById('openDoors');
 const cutawayEl = document.getElementById('cutaway');
+const hasDoors = unitUsesRuns(U)
+  ? (U.walls || []).some((w) => (w.openings || []).some((o) => o.type === 'door'))
+  : (U.doors || []).length > 0;
 if (showDoorsEl) {
-  if (!(U.doors || []).length) showDoorsEl.closest('label').hidden = true;
+  if (!hasDoors) showDoorsEl.closest('label').hidden = true;
   showDoorsEl.checked = doorsShown;
   showDoorsEl.addEventListener('change', () => {
     doorsShown = showDoorsEl.checked;
@@ -575,7 +588,7 @@ if (showDoorsEl) {
   });
 }
 if (openDoorsEl) {
-  if (!(U.doors || []).length) openDoorsEl.closest('label').hidden = true;
+  if (!hasDoors) openDoorsEl.closest('label').hidden = true;
   openDoorsEl.checked = doorsOpen;
   openDoorsEl.addEventListener('change', () => { doorsOpen = openDoorsEl.checked; });
 }
@@ -613,6 +626,20 @@ new ResizeObserver(resize).observe(stage);
 resize();
 const startView = VIEWS.find((v) => v.id === params.get('view')) || VIEWS[0];
 goView(startView, true);
+const camSpec = params.get('cam');
+if (camSpec) {
+  const n = camSpec.split(',').map(Number);
+  if (n.length >= 6 && n.every((v) => Number.isFinite(v))) {
+    interior = false;
+    syncLabels();
+    setActive(null);
+    camera.position.copy(B(n[0], n[1], n[2]));
+    controls.target.copy(B(n[3], n[4], n[5]));
+    if (n[6]) camera.fov = n[6];
+    camera.updateProjectionMatrix();
+    controls.update();
+  }
+}
 
 // embed mode
 const root = document.documentElement;
