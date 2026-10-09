@@ -7,6 +7,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { buildWallGraph, unitUsesRuns } from './wall-graph.js';
+import { buildFloorGraph } from './floor-graph.js';
 
 const U = window.UNIT;
 if (!U) throw new Error('UNIT data missing');
@@ -147,17 +148,26 @@ scene.add(ground);
 const wallMat = new THREE.MeshStandardMaterial({ color: 0xf5f3ed, roughness: 0.9, metalness: 0 });
 // Hammer on the plan: the wall can be removed. A warm tint, still plaster.
 const wallMatHack = new THREE.MeshStandardMaterial({ color: 0xecd3b4, roughness: 0.88, metalness: 0 });
-const floorDry = new THREE.MeshStandardMaterial({ color: 0xd4c8b0, roughness: 0.85 });
-const floorWet = new THREE.MeshStandardMaterial({ color: 0xb8b9b8, roughness: 0.5 });
-const floorOut = new THREE.MeshStandardMaterial({ color: 0x8a8680, roughness: 0.9 });
+const floorDry = new THREE.MeshStandardMaterial({ color: 0xd4c8b0, roughness: 0.85, side: THREE.DoubleSide });
+const floorWet = new THREE.MeshStandardMaterial({ color: 0xb8b9b8, roughness: 0.5, side: THREE.DoubleSide });
+const floorOut = new THREE.MeshStandardMaterial({ color: 0x8a8680, roughness: 0.9, side: THREE.DoubleSide });
 patch(floorDry, ...PATCHES['Floor Timber']);
 patch(floorWet, ...PATCHES['Floor Wet Tile']);
 patch(floorOut, ...PATCHES['Floor Outdoor']);
+// Finishes sit a few millimetres above the slab. polygonOffset keeps the
+// overlap from flickering where two zones share an edge.
+for (const m of [floorDry, floorWet, floorOut]) {
+  m.polygonOffset = true;
+  m.polygonOffsetFactor = -2;
+  m.polygonOffsetUnits = -2;
+}
+const floorSlabMat = new THREE.MeshStandardMaterial({ color: 0xc8bfb2, roughness: 0.95, metalness: 0, side: THREE.DoubleSide });
 
 const wallGroup = new THREE.Group();
 const glassGroup = new THREE.Group();
 const doorGroup = new THREE.Group();
-scene.add(wallGroup, glassGroup, doorGroup);
+const floorGroup = new THREE.Group();
+scene.add(wallGroup, glassGroup, doorGroup, floorGroup);
 const matLeaf = new THREE.MeshStandardMaterial({ color: 0xd4c4ae, roughness: 0.7 });
 const matHandle = new THREE.MeshStandardMaterial({ color: 0x2c2e32, roughness: 0.35, metalness: 0.65 });
 const matEntry = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.58 });
@@ -165,6 +175,7 @@ const doorPivots = [];
 // Full ceiling is the default. walls=low (or walls=cut) drops to cutH.
 // walls=full is accepted and stays at the ceiling.
 let wallsLow = U.cutH != null && (params.get('walls') === 'low' || params.get('walls') === 'cut');
+const floorsOnly = params.get('floors') === 'only';
 let doorsShown = params.get('doors') !== '0';
 let doorsOpen = params.get('doors') !== 'closed';
 doorGroup.visible = doorsShown;
@@ -214,7 +225,18 @@ function addFloor(box, name) {
   floor.rotation.x = -Math.PI / 2;
   floor.position.set((x0 + x1) / 2, 0.001, -(y0 + y1) / 2);
   floor.receiveShadow = true;
-  scene.add(floor);
+  floorGroup.add(floor);
+}
+function addFloorPoly(poly, material, y) {
+  if (!poly || poly.length < 3) return;
+  const shape = new THREE.Shape();
+  shape.moveTo(poly[0].x, poly[0].y);
+  for (let i = 1; i < poly.length; i++) shape.lineTo(poly[i].x, poly[i].y);
+  const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
+  mesh.rotation.x = -Math.PI / 2;
+  mesh.position.y = y;
+  mesh.receiveShadow = true;
+  floorGroup.add(mesh);
 }
 function addHeader(x0, y0, x1, y1, ceiling) {
   const head = U.windowHead ?? 2.1;
@@ -287,10 +309,36 @@ function buildShell() {
   }
   if (shellBuilt) return;
   shellBuilt = true;
-  const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
-  for (const r of floorRects) addFloor(r.box, r.name || '');
+  if (unitUsesRuns(U)) {
+    const floors = buildFloorGraph(U);
+    if (floors.issues.length) console.warn(floors.issues.join('\n'));
+    const mat = { timber: floorDry, wet: floorWet, outdoor: floorOut };
+    if (floors.slab.length >= 3) {
+      addFloorPoly(floors.slab, floorSlabMat, 0.001);
+      for (const zone of floors.zones) addFloorPoly(zone.poly, mat[zone.kind] || floorDry, 0.006);
+    } else {
+      const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
+      for (const r of floorRects) addFloor(r.box, r.name || '');
+    }
+  } else {
+    const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
+    for (const r of floorRects) addFloor(r.box, r.name || '');
+  }
 }
 buildShell();
+if (floorsOnly) {
+  wallGroup.visible = false;
+  glassGroup.visible = false;
+  doorGroup.visible = false;
+  ground.visible = false;
+  renderer.setClearColor(0x2a62c8, 1);
+  for (const id of ['loader', 'labels', 'panel', 'gate']) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    el.hidden = true;
+    el.style.display = 'none';
+  }
+}
 
 // ---------- procedural furniture (Ayanna style, no matching asset) ----------
 function makeKitchenCabinet(p) {
@@ -336,7 +384,7 @@ function placeGroup(g, x, y, rot) {
   g.rotation.y = -rot * Math.PI / 2;
 }
 
-for (const p of U.procedural || []) {
+for (const p of floorsOnly ? [] : (U.procedural || [])) {
   if (p.skip) continue;
   if (p.kind === 'kitchen_cabinet') makeKitchenCabinet(p);
   else if (p.kind === 'kitchen_island') makeKitchenIsland(p);
@@ -464,7 +512,8 @@ function loadFurniture(urls) {
       else furnitureFailed(e);
     });
 }
-loadFurniture(furnitureUrls);
+if (!floorsOnly) loadFurniture(furnitureUrls);
+else if (loaderEl) loaderEl.hidden = true;
 // Safety: never leave the loader up forever (e.g. hung network)
 setTimeout(() => {
   if (loaderEl && !loaderEl.hidden && loadtxt?.textContent?.includes('Loading')) {

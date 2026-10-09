@@ -7,13 +7,15 @@
  *
  * Fails when a run end is not on another wall, an opening has no
  * door/window/opening type, a door leaf width differs from its opening,
- * or openings overlap or run past the wall.
+ * or openings overlap or run past the wall. Also fails when a 2 cm
+ * sample inside the floor slab is not covered by a finish zone.
  */
 import fs from 'fs';
 import path from 'path';
 import vm from 'vm';
 import { fileURLToPath } from 'url';
 import { buildWallGraph } from '../public/apartments/shared/wall-graph.js';
+import { buildFloorGraph, checkFloorCoverage } from '../public/apartments/shared/floor-graph.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -40,12 +42,24 @@ function report(file) {
   console.log(
     `${unit.id}: ${graph.runs.length} walls, ${graph.openings.length} openings, ${graph.leaves.length} doors, largest snap ${(moved * 100).toFixed(1)} cm`,
   );
+  let failed = 0;
   if (graph.issues.length) {
     for (const issue of graph.issues) console.error(`  ${issue}`);
-    return 1;
+    failed = 1;
   }
-  console.log('OK');
-  return 0;
+  const floor = buildFloorGraph(unit);
+  if (!floor.legacy) {
+    const area = floor.uncoveredArea || 0;
+    console.log(
+      `  floors: ${floor.zones.length} finish zones, uncovered ${area.toFixed(3)} m² (${floor.uncoveredCells || 0} of ${floor.insideCells || 0} samples at 2 cm)`,
+    );
+    if (floor.issues.length) {
+      for (const issue of floor.issues) console.error(`  ${issue}`);
+      failed = 1;
+    }
+  }
+  if (!failed) console.log('OK');
+  return failed;
 }
 
 function selfTest() {
@@ -94,6 +108,28 @@ function selfTest() {
   });
   if (good.issues.length || Math.abs(good.leaves[0].w - 0.8) > 1e-6) {
     console.error('self-test clean corner failed', good.issues, good.leaves);
+    return 1;
+  }
+  const covered = buildFloorGraph({
+    wallT: 0.2,
+    floors: [{ name: 'Living', box: [0.3, 0.3, 1.7, 1.7] }],
+    walls: [
+      { x0: 0, y0: 0, x1: 2, y1: 0 },
+      { x0: 2, y0: 0, x1: 2, y1: 2 },
+      { x0: 2, y0: 2, x1: 0, y1: 2 },
+      { x0: 0, y0: 2, x1: 0, y1: 0 },
+    ],
+  });
+  if (covered.issues.length || !covered.slab.length) {
+    console.error('self-test floor coverage failed', covered.issues);
+    return 1;
+  }
+  const hole = checkFloorCoverage({
+    slab: [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }],
+    zones: [{ poly: [{ x: 0, y: 0 }, { x: 0.4, y: 0 }, { x: 0.4, y: 1 }, { x: 0, y: 1 }] }],
+  });
+  if (!hole.length) {
+    console.error('self-test did not catch an uncovered floor');
     return 1;
   }
   console.log('self-test OK');
