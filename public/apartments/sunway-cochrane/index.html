@@ -81,6 +81,7 @@
     slot.appendChild(frame);
   }
   const slots = [...document.querySelectorAll('.slot')];
+  activate(slots[0]);
   const io = new IntersectionObserver((entries) => {
     for (const entry of entries) ratios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
     let best = null;
