@@ -1,5 +1,5 @@
 /**
- * Shared apartment unit viewer — Ayanna-style lighting/UI + furniture from /shared/furniture.txt
+ * Shared apartment unit viewer — Ayanna-style lighting/UI + furniture from ./furniture.txt
  * Expects window.UNIT to be set before this module runs.
  */
 import * as THREE from 'three';
@@ -489,11 +489,9 @@ function furnitureFailed(err) {
   // Keep the banner visible briefly so the failure is obvious, then clear it
   setTimeout(() => { if (loaderEl) loaderEl.hidden = true; }, 2500);
 }
-// Resolve furniture relative to the site root; also try a path relative to this page as fallback
-// Prefer site-root absolute path; fall back to a path relative to this HTML page
+// Furniture lives beside this module so public/apartments/ can move as one folder.
 const furnitureUrls = [
-  '/shared/furniture.txt',
-  new URL('../../shared/furniture.txt', location.href).pathname,
+  new URL('./furniture.txt', import.meta.url).href,
 ];
 function loadFurniture(urls) {
   const url = urls[0];
@@ -696,6 +694,15 @@ if (camSpec) {
     controls.update();
   }
 }
+
+// Live theme from the condo page or catalogue. The page background is the CSS
+// gradient behind this transparent canvas, and labels use the same variables.
+window.addEventListener('message', (ev) => {
+  if (ev.origin !== location.origin) return;
+  const data = ev.data;
+  if (!data || data.type !== 'apartments-theme') return;
+  if (data.theme === 'light' || data.theme === 'dark') document.documentElement.dataset.theme = data.theme;
+});
 
 // embed mode
 const root = document.documentElement;
