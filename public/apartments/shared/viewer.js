@@ -361,6 +361,25 @@ function makeKitchenCabinet(p) {
 function makeKitchenIsland(p) {
   makeKitchenCabinet({ ...p, kind: 'kitchen_cabinet' });
 }
+function makeStool(p) {
+  const g = new THREE.Group();
+  const wood = new THREE.MeshStandardMaterial({ color: 0x5a3d24, roughness: 0.7 });
+  patch(wood, ...WOOD([0.34, 0.21, 0.1], [0.5, 0.33, 0.18]));
+  const seatMat = new THREE.MeshStandardMaterial({ color: 0xc9c2b4, roughness: 0.9 });
+  const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.16, 0.05, 18), seatMat);
+  seat.position.y = 0.66;
+  const rung = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.02, 18), wood);
+  rung.position.y = 0.24;
+  for (const [x, z] of [[-0.11, -0.11], [0.11, -0.11], [-0.11, 0.11], [0.11, 0.11]]) {
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.66, 8), wood);
+    leg.position.set(x, 0.33, z);
+    g.add(leg);
+  }
+  g.add(seat, rung);
+  g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  placeGroup(g, p.x, p.y, p.rot || 0);
+  scene.add(g);
+}
 function makeOttoman(p) {
   const g = new THREE.Group();
   const boucle = new THREE.MeshStandardMaterial({ color: 0xc9c2b4, roughness: 0.9 });
@@ -389,6 +408,7 @@ for (const p of floorsOnly ? [] : (U.procedural || [])) {
   if (p.kind === 'kitchen_cabinet') makeKitchenCabinet(p);
   else if (p.kind === 'kitchen_island') makeKitchenIsland(p);
   else if (p.kind === 'ottoman') makeOttoman(p);
+  else if (p.kind === 'stool') makeStool(p);
 }
 
 // ---------- furniture load ----------
