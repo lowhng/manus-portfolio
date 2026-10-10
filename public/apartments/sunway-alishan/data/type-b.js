@@ -29,8 +29,8 @@ window.UNIT = {
     { name: 'Master Bedroom', c: [1.55, 5.80], box: [0.11, 2.94, 3.16, 9.45] },
     { name: 'Bedroom 3', c: [4.50, 5.70], box: [3.16, 4.74, 5.93, 9.45] },
     { name: 'Bedroom 4', c: [7.30, 7.70], box: [5.93, 6.08, 8.69, 9.45] },
-    { name: 'Living', c: [10.50, 8.20], box: [8.69, 5.40, 12.50, 9.95] },
-    { name: 'Dining', c: [11.15, 3.55], box: [9.30, 2.15, 12.55, 5.15] },
+    { name: 'Living', c: [10.80, 9.45], box: [8.69, 5.40, 12.50, 9.95] },
+    { name: 'Dining', c: [9.70, 4.70], box: [9.30, 2.15, 12.55, 5.15] },
     { name: 'Pantry', c: [7.40, 3.20], box: [6.45, 2.15, 8.70, 5.20] },
     { name: 'Junior Bedroom', c: [14.05, 6.60], box: [12.65, 5.24, 15.49, 9.45] },
     { name: 'Junior Bath', c: [14.35, 3.60], box: [13.23, 2.02, 15.49, 5.24] },
@@ -103,64 +103,65 @@ window.UNIT = {
   // TV screen -X. Master_Wardrobe long Z, front +X. Bed2_Wardrobe long X, front -Z.
   // Kitchen_Run backsplash +Z. Dining table long Z. Fridge back +Z.
   furniture: [
-    // Master — queen against the north wall, head north; wardrobe on the south wall
-    ['Master_Bed', 1.22, 8.15, 1, 0.90, 0.78],
-    ['Master_Bedside_L', 2.15, 8.85, 1],
-    ['Master_Wardrobe', 1.65, 3.32, 3, 0.75, 0.85],
-    // Bedroom 3 — head south, wardrobe on the east wall, desk in the south bay
-    ['Bed2_Bed', 4.50, 7.95, 1, 0.88, 0.80],
-    ['Master_Wardrobe', 5.55, 8.05, 2, 0.70, 0.75],
-    ['Master_Desk', 4.40, 5.45, 0],
-    ['Master_DeskChair', 4.40, 5.95, 2],
-    // Bedroom 4 — same arrangement, one bay east
-    ['Bed1_Bed', 7.25, 7.90, 1, 0.85, 0.78],
-    ['Bed1_Wardrobe', 8.30, 7.85, 3, 0.85, 0.80],
-    // Junior bedroom — head on the east wall
-    ['Bed2_Bed', 14.25, 8.00, 0, 0.82, 0.82],
-    ['Bed2_Wardrobe', 15.05, 6.20, 3, 0.90, 0.80],
-    ['Master_Desk', 13.55, 6.20, 1, 0.85, 0.85],
-    ['Master_DeskChair', 14.05, 6.20, 3],
-    // Living — sofa on the west side facing the TV, rug under the set
-    ['Rug_Living', 10.55, 8.05, 0, 0.85, 0.75],
-    ['Sofa', 9.25, 8.15, 2, 0.90, 0.85],
-    ['Armchair', 10.15, 6.85, 1],
-    ['Armchair', 11.55, 6.85, 3],
-    ['Coffee_Table', 10.50, 8.05, 0],
-    ['TV_Unit', 12.30, 8.10, 0, 1, 0.85],
-    // Dining — table long north–south, chairs on the long sides
-    ['Dining_Table', 11.30, 3.70, 0, 0.85, 1.05],
-    ['Dining_Chair_L1', 10.70, 3.30, 0],
-    ['Dining_Chair_L2', 10.70, 4.15, 0],
-    ['Dining_Chair_R1', 11.90, 3.30, 0],
-    ['Dining_Chair_R2', 11.90, 4.15, 0],
-    // Pantry island and a short counter
-    ['Kitchen_Run', 6.80, 3.60, 1, 0.32, 1],
+    // Symbol centres from the plan. Master bed 1.27 x 1.94, head north; wardrobe on the west wall.
+    ['Master_Bed', 1.51, 7.84, 1, 0.89, 0.61],
+    ['Master_Bedside_L', 2.20, 8.45, 1],
+    ['Master_Wardrobe', 0.55, 5.72, 0, 1, 0.63],
+    // Bedroom 3 — 1.57 square, head north; desk on the south wall of the bay
+    ['Bed2_Bed', 4.69, 8.09, 3, 0.71, 0.89],
+    ['Master_Desk', 5.12, 6.43, 0],
+    ['Master_DeskChair', 5.12, 6.95, 2],
+    // Bedroom 4 — same pair of symbols, one bay east
+    ['Bed1_Bed', 7.46, 8.09, 3, 0.71, 0.89],
+    ['Master_Desk', 7.90, 6.43, 0],
+    ['Master_DeskChair', 7.90, 6.95, 2],
+    // Junior bedroom — head east, wardrobe on the east wall
+    ['Bed2_Bed', 14.24, 8.01, 0, 0.72, 0.88],
+    ['Bed2_Wardrobe', 15.12, 6.06, 3, 0.95, 0.85],
+    // Living — rug 2.58 x 2.50, sofa on its west edge, two chairs at the south
+    ['Rug_Living', 10.44, 7.98, 0, 0.85, 0.80],
+    ['Sofa', 9.30, 8.15, 2, 0.90, 0.85],
+    ['Armchair', 10.43, 6.89, 1],
+    ['Armchair', 11.04, 6.96, 3],
+    ['Coffee_Table', 10.73, 8.16, 0],
+    ['TV_Unit', 12.20, 8.10, 0, 1, 0.85],
+    // Dining — table 0.80 x 2.14, three chairs each long side
+    ['Dining_Table', 11.40, 3.77, 0, 0.89, 1.19],
+    ['Dining_Chair_L1', 10.81, 4.48, 0],
+    ['Dining_Chair_L2', 10.81, 3.79, 0],
+    ['Dining_Chair_L1', 10.81, 3.09, 0],
+    ['Dining_Chair_R1', 11.99, 4.48, 0],
+    ['Dining_Chair_R2', 11.99, 3.79, 0],
+    ['Dining_Chair_R1', 11.99, 3.09, 0],
+    // Pantry counter on the west wall, 2.75 m
+    ['Kitchen_Run', 6.78, 3.44, 1, 0.57, 1],
     // Kitchen along the south wall, fridge at the foyer end
-    ['Kitchen_Run', 6.45, 0.48, 0, 0.68, 1],
+    ['Kitchen_Run', 6.48, 0.49, 0, 0.55, 1],
     ['Fridge', 8.42, 1.35, 3],
-    ['Yard_Washer', 3.80, 0.55, 0],
+    ['Yard_Washer', 3.77, 0.54, 0],
     ['Shoe_Cabinet', 9.20, 0.55, 1],
-    // Balcony set
-    ['Balcony_Chair_1', 10.10, 10.82, 0],
-    ['Balcony_SideTable', 10.65, 10.82, 0],
-    ['Balcony_Chair_2', 11.20, 10.82, 2],
-    ['Balcony_Plant_2', 12.10, 10.85, 0, 0.45, 0.45],
-    // Baths — shower, basin, toilet
-    ['MBath_Shower', 3.60, 4.20, 0],
-    ['MBath_Vanity', 4.05, 2.05, 1],
-    ['MBath_Toilet', 4.40, 2.70, 1],
-    ['Bath1_Shower', 5.20, 4.20, 0],
-    ['Bath1_Vanity', 5.70, 2.40, 1],
-    ['Bath1_Toilet', 6.05, 3.10, 1],
-    ['Bath1_Shower', 13.70, 4.55, 0],
-    ['Bath1_Vanity', 14.40, 2.45, 1],
-    ['Bath1_Toilet', 15.05, 3.40, 3],
+    // Balcony set, on the drawn squares
+    ['Balcony_Chair_1', 10.07, 10.91, 0],
+    ['Balcony_SideTable', 10.64, 10.88, 0],
+    ['Balcony_Chair_2', 11.20, 10.89, 2],
+    ['Balcony_Plant_2', 12.27, 10.90, 0, 0.45, 0.45],
+    // Baths — shower, basin, toilet on the drawn fittings
+    ['MBath_Shower', 4.43, 4.16, 0],
+    ['MBath_Vanity', 4.35, 3.15, 1],
+    ['MBath_Toilet', 4.55, 2.55, 1],
+    ['Bath1_Shower', 5.18, 4.24, 0],
+    ['Bath1_Vanity', 5.30, 3.37, 1],
+    ['Bath1_Toilet', 5.90, 2.85, 1],
+    ['Bath1_Shower', 14.98, 4.51, 0],
+    ['Bath1_Vanity', 13.73, 2.70, 1],
+    ['Bath1_Toilet', 14.70, 3.20, 3],
   ],
   procedural: [
-    { kind: 'kitchen_island', x: 7.45, y: 4.30, w: 1.50, d: 0.70, rot: 0 },
-    { kind: 'stool', x: 6.90, y: 3.75 },
-    { kind: 'stool', x: 7.45, y: 3.75 },
-    { kind: 'stool', x: 8.00, y: 3.75 },
+    // Island drawn 1.01 x 1.75, long north–south, stools on the west side
+    { kind: 'kitchen_island', x: 8.63, y: 3.93, w: 1.01, d: 1.75, rot: 0 },
+    { kind: 'stool', x: 7.90, y: 3.40 },
+    { kind: 'stool', x: 7.90, y: 3.93 },
+    { kind: 'stool', x: 7.90, y: 4.46 },
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-1.8, -3.4, 17.8], tgt: [7.75, 4.16, 0.4], fov: 32 },
