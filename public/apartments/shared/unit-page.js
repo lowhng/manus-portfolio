@@ -63,9 +63,12 @@ document.querySelector('#panel .meta').textContent =
   `${countLabel(U.beds, 'bedroom', 'bedrooms')} · ${countLabel(U.baths, 'bathroom', 'bathrooms')} · ${U.sqft} sqft built-up. Furnished with Ayanna-style pieces.`;
 
 const foot = document.querySelector('#panel .foot');
+const hasHackable = (U.walls || []).some((w) => w && w.hackable);
 foot.append(
-  'Walls traced from the floor plan. Ceiling is 2.5 m; lower walls drops the cut to 1.05 m. Tinted walls can be removed. Doors follow the drawn swings. Source: ',
+  'Walls traced from the floor plan. Ceiling is 2.5 m; lower walls drops the cut to 1.05 m. ',
 );
+if (hasHackable) foot.append('Tinted walls can be removed. ');
+foot.append('Doors follow the drawn swings. Source: ');
 if (U.sourceUrl) {
   const a = document.createElement('a');
   a.href = U.sourceUrl;

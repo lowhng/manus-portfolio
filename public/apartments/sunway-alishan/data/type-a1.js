@@ -2,8 +2,9 @@
 // Scale: printed 12500 mm arrow is 1094 px,
 //   s = 12.500 / 1094 m/px, used for both axes.
 // Origin is the non-balcony end of that arrow. +x right, +y toward the balcony.
-// Walls are centrelines of the filled strokes. A gap with an orange swing arc
-// is a door; other gaps on the outer face are windows; interior gaps are openings.
+// Walls are centrelines of the filled strokes. A black dashed quarter-arc is a hinged door. Orange marks are shower screens, not doors.
+// Other gaps on the outer face are windows; interior gaps without an arc stay openings.
+// This plan has no pink hammer, so no wall is hackable.
 // Variant A1a draws a window in the master bathroom. Built-up is 1,216 sqft;
 // the traced outline follows the printed arrows, so the gross footprint is larger.
 window.UNIT = {
@@ -45,9 +46,9 @@ window.UNIT = {
   ],
   walls: [
     { x0: 1.74, y0: 0.09, x1: 7.54, y1: 0.09 },
-    { x0: 7.54, y0: 0.98, x1: 9.38, y1: 0.98 },
+    { x0: 7.54, y0: 0.98, x1: 9.38, y1: 0.98, openings: [{ at: 0.27, w: 1.05, type: 'door', hinge: 'end', swing: -1 }] },
     { x0: 1.74, y0: 2.61, x1: 12.44, y1: 2.61, openings: [{ at: 5.72, w: 1.83, type: 'opening' }] },
-    { x0: 9.38, y0: 4.24, x1: 12.44, y1: 4.24, openings: [{ at: 1.11, w: 0.64, type: 'door', hinge: 'start', swing: -1 }] },
+    { x0: 9.38, y0: 4.24, x1: 12.44, y1: 4.24, openings: [{ at: 1.12, w: 0.66, type: 'door', hinge: 'end', swing: 1 }] },
     { x0: 0.06, y0: 5.36, x1: 4.10, y1: 5.36 },
     { x0: 3.94, y0: 6.69, x1: 5.70, y1: 6.69 },
     { x0: 0.06, y0: 10.03, x1: 5.70, y1: 10.03 },
@@ -55,12 +56,12 @@ window.UNIT = {
     { x0: 5.70, y0: 10.03, x1: 9.38, y1: 10.03 },
     { x0: 0.06, y0: 5.35, x1: 0.06, y1: 10.03 },
     { x0: 1.74, y0: 0.09, x1: 1.74, y1: 2.61 },
-    { x0: 2.93, y0: 2.61, x1: 2.93, y1: 10.03, openings: [{ at: 2.97, w: 0.90, type: 'opening' }] },
+    { x0: 2.93, y0: 2.61, x1: 2.93, y1: 10.03, openings: [{ at: 2.97, w: 0.90, type: 'door', hinge: 'start', swing: 1 }] },
     { x0: 4.46, y0: 0.09, x1: 4.46, y1: 2.61, openings: [{ at: 0.73, w: 0.83, type: 'opening' }] },
     { x0: 5.20, y0: 2.61, x1: 5.20, y1: 5.39 },
     { x0: 5.70, y0: 6.69, x1: 5.70, y1: 11.81 },
     { x0: 7.54, y0: 0.09, x1: 7.54, y1: 0.98 },
-    { x0: 9.38, y0: 0.00, x1: 9.38, y1: 11.81, openings: [{ at: 5.64, w: 0.74, type: 'opening' }], hackable: true },
+    { x0: 9.38, y0: 0.00, x1: 9.38, y1: 11.81, openings: [{ at: 5.64, w: 0.74, type: 'door', hinge: 'start', swing: -1 }] },
     { x0: 12.44, y0: 2.61, x1: 12.44, y1: 10.03 },
     { x0: 7.54, y0: 0.09, x1: 7.54, y1: 0.98 },
     { x0: 9.38, y0: 0.00, x1: 9.38, y1: 0.98 },
