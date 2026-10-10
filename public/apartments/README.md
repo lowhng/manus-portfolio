@@ -29,6 +29,18 @@ Four unit types from Sunway Alishan (Cheras, KL), on the same shared condo page:
 
 [All four types →](sunway-alishan/index.html)
 
+## Sunway Velocity 3
+
+Three unit types from Sunway Velocity 3 (Cheras / Maluri, KL), on the same shared condo page:
+
+| Unit | Beds | Baths | Sqft | Model |
+|------|------|-------|------|-------|
+| Type A | 2 | 2 | 721 | [type-a.html](sunway-velocity-3/type-a.html) |
+| Type B | 3 | 2 | 926 | [type-b.html](sunway-velocity-3/type-b.html) |
+| Type C | 3+1 | 2 | 1076 | [type-c.html](sunway-velocity-3/type-c.html) |
+
+[All three types →](sunway-velocity-3/index.html)
+
 ## Architecture
 
 ```
