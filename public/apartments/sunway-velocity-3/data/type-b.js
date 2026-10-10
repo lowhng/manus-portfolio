@@ -2,7 +2,8 @@
 // Printed 11900 mm arrow is 975 px between the outer wall-face centres
 // (west px 16, east px 991). s = 11.900 / 975. Origin is the south-west
 // outer centre (image y 1286). +x right, +y toward the balcony.
-// A filled tan quarter-circle is a hinged door. This sheet has no pink hammer.
+// A dashed quarter-circle is a hinged door. The tan discs are window and door
+// number badges, not swings. This sheet has no pink hammer.
 window.UNIT = {
   id: 'type-b',
   project: 'Sunway Velocity 3',
@@ -55,11 +56,11 @@ window.UNIT = {
     { x0: 3.55, y0: 2.50, x1: 8.95, y1: 2.50 },
     { x0: 11.90, y0: 4.10, x1: 11.90, y1: 8.50 },
     { x0: 0, y0: 8.50, x1: 11.90, y1: 8.50, openings: [
-      { at: 4.70, w: 0.60, type: 'door', hinge: 'start', swing: -1 },
-      { at: 7.40, w: 0.70, type: 'door', hinge: 'start', swing: -1 },
-      { at: 10.10, w: 0.70, type: 'door', hinge: 'start', swing: -1 },
+      { at: 4.80, w: 0.45, type: 'window' },
+      { at: 7.47, w: 0.45, type: 'window' },
+      { at: 10.20, w: 0.44, type: 'window' },
     ] },
-    { x0: 0, y0: 9.35, x1: 2.70, y1: 9.35, openings: [{ at: 1.05, w: 0.55, type: 'door', hinge: 'start', swing: -1 }] },
+    { x0: 0, y0: 9.35, x1: 2.70, y1: 9.35, openings: [{ at: 1.16, w: 0.48, type: 'opening' }] },
     { x0: 2.70, y0: 8.50, x1: 2.70, y1: 9.55 },
     { x0: 2.70, y0: 9.55, x1: 4.05, y1: 9.55 },
     { x0: 4.05, y0: 8.50, x1: 4.05, y1: 9.55 },
@@ -69,15 +70,20 @@ window.UNIT = {
     { x0: 6.25, y0: 2.50, x1: 6.25, y1: 4.10 },
     { x0: 8.95, y0: 5.20, x1: 8.95, y1: 8.50 },
     { x0: 8.95, y0: 2.50, x1: 8.95, y1: 4.10 },
-    { x0: 3.55, y0: 5.20, x1: 6.25, y1: 5.20, openings: [{ at: 0.15, w: 1.00, type: 'opening' }] },
-    { x0: 6.25, y0: 5.20, x1: 8.95, y1: 5.20, openings: [{ at: 0.10, w: 1.05, type: 'opening' }] },
+    // Bedroom 3 and Bedroom 2: hinge on the west jamb, swing north into the room.
+    // The next leaf is the master door, hinge west, swing south into the corridor.
+    { x0: 3.55, y0: 5.20, x1: 6.25, y1: 5.20, openings: [{ at: 0.20, w: 0.82, type: 'door', hinge: 'start', swing: 1 }] },
+    { x0: 6.25, y0: 5.20, x1: 8.95, y1: 5.20, openings: [
+      { at: 0.25, w: 0.80, type: 'door', hinge: 'start', swing: 1 },
+      { at: 1.17, w: 0.95, type: 'door', hinge: 'start', swing: -1 },
+    ] },
     { x0: 3.55, y0: 4.10, x1: 11.90, y1: 4.10, openings: [
-      { at: 1.15, w: 0.80, type: 'door', hinge: 'end', swing: -1 },
+      { at: 1.15, w: 0.80, type: 'door', hinge: 'end', swing: 1 },
       { at: 4.55, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
     ] },
-    { x0: 4.20, y0: 0, x1: 4.20, y1: 2.50, openings: [{ at: 0.65, w: 0.70, type: 'door', hinge: 'start', swing: 1 }] },
+    { x0: 4.20, y0: 0, x1: 4.20, y1: 2.50, openings: [{ at: 0.65, w: 0.70, type: 'door', hinge: 'start', swing: -1 }] },
     { x0: 1.70, y0: 0, x1: 1.70, y1: 1.00 },
-    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.15, w: 0.55, type: 'door', hinge: 'start', swing: 1 }] },
+    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.15, w: 0.55, type: 'door', hinge: 'start', swing: -1 }] },
   ],
   // Centres and scales are the drawn symbol boxes. Six dining chairs; heads face the balcony.
   furniture: [

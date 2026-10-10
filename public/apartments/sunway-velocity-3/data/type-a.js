@@ -2,7 +2,8 @@
 // Printed 8950 mm arrow is 736 px between the outer wall-face centres
 // (west px 123, east px 859). s = 8.950 / 736. Origin is the south-west
 // outer centre (image y 1268). +x right, +y toward the balcony.
-// A filled tan quarter-circle is a hinged door. This sheet has no pink hammer.
+// A dashed quarter-circle is a hinged door. The tan discs are window and door
+// number badges, not swings. This sheet has no pink hammer.
 window.UNIT = {
   id: 'type-a',
   project: 'Sunway Velocity 3',
@@ -51,10 +52,10 @@ window.UNIT = {
     { x0: 3.15, y0: 2.15, x1: 8.95, y1: 2.15 },
     { x0: 8.95, y0: 2.15, x1: 8.95, y1: 7.98 },
     { x0: 0, y0: 7.98, x1: 8.95, y1: 7.98, openings: [
-      { at: 4.50, w: 0.60, type: 'door', hinge: 'start', swing: -1 },
-      { at: 7.10, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
+      { at: 4.55, w: 0.44, type: 'window' },
+      { at: 7.26, w: 0.44, type: 'window' },
     ] },
-    { x0: 0, y0: 8.70, x1: 2.55, y1: 8.70, openings: [{ at: 0.90, w: 0.55, type: 'door', hinge: 'start', swing: -1 }] },
+    { x0: 0, y0: 8.70, x1: 2.55, y1: 8.70, openings: [{ at: 0.95, w: 0.46, type: 'opening' }] },
     { x0: 2.55, y0: 7.98, x1: 2.55, y1: 8.98 },
     { x0: 2.55, y0: 8.98, x1: 3.80, y1: 8.98 },
     { x0: 3.80, y0: 7.98, x1: 3.80, y1: 8.98 },
@@ -62,9 +63,10 @@ window.UNIT = {
     { x0: 3.15, y0: 2.15, x1: 3.15, y1: 3.75 },
     { x0: 6.00, y0: 4.80, x1: 6.00, y1: 7.98 },
     { x0: 6.00, y0: 2.15, x1: 6.00, y1: 3.75 },
-    { x0: 3.15, y0: 4.80, x1: 6.00, y1: 4.80, openings: [{ at: 0.30, w: 0.90, type: 'opening' }] },
+    // Bedroom 2: hinge on the west jamb, swing north into the room.
+    { x0: 3.15, y0: 4.80, x1: 6.00, y1: 4.80, openings: [{ at: 0.35, w: 0.80, type: 'door', hinge: 'start', swing: 1 }] },
     { x0: 3.15, y0: 3.75, x1: 8.95, y1: 3.75, openings: [
-      { at: 1.25, w: 0.80, type: 'door', hinge: 'end', swing: -1 },
+      { at: 1.25, w: 0.80, type: 'door', hinge: 'end', swing: 1 },
       { at: 3.15, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 1.70, y0: 0, x1: 1.70, y1: 1.00 },

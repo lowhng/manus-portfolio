@@ -70,7 +70,7 @@ window.UNIT = {
     ] },
     { x0: 1.20, y0: 0, x1: 1.20, y1: 2.87 },
     { x0: 0, y0: 2.87, x1: 2.90, y1: 2.87, openings: [
-      { at: 2.00, w: 0.75, type: 'door', hinge: 'end', swing: -1 },
+      { at: 2.00, w: 0.75, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 2.90, y0: 0, x1: 2.90, y1: 8.78, openings: [
       { at: 3.15, w: 0.77, type: 'door', hinge: 'start', swing: 1 },
@@ -85,7 +85,7 @@ window.UNIT = {
     ], hackable: [{ at: 1.65, w: 1.50 }] },
     { x0: 4.80, y0: 0, x1: 4.80, y1: 2.20 },
     { x0: 4.80, y0: 2.20, x1: 8.20, y1: 2.20, openings: [
-      { at: 1.21, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
+      { at: 1.21, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 8.20, y0: 0, x1: 8.20, y1: 5.06, openings: [
       { at: 3.89, w: 1.17, type: 'opening' },

@@ -2,7 +2,8 @@
 // Printed 12000 mm arrow is 982 px between the outer wall-face centres
 // (west px 66, east px 1048). s = 12.000 / 982. Origin is the south-west
 // outer centre (image y 1377). +x right, +y toward the balcony.
-// A filled tan quarter-circle is a hinged door. This sheet has no pink hammer.
+// A dashed quarter-circle is a hinged door. The tan discs are window and door
+// number badges, not swings. This sheet has no pink hammer.
 window.UNIT = {
   id: 'type-c',
   project: 'Sunway Velocity 3',
@@ -54,16 +55,16 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 10.58 },
-    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.40, w: 0.85, type: 'door', hinge: 'end', swing: 1, kind: 'entry' }] },
+    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.40, w: 0.85, type: 'door', hinge: 'end', swing: -1, kind: 'entry' }] },
     { x0: 6.40, y0: 0, x1: 6.40, y1: 2.60 },
     { x0: 3.65, y0: 2.60, x1: 12.00, y1: 2.60 },
     { x0: 12.00, y0: 2.60, x1: 12.00, y1: 9.80 },
     { x0: 0, y0: 9.80, x1: 12.00, y1: 9.80, openings: [
-      { at: 4.80, w: 0.60, type: 'door', hinge: 'start', swing: -1 },
-      { at: 7.60, w: 0.50, type: 'door', hinge: 'start', swing: -1 },
-      { at: 10.40, w: 0.50, type: 'door', hinge: 'start', swing: -1 },
+      { at: 4.88, w: 0.45, type: 'window' },
+      { at: 7.61, w: 0.45, type: 'window' },
+      { at: 10.42, w: 0.45, type: 'window' },
     ] },
-    { x0: 0, y0: 10.58, x1: 2.75, y1: 10.58, openings: [{ at: 1.05, w: 0.55, type: 'door', hinge: 'start', swing: -1 }] },
+    { x0: 0, y0: 10.58, x1: 2.75, y1: 10.58, openings: [{ at: 1.16, w: 0.46, type: 'opening' }] },
     { x0: 2.75, y0: 9.80, x1: 2.75, y1: 10.75 },
     { x0: 2.75, y0: 10.75, x1: 4.15, y1: 10.75 },
     { x0: 4.15, y0: 9.80, x1: 4.15, y1: 10.75 },
@@ -74,15 +75,16 @@ window.UNIT = {
     { x0: 6.15, y0: 2.60, x1: 6.15, y1: 5.40 },
     { x0: 8.75, y0: 6.60, x1: 8.75, y1: 9.80 },
     { x0: 8.75, y0: 2.60, x1: 8.75, y1: 5.40 },
-    { x0: 3.65, y0: 6.60, x1: 6.15, y1: 6.60, openings: [{ at: 0.15, w: 1.15, type: 'opening' }] },
-    { x0: 6.15, y0: 6.60, x1: 8.75, y1: 6.60, openings: [{ at: 0.10, w: 1.20, type: 'opening' }] },
+    // Bedroom 3 and Bedroom 2: hinge on the west jamb, swing north into the room.
+    { x0: 3.65, y0: 6.60, x1: 6.15, y1: 6.60, openings: [{ at: 0.22, w: 0.80, type: 'door', hinge: 'start', swing: 1 }] },
+    { x0: 6.15, y0: 6.60, x1: 8.75, y1: 6.60, openings: [{ at: 0.46, w: 0.81, type: 'door', hinge: 'start', swing: 1 }] },
     { x0: 3.65, y0: 5.40, x1: 12.00, y1: 5.40, openings: [
       { at: 1.65, w: 0.80, type: 'opening' },
-      { at: 3.85, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
-      { at: 5.65, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
+      { at: 4.09, w: 0.70, type: 'door', hinge: 'start', swing: -1 },
+      { at: 4.91, w: 0.81, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 6.15, y0: 3.70, x1: 8.75, y1: 3.70 },
-    { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'door', hinge: 'start', swing: 1 }] },
+    { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'door', hinge: 'start', swing: -1 }] },
     { x0: 1.70, y0: 0, x1: 1.70, y1: 1.00 },
     { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.45, w: 0.55, type: 'door', hinge: 'end', swing: 1 }] },
   ],

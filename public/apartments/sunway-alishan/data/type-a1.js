@@ -54,7 +54,7 @@ window.UNIT = {
   ],
   walls: [
     { x0: 1.74, y0: 0.09, x1: 7.54, y1: 0.09 },
-    { x0: 7.54, y0: 0.98, x1: 9.38, y1: 0.98, openings: [{ at: 0.27, w: 1.05, type: 'door', hinge: 'end', swing: -1 }] },
+    { x0: 7.54, y0: 0.98, x1: 9.38, y1: 0.98, openings: [{ at: 0.27, w: 1.05, type: 'door', hinge: 'end', swing: -1, kind: 'entry' }] },
     { x0: 1.74, y0: 2.61, x1: 12.44, y1: 2.61, openings: [{ at: 5.72, w: 1.83, type: 'opening' }] },
     { x0: 9.38, y0: 4.24, x1: 12.44, y1: 4.24, openings: [{ at: 1.12, w: 0.66, type: 'door', hinge: 'end', swing: 1 }] },
     { x0: 0.06, y0: 5.36, x1: 4.10, y1: 5.36 },

@@ -73,7 +73,7 @@ window.UNIT = {
       { at: 1.67, w: 0.95, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 0, y0: 3.65, x1: 5.65, y1: 3.65, openings: [
-      { at: 1.95, w: 0.75, type: 'door', hinge: 'end', swing: -1 },
+      { at: 1.95, w: 0.75, type: 'door', hinge: 'end', swing: 1 },
       { at: 3.77, w: 0.67, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 0, y0: 2.05, x1: 5.65, y1: 2.05 },
