@@ -2,8 +2,9 @@
 // Printed 12000 mm arrow is 982 px between the outer wall-face centres
 // (west px 66, east px 1048). s = 12.000 / 982. Origin is the south-west
 // outer centre (image y 1377). +x right, +y toward the balcony.
-// A dashed quarter-circle is a hinged door. The tan discs are window and door
-// number badges, not swings. This sheet has no pink hammer.
+// A hinged leaf is placed only where a dashed quarter-circle is drawn.
+// The tan discs are window and door number badges, not swings.
+// This sheet has no pink hammer.
 window.UNIT = {
   id: 'type-c',
   project: 'Sunway Velocity 3',
@@ -55,7 +56,8 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 10.58 },
-    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.40, w: 0.85, type: 'door', hinge: 'end', swing: -1, kind: 'entry' }] },
+    // One entrance leaf: hinge on the west jamb, swing north into the foyer.
+    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.34, w: 0.87, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
     { x0: 6.40, y0: 0, x1: 6.40, y1: 2.60 },
     { x0: 3.65, y0: 2.60, x1: 12.00, y1: 2.60 },
     { x0: 12.00, y0: 2.60, x1: 12.00, y1: 9.80 },
@@ -84,9 +86,11 @@ window.UNIT = {
       { at: 4.91, w: 0.81, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 6.15, y0: 3.70, x1: 8.75, y1: 3.70 },
-    { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'door', hinge: 'start', swing: -1 }] },
+    // Wet-kitchen west side is a straight partition, not a hinged leaf.
+    { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'opening' }] },
     { x0: 1.70, y0: 0, x1: 1.70, y1: 1.00 },
-    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.45, w: 0.55, type: 'door', hinge: 'end', swing: 1 }] },
+    // Foyer opens north into dining. No swing is drawn on this line.
+    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.12, w: 1.46, type: 'opening' }] },
   ],
   // Centres and scales are the drawn symbol boxes. Dining chairs sit on the long sides.
   furniture: [

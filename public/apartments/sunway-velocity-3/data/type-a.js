@@ -2,8 +2,9 @@
 // Printed 8950 mm arrow is 736 px between the outer wall-face centres
 // (west px 123, east px 859). s = 8.950 / 736. Origin is the south-west
 // outer centre (image y 1268). +x right, +y toward the balcony.
-// A dashed quarter-circle is a hinged door. The tan discs are window and door
-// number badges, not swings. This sheet has no pink hammer.
+// A hinged leaf is placed only where a dashed quarter-circle is drawn.
+// The tan discs are window and door number badges, not swings.
+// This sheet has no pink hammer.
 window.UNIT = {
   id: 'type-a',
   project: 'Sunway Velocity 3',
@@ -47,7 +48,8 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 8.70 },
-    { x0: 0, y0: 0, x1: 5.55, y1: 0, openings: [{ at: 0.45, w: 0.80, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
+    // One entrance leaf: hinge on the west jamb, swing north into the foyer.
+    { x0: 0, y0: 0, x1: 5.55, y1: 0, openings: [{ at: 0.34, w: 0.86, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
     { x0: 5.55, y0: 0, x1: 5.55, y1: 2.15 },
     { x0: 3.15, y0: 2.15, x1: 8.95, y1: 2.15 },
     { x0: 8.95, y0: 2.15, x1: 8.95, y1: 7.98 },
@@ -70,7 +72,8 @@ window.UNIT = {
       { at: 3.15, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 1.70, y0: 0, x1: 1.70, y1: 1.00 },
-    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.50, w: 0.55, type: 'door', hinge: 'end', swing: 1 }] },
+    // Foyer opens north into dining. No swing is drawn on this line.
+    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.12, w: 1.46, type: 'opening' }] },
   ],
   // Centres and scales are the drawn symbol boxes. Heads face the balcony.
   furniture: [
