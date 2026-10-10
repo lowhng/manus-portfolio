@@ -56,8 +56,8 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 10.58 },
-    // One entrance leaf: hinge on the west jamb, swing north into the foyer.
-    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.34, w: 0.87, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
+    // South edge is the outer foyer opening (the number badge). No swing is drawn there.
+    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.34, w: 0.87, type: 'opening' }] },
     { x0: 6.40, y0: 0, x1: 6.40, y1: 2.60 },
     { x0: 3.65, y0: 2.60, x1: 12.00, y1: 2.60 },
     { x0: 12.00, y0: 2.60, x1: 12.00, y1: 9.80 },
@@ -88,9 +88,9 @@ window.UNIT = {
     { x0: 6.15, y0: 3.70, x1: 8.75, y1: 3.70 },
     // Wet-kitchen west side is a straight partition, not a hinged leaf.
     { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'opening' }] },
-    { x0: 1.70, y0: 0, x1: 1.70, y1: 1.00 },
-    // Foyer opens north into dining. No swing is drawn on this line.
-    { x0: 0, y0: 1.00, x1: 1.70, y1: 1.00, openings: [{ at: 0.12, w: 1.46, type: 'opening' }] },
+    { x0: 1.70, y0: 0, x1: 1.70, y1: 0.90 },
+    // Entrance: dashed arc from the west wall up into the unit. Hinge west, closed along this line.
+    { x0: 0, y0: 0.90, x1: 1.70, y1: 0.90, openings: [{ at: 0.28, w: 1.09, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
   ],
   // Centres and scales are the drawn symbol boxes. Dining chairs sit on the long sides.
   furniture: [
