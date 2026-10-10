@@ -1,0 +1,45 @@
+{
+  "condos": [
+    {
+      "slug": "sunway-cochrane",
+      "name": "Sunway Cochrane",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Sunway Property",
+      "intro": "Cheras, Kuala Lumpur. Four unit types from the sales-gallery plans. One model runs at a time; the others wait as floor plans until you scroll to them. Click a model to explore it.",
+      "sourceUrl": "https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": "1+1", "baths": 1, "sqft": 650, "plan": "type-a-650sf.png", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": 2, "baths": 2, "sqft": 732, "plan": "type-b-732sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "2+1", "baths": 2, "sqft": 872, "plan": "type-c-872sf.png", "page": "type-c.html" },
+        { "id": "type-d", "name": "Type D", "beds": 3, "baths": 2, "sqft": 1001, "plan": "type-d-1001sf.png", "page": "type-d.html" }
+      ]
+    },
+    {
+      "slug": "sunway-alishan",
+      "name": "Sunway Alishan",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Sunway Alishan Sdn Bhd (Sunway Property)",
+      "intro": "Cheras, Kuala Lumpur — Batu 5, Jalan Cheras, about 400 m from EkoCheras Mall. Freehold. Four unit types from the sales brochure (expected completion October 2025). One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://sunwayproperty.com/sunway-alishan/",
+      "units": [
+        { "id": "type-a1", "name": "Type A1", "beds": 3, "baths": 2, "sqft": 1216, "plan": "type-a1-1216sf.png", "page": "type-a1.html" },
+        { "id": "type-a2", "name": "Type A2", "beds": 3, "baths": 2, "sqft": 1249, "plan": "type-a2-1249sf.png", "page": "type-a2.html" },
+        { "id": "type-b", "name": "Type B", "beds": 4, "baths": 3, "sqft": 1496, "plan": "type-b-1496sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": 4, "baths": 4, "sqft": 1798, "plan": "type-c-1798sf.png", "page": "type-c.html" }
+      ]
+    },
+    {
+      "slug": "sunway-velocity-3",
+      "name": "Sunway Velocity 3",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Sunway Velocity Three Sdn Bhd (Sunway Property)",
+      "intro": "Sunway Velocity township, Jalan Cheras / Maluri, Kuala Lumpur. Leasehold. Three unit types from the sales brochure (expected completion May 2028). One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://www.sunwayvelocity3.com/",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 2, "baths": 2, "sqft": 721, "plan": "type-a-721sf.png", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": 3, "baths": 2, "sqft": 926, "plan": "type-b-926sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "3+1", "baths": 2, "sqft": 1076, "plan": "type-c-1076sf.png", "page": "type-c.html" }
+      ]
+    }
+  ]
+}
