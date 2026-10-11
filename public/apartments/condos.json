@@ -40,6 +40,22 @@
         { "id": "type-b", "name": "Type B", "beds": 3, "baths": 2, "sqft": 926, "plan": "type-b-926sf.png", "page": "type-b.html" },
         { "id": "type-c", "name": "Type C", "beds": "3+1", "baths": 2, "sqft": 1076, "plan": "type-c-1076sf.png", "page": "type-c.html" }
       ]
+    },
+    {
+      "slug": "quartz-queensville",
+      "name": "Quartz Queensville",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Dwitasik Sdn Bhd (Queensville)",
+      "intro": "Jalan Sri Permaisuri, Bandar Sri Permaisuri, Cheras. Leasehold, 99 years expiring May 2112. Six unit types from the Quartz @ Queens Residenz sales plans (new launch, estimated Q1 2028). One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://queensville.com.my/quartz/",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 2, "baths": 2, "sqft": 702, "plan": "type-a-702sf.png", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": "2+1", "baths": 2, "sqft": 805, "plan": "type-b-805sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "2+1", "baths": 2, "sqft": 877, "plan": "type-c-877sf.png", "page": "type-c.html" },
+        { "id": "type-d", "name": "Type D", "beds": "3+1", "baths": 3, "sqft": 1011, "plan": "type-d-1011sf.png", "page": "type-d.html" },
+        { "id": "type-e", "name": "Type E", "beds": "3+1", "baths": 3, "sqft": 1063, "plan": "type-e-1063sf.png", "page": "type-e.html" },
+        { "id": "type-f", "name": "Type F", "beds": 4, "baths": 3, "sqft": 1212, "plan": "type-f-1212sf.png", "page": "type-f.html" }
+      ]
     }
   ]
 }
