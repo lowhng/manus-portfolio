@@ -500,6 +500,7 @@ export function buildFloorGraph(unit) {
     legacy: false,
     slab,
     zones,
+    voids: unit.voids || [],
     issues: [],
   };
   if (!slab.length) floor.issues.push('floor outline is missing');
@@ -520,6 +521,11 @@ export function checkFloorCoverage(floor, step = 0.02) {
   for (let x = bb.minX + step / 2; x < bb.maxX; x += step) {
     for (let y = bb.minY + step / 2; y < bb.maxY; y += step) {
       if (!pointInPoly(x, y, slab)) continue;
+      const inVoid = (floor.voids || []).some((v) => {
+        const [x0, y0, x1, y1] = v.box;
+        return x >= x0 && x <= x1 && y >= y0 && y <= y1;
+      });
+      if (inVoid) continue;
       inside++;
       const covered = zones.some((z) => pointInPoly(x, y, z.poly));
       if (!covered) {

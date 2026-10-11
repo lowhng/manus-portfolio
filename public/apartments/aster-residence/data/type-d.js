@@ -1,0 +1,173 @@
+// Aster Residence Type D — duplex, 1,009 sqft, 3 bedrooms, 2 baths + powder.
+// Both floors are on one sheet and share this scale. No millimetre arrow.
+// Each floor's outer wall-centre rectangle is about half of 1,009 sqft
+// (s = 0.0084 m/px). Origin is the south-west outer centre of either
+// plan, so the upper floor stacks on the lower. +y toward the top of
+// each plan (foyer on the lower floor). No pink hammer.
+// The stair is drawn on the lower floor. The upper floor leaves a void
+// in the slab over that box. Level chips live in the shared viewer.
+window.UNIT = {
+  id: 'type-d',
+  project: 'Aster Residence',
+  location: 'Cheras, Kuala Lumpur',
+  name: 'Type D',
+  beds: 3,
+  baths: '2+1',
+  sqft: 1009,
+  sourceUrl: 'https://www.amberhomes.com.my/home/project/aster-residence/',
+  width: 6.20,
+  depth: 7.70,
+  wallH: 2.5,
+  cutH: 1.05,
+  doorH: 2.0,
+  windowHead: 2.1,
+  wallT: 0.18,
+  explicitWalls: true,
+  rooms: [
+    { name: 'Foyer', level: 'lower', c: [1.70, 6.90], box: [0.30, 6.30, 3.20, 7.50] },
+    { name: 'Bath', level: 'lower', c: [4.20, 6.80], box: [3.40, 6.20, 5.40, 7.50] },
+    { name: 'Kitchen', level: 'lower', c: [1.20, 5.30], box: [0.25, 4.30, 2.50, 6.20] },
+    { name: 'Dining', level: 'lower', c: [1.30, 3.20], box: [0.25, 2.20, 2.50, 4.20] },
+    { name: 'Living', level: 'lower', c: [1.40, 1.10], box: [0.25, 0.20, 2.80, 2.00] },
+    { name: 'Master Bedroom', level: 'lower', c: [4.50, 1.30], box: [3.20, 0.20, 6.00, 2.60] },
+    { name: 'Family', level: 'upper', c: [3.40, 6.60], box: [1.60, 5.80, 5.40, 7.50] },
+    { name: 'Storage', level: 'upper', c: [4.60, 6.90], box: [3.80, 6.40, 5.40, 7.40] },
+    { name: 'Bedroom 2', level: 'upper', c: [1.40, 1.80], box: [0.25, 0.20, 2.50, 3.40] },
+    { name: 'Bedroom 3', level: 'upper', c: [4.40, 1.40], box: [3.20, 0.20, 6.00, 2.60] },
+    { name: 'Bath', level: 'upper', c: [5.00, 3.40], box: [4.20, 2.40, 6.00, 4.40] },
+  ],
+  walls: [],
+  floors: [],
+  furniture: [],
+  levels: [
+    {
+      id: 'lower',
+      name: 'Lower',
+      stair: { box: [2.90, 4.10, 4.40, 5.70] },
+      floors: [
+        { name: 'Foyer', box: [0, 6.20, 2.70, 7.70] },
+        { name: 'Bath', box: [3.68, 6.20, 6.20, 7.70] },
+        { name: 'Kitchen', box: [0, 3.98, 2.70, 6.20] },
+        { name: 'Dining', box: [0, 2.20, 2.70, 3.98] },
+        { name: 'Living', box: [0, 0, 2.70, 2.20] },
+        { name: 'Master Bedroom', box: [2.70, 0, 6.20, 2.86] },
+        { name: 'Stair', box: [2.70, 2.86, 5.61, 6.20] },
+      ],
+      walls: [
+        { x0: 0, y0: 0, x1: 6.20, y1: 0, openings: [
+          { at: 3.40, w: 1.60, type: 'window' },
+        ] },
+        { x0: 6.20, y0: 0, x1: 6.20, y1: 7.70 },
+        { x0: 0, y0: 7.70, x1: 6.20, y1: 7.70, openings: [
+          { at: 1.20, w: 0.90, type: 'door', hinge: 'start', swing: -1, kind: 'entry' },
+          { at: 4.40, w: 1.20, type: 'window' },
+        ] },
+        { x0: 0, y0: 0, x1: 0, y1: 7.70 },
+        { x0: 2.70, y0: 0, x1: 2.70, y1: 7.70, openings: [
+          { at: 4.03, w: 1.70, type: 'opening' },
+        ] },
+        { x0: 2.70, y0: 5.20, x1: 4.75, y1: 5.20 },
+        { x0: 3.68, y0: 5.20, x1: 3.68, y1: 7.70 },
+        { x0: 4.75, y0: 3.98, x1: 4.75, y1: 7.70, openings: [
+          { at: 1.54, w: 1.08, type: 'opening' },
+        ] },
+        { x0: 5.61, y0: 0, x1: 5.61, y1: 7.70, openings: [
+          { at: 2.91, w: 2.40, type: 'opening' },
+        ] },
+        { x0: 0, y0: 6.41, x1: 2.70, y1: 6.41 },
+        { x0: 3.68, y0: 6.67, x1: 4.75, y1: 6.67 },
+        { x0: 4.75, y0: 5.47, x1: 6.20, y1: 5.47 },
+        { x0: 2.70, y0: 3.98, x1: 4.75, y1: 3.98, openings: [
+          { at: 1.05, w: 0.78, type: 'door', hinge: 'start', swing: -1 },
+        ] },
+        { x0: 5.61, y0: 2.86, x1: 6.20, y1: 2.86 },
+        { x0: 0, y0: 2.20, x1: 2.70, y1: 2.20, openings: [
+          { at: 0.40, w: 0.85, type: 'opening' },
+        ] },
+      ],
+      furniture: [
+        ['Shoe_Cabinet', 1.20, 7.10, 0, 0.70, 0.60],
+        ['Foyer_Mirror', 0.40, 6.80, 1, 0.50, 0.50],
+        ['Bath1_Vanity', 4.20, 7.20, 0, 0.60, 0.50],
+        ['Bath1_Toilet', 5.00, 6.60, 0, 0.45, 0.55],
+        ['Kitchen_Run', 0.50, 5.40, 1, 0.40, 1.00],
+        ['Fridge', 2.20, 5.60, 1, 0.55, 0.60],
+        ['Dining_Table', 1.30, 3.20, 0, 0.70, 0.75],
+        ['Dining_Chair_L1', 0.70, 3.50, 1],
+        ['Dining_Chair_R1', 1.90, 3.50, 3],
+        ['Dining_Chair_L2', 0.70, 2.90, 1],
+        ['Dining_Chair_R2', 1.90, 2.90, 3],
+        ['Sofa', 1.40, 1.20, 2, 0.70, 0.85],
+        ['Coffee_Table', 1.40, 0.50, 0, 0.55, 0.55],
+        ['Master_Bed', 4.50, 1.30, 0, 0.80, 0.85],
+        ['Master_Wardrobe', 5.70, 2.20, 1, 0.50, 0.80],
+        ['Master_Bedside_L', 3.40, 1.40, 0, 0.55, 0.55],
+        ['Master_Bedside_R', 5.50, 1.40, 0, 0.55, 0.55],
+      ],
+    },
+    {
+      id: 'upper',
+      name: 'Upper',
+      voids: [{ box: [2.90, 4.10, 4.40, 5.70] }],
+      floors: [
+        { name: 'Family', box: [0, 5.40, 2.70, 7.70] },
+        { name: 'Storage', box: [2.70, 6.20, 6.20, 7.70] },
+        { name: 'Bedroom 2', box: [0, 0, 2.70, 3.62] },
+        { name: 'Hall', box: [0, 3.62, 2.70, 5.40] },
+        { name: 'Bedroom 3', box: [2.70, 0, 5.61, 2.18] },
+        { name: 'Bath', box: [4.69, 2.18, 6.20, 4.48] },
+        { name: 'Hall', box: [2.70, 2.18, 4.69, 6.20] },
+      ],
+      walls: [
+        { x0: 0, y0: 0, x1: 6.20, y1: 0, openings: [
+          { at: 0.40, w: 1.40, type: 'window' },
+          { at: 3.60, w: 1.40, type: 'window' },
+        ] },
+        { x0: 6.20, y0: 0, x1: 6.20, y1: 7.70 },
+        { x0: 0, y0: 7.70, x1: 6.20, y1: 7.70, openings: [
+          { at: 1.00, w: 1.40, type: 'window' },
+        ] },
+        { x0: 0, y0: 0, x1: 0, y1: 7.70 },
+        { x0: 2.70, y0: 0, x1: 2.70, y1: 7.70, openings: [
+          { at: 2.18, w: 0.86, type: 'door', hinge: 'start', swing: 1 },
+          { at: 3.75, w: 0.78, type: 'door', hinge: 'start', swing: -1 },
+        ] },
+        { x0: 4.69, y0: 2.18, x1: 4.69, y1: 7.70, openings: [
+          { at: 1.49, w: 2.20, type: 'opening' },
+        ] },
+        { x0: 5.61, y0: 0, x1: 5.61, y1: 7.70, openings: [
+          { at: 2.04, w: 3.20, type: 'opening' },
+        ] },
+        { x0: 0, y0: 6.41, x1: 2.70, y1: 6.41, openings: [
+          { at: 0.30, w: 0.80, type: 'opening' },
+        ] },
+        { x0: 2.70, y0: 6.06, x1: 4.69, y1: 6.06 },
+        { x0: 4.69, y0: 4.48, x1: 6.20, y1: 4.48 },
+        { x0: 0, y0: 3.62, x1: 4.69, y1: 3.62, openings: [
+          { at: 1.77, w: 0.87, type: 'door', hinge: 'start', swing: -1 },
+          { at: 3.20, w: 0.79, type: 'door', hinge: 'end', swing: 1 },
+        ] },
+        { x0: 4.70, y0: 2.18, x1: 6.20, y1: 2.18 },
+      ],
+      furniture: [
+        ['Sofa', 1.40, 6.60, 2, 0.70, 0.85],
+        ['Coffee_Table', 1.40, 5.80, 0, 0.55, 0.55],
+        ['Shoe_Cabinet', 4.40, 7.00, 0, 0.70, 0.55],
+        ['Bed2_Bed', 1.30, 1.80, 0, 0.80, 0.85],
+        ['Bed2_Wardrobe', 0.45, 2.80, 1, 0.50, 0.80],
+        ['Bed2_Bedside', 2.20, 1.60, 0, 0.50, 0.50],
+        ['Bed1_Bed', 4.10, 1.20, 0, 0.75, 0.80],
+        ['Bed1_Wardrobe', 5.20, 1.80, 1, 0.45, 0.70],
+        ['Bath1_Shower', 5.40, 4.00, 0, 0.50, 0.60],
+        ['Bath1_Vanity', 5.50, 2.70, 0, 0.60, 0.45],
+        ['Bath1_Toilet', 4.90, 3.20, 1, 0.45, 0.55],
+      ],
+    },
+  ],
+  views: [
+    { id: 'overview', name: 'Overview', pos: [-2.2, -2.6, 12], tgt: [3.1, 3.6, 1.6], fov: 38 },
+    { id: 'plan', name: 'Plan', pos: [3.1, 3.8, 16], tgt: [3.1, 3.8, 1.2], fov: 36 },
+    { id: 'lower', name: 'Lower', pos: [-1.6, -2.0, 11], tgt: [3.1, 3.6, 0.4], fov: 36 },
+    { id: 'upper', name: 'Upper', pos: [-1.6, -2.0, 11], tgt: [3.1, 3.6, 3.2], fov: 36 },
+  ],
+};

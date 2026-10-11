@@ -168,6 +168,18 @@ const glassGroup = new THREE.Group();
 const doorGroup = new THREE.Group();
 const floorGroup = new THREE.Group();
 scene.add(wallGroup, glassGroup, doorGroup, floorGroup);
+// A duplex sets UNIT.levels. Single-level plans leave it unset, so this
+// control stays off and the groups above are the whole model.
+const LEVELS = Array.isArray(U.levels) && U.levels.length > 1 ? U.levels : null;
+const EXPLODE_GAP = 0.65;
+let levelMode = 'both';
+if (LEVELS) {
+  const q = params.get('level');
+  if (q === 'lower' || q === 'upper' || q === 'both') levelMode = q;
+}
+const levelRoots = [];
+const doorGroups = [doorGroup];
+let host = { walls: wallGroup, glass: glassGroup, doors: doorGroup, floors: floorGroup };
 const matLeaf = new THREE.MeshStandardMaterial({ color: 0xd4c4ae, roughness: 0.7 });
 const matHandle = new THREE.MeshStandardMaterial({ color: 0x2c2e32, roughness: 0.35, metalness: 0.65 });
 const matEntry = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.58 });
@@ -197,7 +209,7 @@ function addWallSeg(x0, y0, x1, y1, h, t = U.wallT, yBase = 0, hackable = false)
   mesh.rotation.y = -Math.atan2(dy, dx);
   mesh.castShadow = true;
   mesh.receiveShadow = true;
-  wallGroup.add(mesh);
+  host.walls.add(mesh);
 }
 
 const glassMat = new THREE.MeshStandardMaterial({
@@ -211,7 +223,7 @@ function addGlass(x0, y0, x1, y1, sill, head) {
   mesh.rotation.y = -Math.atan2(dy, dx);
   mesh.castShadow = false;
   mesh.receiveShadow = true;
-  glassGroup.add(mesh);
+  host.glass.add(mesh);
 }
 function floorMatFor(name) {
   const out = /balcony|a\/?c|ledge/i.test(name);
@@ -225,18 +237,50 @@ function addFloor(box, name) {
   floor.rotation.x = -Math.PI / 2;
   floor.position.set((x0 + x1) / 2, 0.001, -(y0 + y1) / 2);
   floor.receiveShadow = true;
-  floorGroup.add(floor);
+  host.floors.add(floor);
 }
-function addFloorPoly(poly, material, y) {
+function addFloorPoly(poly, material, y, holes) {
   if (!poly || poly.length < 3) return;
   const shape = new THREE.Shape();
   shape.moveTo(poly[0].x, poly[0].y);
   for (let i = 1; i < poly.length; i++) shape.lineTo(poly[i].x, poly[i].y);
+  for (const hole of holes || []) {
+    if (!hole || hole.length < 3) continue;
+    const cx = hole.reduce((s, p) => s + p.x, 0) / hole.length;
+    const cy = hole.reduce((s, p) => s + p.y, 0) / hole.length;
+    let inside = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const yi = poly[i].y;
+      const yj = poly[j].y;
+      if ((yi > cy) !== (yj > cy) && cx < ((poly[j].x - poly[i].x) * (cy - yi)) / (yj - yi) + poly[i].x) inside = !inside;
+    }
+    if (!inside) continue;
+    const path = new THREE.Path();
+    path.moveTo(hole[0].x, hole[0].y);
+    for (let i = 1; i < hole.length; i++) path.lineTo(hole[i].x, hole[i].y);
+    shape.holes.push(path);
+  }
   const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape), material);
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.y = y;
   mesh.receiveShadow = true;
-  floorGroup.add(mesh);
+  host.floors.add(mesh);
+}
+function addStair(box, rise) {
+  const [x0, y0, x1, y1] = box;
+  const steps = 14;
+  const w = Math.abs(x1 - x0);
+  const d = Math.abs(y1 - y0);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xcfc6ba, roughness: 0.82 });
+  for (let i = 0; i < steps; i++) {
+    const h = (rise * (i + 1)) / steps;
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(Math.max(0.4, w * 0.9), Math.max(0.04, h), Math.max(0.08, d / steps)), mat);
+    const t = (i + 0.5) / steps;
+    mesh.position.set((x0 + x1) / 2, h / 2, -(y0 + (y1 - y0) * t));
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    host.floors.add(mesh);
+  }
 }
 function addHeader(x0, y0, x1, y1, ceiling) {
   const head = U.windowHead ?? 2.1;
@@ -264,72 +308,146 @@ function addDoorLeaf(d, ceiling, withLintel) {
   pivot.userData.closed = theta;
   pivot.userData.open = theta + swing;
   pivot.rotation.y = doorsOpen ? pivot.userData.open : pivot.userData.closed;
-  doorGroup.add(pivot);
+  host.doors.add(pivot);
   doorPivots.push(pivot);
   if (withLintel && ceiling > doorH + 0.02) {
     addWallSeg(d.x, d.y, d.x + d.dx * w, d.y + d.dy * w, ceiling - doorH, U.wallT, doorH);
   }
 }
 let shellBuilt = false;
-function buildShell() {
-  const ceiling = ceilingNow();
-  emptyGroup(wallGroup);
-  emptyGroup(glassGroup);
-  emptyGroup(doorGroup);
-  doorPivots.length = 0;
-  const W = U.width, D = U.depth;
-  if (unitUsesRuns(U)) {
-    const graph = buildWallGraph(U, { ceiling, doorH: U.doorH, windowHead: U.windowHead });
+function voidHoles(unitLike) {
+  return (unitLike.voids || []).map((v) => {
+    const [x0, y0, x1, y1] = v.box;
+    return [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
+  });
+}
+function levelRise(index) {
+  if (!LEVELS || levelMode !== 'both') return 0;
+  return index * ((U.wallH || 2.5) + EXPLODE_GAP);
+}
+function levelShown(level) {
+  return !LEVELS || levelMode === 'both' || level.id === levelMode;
+}
+function drawRuns(unitLike, ceiling, withFloors) {
+  const W = unitLike.width ?? U.width;
+  const D = unitLike.depth ?? U.depth;
+  if (unitUsesRuns(unitLike)) {
+    const graph = buildWallGraph(unitLike, { ceiling, doorH: U.doorH, windowHead: U.windowHead });
     if (graph.issues.length) console.warn(graph.issues.join('\n'));
     for (const seg of graph.segments) addWallSeg(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t, seg.yBase || 0, !!seg.hackable);
     for (const g of graph.glass) addGlass(g.x0, g.y0, g.x1, g.y1, g.sill, g.head);
     for (const d of graph.leaves) addDoorLeaf(d, ceiling, false);
+    if (withFloors) {
+      const floors = buildFloorGraph(unitLike);
+      if (floors.issues.length) console.warn(floors.issues.join('\n'));
+      const mat = { timber: floorDry, wet: floorWet, outdoor: floorOut };
+      const holes = voidHoles(unitLike);
+      if (floors.slab.length >= 3) {
+        addFloorPoly(floors.slab, floorSlabMat, 0.001, holes);
+        for (const zone of floors.zones) addFloorPoly(zone.poly, mat[zone.kind] || floorDry, 0.006, holes);
+      } else {
+        const floorRects = unitLike.floors || [];
+        for (const r of floorRects) addFloor(r.box, r.name || '');
+      }
+      if (unitLike.stair && (levelMode !== 'upper')) addStair(unitLike.stair.box, U.wallH || 2.5);
+    }
   } else {
-    // Rectangular outer shell unless the unit supplies its own footprint.
     if (!U.explicitWalls) {
       addWallSeg(0, 0, W, 0, ceiling);
       addWallSeg(0, D, W, D, ceiling);
       addWallSeg(0, 0, 0, D, ceiling);
       addWallSeg(W, 0, W, D, ceiling);
     }
-    for (const seg of U.walls || []) {
+    for (const seg of unitLike.walls || []) {
       const explicit = seg[4];
       const h = explicit != null ? Math.min(explicit, ceiling) : ceiling;
       addWallSeg(seg[0], seg[1], seg[2], seg[3], h);
       if (explicit != null) addHeader(seg[0], seg[1], seg[2], seg[3], ceiling);
     }
-    for (const win of U.windows || []) {
+    for (const win of unitLike.windows || []) {
       const [x0, y0, x1, y1, sill] = win;
       const h0 = sill != null ? sill : 0.12;
       const head = Math.min(U.windowHead ?? ceiling, ceiling);
       addGlass(x0, y0, x1, y1, h0, head);
       if (sill == null) addHeader(x0, y0, x1, y1, ceiling);
     }
-    for (const d of U.doors || []) addDoorLeaf(d, ceiling, true);
-  }
-  if (shellBuilt) return;
-  shellBuilt = true;
-  if (unitUsesRuns(U)) {
-    const floors = buildFloorGraph(U);
-    if (floors.issues.length) console.warn(floors.issues.join('\n'));
-    const mat = { timber: floorDry, wet: floorWet, outdoor: floorOut };
-    if (floors.slab.length >= 3) {
-      addFloorPoly(floors.slab, floorSlabMat, 0.001);
-      for (const zone of floors.zones) addFloorPoly(zone.poly, mat[zone.kind] || floorDry, 0.006);
-    } else {
-      const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
+    for (const d of unitLike.doors || []) addDoorLeaf(d, ceiling, true);
+    if (withFloors) {
+      const floorRects = unitLike.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
       for (const r of floorRects) addFloor(r.box, r.name || '');
     }
-  } else {
-    const floorRects = U.floors || U.rooms.map((r) => ({ box: r.box, name: r.name }));
-    for (const r of floorRects) addFloor(r.box, r.name || '');
   }
+}
+function buildShell() {
+  const ceiling = ceilingNow();
+  doorPivots.length = 0;
+  if (!LEVELS) {
+    emptyGroup(wallGroup);
+    emptyGroup(glassGroup);
+    emptyGroup(doorGroup);
+    host = { walls: wallGroup, glass: glassGroup, doors: doorGroup, floors: floorGroup };
+    drawRuns(U, ceiling, !shellBuilt);
+    shellBuilt = true;
+    return;
+  }
+  if (!levelRoots.length) {
+    LEVELS.forEach((level, index) => {
+      const root = new THREE.Group();
+      root.userData.levelId = level.id;
+      root.userData.index = index;
+      const walls = new THREE.Group();
+      const glass = new THREE.Group();
+      const doors = new THREE.Group();
+      const floors = new THREE.Group();
+      root.add(walls, glass, doors, floors);
+      scene.add(root);
+      levelRoots.push({ root, walls, glass, doors, floors, level });
+      doorGroups.push(doors);
+    });
+    wallGroup.visible = false;
+    glassGroup.visible = false;
+    doorGroup.visible = false;
+    floorGroup.visible = false;
+  }
+  for (const entry of levelRoots) {
+    emptyGroup(entry.walls);
+    emptyGroup(entry.glass);
+    emptyGroup(entry.doors);
+    if (!shellBuilt) emptyGroup(entry.floors);
+    host = entry;
+    const spec = {
+      ...U,
+      walls: entry.level.walls,
+      floors: entry.level.floors,
+      voids: entry.level.voids,
+      stair: entry.level.stair,
+    };
+    drawRuns(spec, ceiling, !shellBuilt);
+    entry.root.visible = levelShown(entry.level);
+    entry.root.position.y = levelRise(entry.root.userData.index);
+    entry.doors.visible = doorsShown;
+  }
+  shellBuilt = true;
+}
+function applyLevelMode(mode) {
+  if (!LEVELS) return;
+  levelMode = mode;
+  for (const entry of levelRoots) {
+    entry.root.visible = levelShown(entry.level);
+    entry.root.position.y = levelRise(entry.root.userData.index);
+  }
+  if (typeof refreshLabels === 'function') refreshLabels();
 }
 buildShell();
 if (floorsOnly) {
   wallGroup.visible = false;
   glassGroup.visible = false;
   doorGroup.visible = false;
+  for (const entry of levelRoots) {
+    entry.walls.visible = false;
+    entry.glass.visible = false;
+    entry.doors.visible = false;
+  }
   ground.visible = false;
   renderer.setClearColor(0x2a62c8, 1);
   for (const id of ['loader', 'labels', 'panel', 'gate']) {
@@ -480,7 +598,14 @@ function spawn(name, x, y, rot = 0, sx = 1, sz = 1) {
   }
   pivot.position.set(x, 0, -y);
   pivot.rotation.y = -rot * Math.PI / 2;
-  scene.add(pivot);
+  pivot.userData.baseX = x;
+  pivot.userData.baseY = y;
+  if (LEVELS && host && host.root) {
+    host.root.add(pivot);
+    pivot.position.y = 0;
+  } else {
+    scene.add(pivot);
+  }
 }
 
 function onFurniture(gltf) {
@@ -494,9 +619,19 @@ function onFurniture(gltf) {
     centreOnFootprint(node);
     templates[node.name] = { node, name: node.name };
   }
-  for (const row of U.furniture || []) {
-    const [name, x, y, rot = 0, sx = 1, sz = 1] = row;
-    spawn(name, x, y, rot, sx, sz);
+  if (LEVELS) {
+    for (const entry of levelRoots) {
+      host = entry;
+      for (const row of entry.level.furniture || []) {
+        const [name, x, y, rot = 0, sx = 1, sz = 1] = row;
+        spawn(name, x, y, rot, sx, sz);
+      }
+    }
+  } else {
+    for (const row of U.furniture || []) {
+      const [name, x, y, rot = 0, sx = 1, sz = 1] = row;
+      spawn(name, x, y, rot, sx, sz);
+    }
   }
   document.getElementById('loader').hidden = true;
 }
@@ -540,13 +675,25 @@ setTimeout(() => {
 }, 20000);
 // ---------- labels / views / UI ----------
 const labelsEl = document.getElementById('labels');
-const labelNodes = U.rooms.map((r) => {
-  const el = document.createElement('div');
-  el.className = 'lbl';
-  el.textContent = r.name;
-  labelsEl.appendChild(el);
-  return { el, p: B(r.c[0], r.c[1], 0.1) };
-});
+let labelNodes = [];
+function roomVisible(r) {
+  if (!LEVELS || levelMode === 'both') return true;
+  return !r.level || r.level === levelMode;
+}
+function refreshLabels() {
+  for (const L of labelNodes) L.el.remove();
+  labelNodes = (U.rooms || []).filter(roomVisible).map((r) => {
+    const el = document.createElement('div');
+    el.className = 'lbl';
+    el.textContent = r.name;
+    labelsEl.appendChild(el);
+    const rise = LEVELS && levelMode === 'both'
+      ? levelRise(Math.max(0, LEVELS.findIndex((l) => l.id === r.level)))
+      : 0;
+    return { el, p: B(r.c[0], r.c[1], 0.1 + rise) };
+  });
+}
+refreshLabels();
 function placeLabels() {
   const w = stage.clientWidth, h = stage.clientHeight;
   for (const L of labelNodes) {
@@ -608,6 +755,24 @@ for (const v of VIEWS) {
   b.onclick = () => goView(v);
   chipEls[v.id] = b; viewsEl.appendChild(b);
 }
+const levelEls = {};
+if (LEVELS) {
+  const levelRow = document.getElementById('levels');
+  if (levelRow) {
+    for (const id of ['lower', 'upper', 'both']) {
+      const b = document.createElement('button');
+      b.className = 'chip';
+      b.textContent = id === 'both' ? 'Both' : id === 'lower' ? 'Lower' : 'Upper';
+      b.setAttribute('aria-pressed', String(id === levelMode));
+      b.onclick = () => {
+        applyLevelMode(id);
+        for (const k in levelEls) levelEls[k].setAttribute('aria-pressed', String(k === id));
+      };
+      levelEls[id] = b;
+      levelRow.appendChild(b);
+    }
+  }
+}
 
 function roomMetrics(r) {
   const parts = (U.floors || []).filter((f) => f.name === r.name);
@@ -645,15 +810,16 @@ document.getElementById('showLabels')?.addEventListener('change', (ev) => { show
 const showDoorsEl = document.getElementById('showDoors');
 const openDoorsEl = document.getElementById('openDoors');
 const cutawayEl = document.getElementById('lowWalls') || document.getElementById('cutaway');
-const hasDoors = unitUsesRuns(U)
-  ? (U.walls || []).some((w) => (w.openings || []).some((o) => o.type === 'door'))
+const doorWalls = LEVELS ? LEVELS.flatMap((l) => l.walls || []) : (U.walls || []);
+const hasDoors = unitUsesRuns(U) || LEVELS
+  ? doorWalls.some((w) => (w.openings || []).some((o) => o.type === 'door'))
   : (U.doors || []).length > 0;
 if (showDoorsEl) {
   if (!hasDoors) showDoorsEl.closest('label').hidden = true;
   showDoorsEl.checked = doorsShown;
   showDoorsEl.addEventListener('change', () => {
     doorsShown = showDoorsEl.checked;
-    doorGroup.visible = doorsShown;
+    for (const g of doorGroups) g.visible = doorsShown;
   });
 }
 if (openDoorsEl) {
@@ -671,7 +837,7 @@ if (cutawayEl) {
 }
 const hackNote = document.getElementById('hackNote');
 if (hackNote) {
-  const hack = unitUsesRuns(U) && (U.walls || []).some((w) => w.hackable);
+  const hack = doorWalls.some((w) => w.hackable);
   hackNote.hidden = !hack;
 }
 const panel = document.getElementById('panel');

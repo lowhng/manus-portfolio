@@ -86,20 +86,19 @@ export function checkDoorPlacement(graph, slab) {
   return issues;
 }
 
-function report(file) {
-  const unit = loadUnit(file);
+function reportUnit(unit, label) {
   const graph = buildWallGraph(unit, {
     ceiling: unit.wallH,
     doorH: unit.doorH,
     windowHead: unit.windowHead,
   });
   if (graph.legacy) {
-    console.log(`${path.relative(root, file)}: legacy segment list, run check skipped`);
+    console.log(`${label}: legacy segment list, run check skipped`);
     return 0;
   }
   const moved = Math.max(0, ...graph.runs.map((r) => r.moved));
   console.log(
-    `${unit.id}: ${graph.runs.length} walls, ${graph.openings.length} openings, ${graph.leaves.length} doors, largest snap ${(moved * 100).toFixed(1)} cm`,
+    `${label}: ${graph.runs.length} walls, ${graph.openings.length} openings, ${graph.leaves.length} doors, largest snap ${(moved * 100).toFixed(1)} cm`,
   );
   let failed = 0;
   if (graph.issues.length) {
@@ -124,6 +123,45 @@ function report(file) {
   }
   if (!failed) console.log('OK');
   return failed;
+}
+
+function report(file) {
+  const unit = loadUnit(file);
+  if (Array.isArray(unit.levels) && unit.levels.length > 1) {
+    let failed = 0;
+    for (const level of unit.levels) {
+      const spec = {
+        ...unit,
+        walls: level.walls || [],
+        floors: level.floors || [],
+        rooms: level.rooms || [],
+        voids: level.voids || [],
+      };
+      failed |= reportUnit(spec, `${unit.id}/${level.id}`);
+      for (const hole of spec.voids) {
+        const [x0, y0, x1, y1] = hole.box || [];
+        if (![x0, y0, x1, y1].every((n) => Number.isFinite(n)) || x1 <= x0 || y1 <= y0) {
+          console.error(`  ${level.id} void is missing a box`);
+          failed = 1;
+        }
+      }
+    }
+    const stair = unit.levels.map((level) => level.stair).find(Boolean);
+    const upper = unit.levels.find((level) => (level.voids || []).length);
+    if (stair && upper) {
+      const [sx0, sy0, sx1, sy1] = stair.box;
+      const covered = upper.voids.some((hole) => {
+        const [x0, y0, x1, y1] = hole.box;
+        return x0 <= sx0 + 0.05 && y0 <= sy0 + 0.05 && x1 >= sx1 - 0.05 && y1 >= sy1 - 0.05;
+      });
+      if (!covered) {
+        console.error('  upper floor has no void over the stair');
+        failed = 1;
+      }
+    }
+    return failed;
+  }
+  return reportUnit(unit, unit.id);
 }
 
 function selfTest() {

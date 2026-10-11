@@ -62,8 +62,20 @@ document.querySelector('#panel h1').textContent = `${U.name} unit`;
 document.querySelector('#panel .meta').textContent =
   `${countLabel(U.beds, 'bedroom', 'bedrooms')} · ${countLabel(U.baths, 'bathroom', 'bathrooms')} · ${U.sqft} sqft built-up. Furnished with Ayanna-style pieces.`;
 
+if (Array.isArray(U.levels) && U.levels.length > 1) {
+  document.querySelector('#views').closest('.sec').insertAdjacentHTML('afterend', `
+    <div class="sec">
+      <h2>Level</h2>
+      <div class="chips" id="levels"></div>
+    </div>
+  `);
+}
+
 const foot = document.querySelector('#panel .foot');
-const hasHackable = (U.walls || []).some((w) => w && w.hackable);
+const wallLists = Array.isArray(U.levels) && U.levels.length
+  ? U.levels.flatMap((level) => level.walls || [])
+  : (U.walls || []);
+const hasHackable = wallLists.some((w) => w && w.hackable);
 foot.append(
   'Walls traced from the floor plan. Ceiling is 2.5 m; lower walls drops the cut to 1.05 m. ',
 );
