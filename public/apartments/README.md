@@ -41,6 +41,20 @@ Three unit types from Sunway Velocity 3 (Cheras / Maluri, KL), on the same share
 
 [All three types →](sunway-velocity-3/index.html)
 
+## Aster Residence
+
+Five unit types from Aster Residence (Cheras, Amber Homes), including the Type D duplex. Type C and Type C1 are separate models. The duplex level control (Lower / Upper / Both) is in the shared viewer and stays hidden on single-level units.
+
+| Unit | Beds | Baths | Sqft | Model |
+|------|------|-------|------|-------|
+| Type A | 2 | 2 | 650 | [type-a.html](aster-residence/type-a.html) |
+| Type B | 3 | 2 | 810 | [type-b.html](aster-residence/type-b.html) |
+| Type C | 3 | 3 | 953 | [type-c.html](aster-residence/type-c.html) |
+| Type C1 | 3 | 3 | 957 | [type-c1.html](aster-residence/type-c1.html) |
+| Type D | 3 | 2+1 | 1009 | [type-d.html](aster-residence/type-d.html) |
+
+[All five types →](aster-residence/index.html)
+
 ## Architecture
 
 ```

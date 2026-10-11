@@ -2,6 +2,7 @@
 // Lower plan on the shared sheet. Same drawing scale as Type C.
 // C1 keeps an extra kitchen/dining partition (the wall near x = 7.38)
 // and the foyer sits on the east side of the entrance. No pink hammer.
+// A hinged leaf is placed only where a quarter-circle swing was measured.
 window.UNIT = {
   id: 'type-c1',
   project: 'Aster Residence',
@@ -45,13 +46,12 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 9.45, openings: [
-      { at: 1.15, w: 1.40, type: 'opening' },
-      { at: 3.10, w: 0.76, type: 'opening' },
-      { at: 5.20, w: 0.65, type: 'opening' },
+      { at: 1.20, w: 1.20, type: 'opening' },
+      { at: 3.11, w: 0.60, type: 'opening' },
+      { at: 5.29, w: 0.60, type: 'opening' },
     ] },
     { x0: 0, y0: 0, x1: 9.35, y1: 0, openings: [
-      { at: 1.18, w: 0.70, type: 'opening' },
-      { at: 3.96, w: 0.90, type: 'door', hinge: 'start', swing: 1, kind: 'entry' },
+      { at: 6.55, w: 2.80, type: 'opening' },
     ] },
     { x0: 9.35, y0: 0, x1: 9.35, y1: 9.45 },
     { x0: 0, y0: 9.45, x1: 9.35, y1: 9.45, openings: [
@@ -60,10 +60,8 @@ window.UNIT = {
       { at: 6.60, w: 1.80, type: 'window' },
     ] },
     { x0: 3.00, y0: 0, x1: 3.00, y1: 9.45, openings: [
-      { at: 0.72, w: 0.83, type: 'door', hinge: 'start', swing: 1 },
-      { at: 1.98, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
-      { at: 4.50, w: 1.10, type: 'opening' },
-      { at: 6.10, w: 0.93, type: 'door', hinge: 'start', swing: 1 },
+      { at: 1.99, w: 0.89, type: 'door', hinge: 'end', swing: -1 },
+      { at: 6.13, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.16, y0: 0, x1: 6.16, y1: 9.45, openings: [
       { at: 0.90, w: 2.16, type: 'opening' },

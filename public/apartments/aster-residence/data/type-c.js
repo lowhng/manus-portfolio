@@ -2,7 +2,8 @@
 // Upper plan on the shared C/C1 sheet. No millimetre arrow. Outer
 // wall-centre polygon scaled to 953 sqft (s = 0.0113 m/px). Origin is
 // the south-west outer centre. +y toward the balcony end of the sheet.
-// No pink hammer. Hinged leaves only on door-width breaks.
+// No pink hammer. A hinged leaf is placed only where a quarter-circle
+// swing was measured on the ink.
 window.UNIT = {
   id: 'type-c',
   project: 'Aster Residence',
@@ -46,18 +47,18 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 9.50, openings: [
-      { at: 1.22, w: 1.21, type: 'opening' },
-      { at: 3.14, w: 0.70, type: 'opening' },
+      { at: 1.22, w: 1.20, type: 'opening' },
+      { at: 3.14, w: 0.62, type: 'opening' },
       { at: 5.37, w: 0.60, type: 'opening' },
     ] },
     { x0: 0, y0: 0, x1: 7.16, y1: 0, openings: [
-      { at: 3.23, w: 0.90, type: 'door', hinge: 'start', swing: 1, kind: 'entry' },
-      { at: 4.13, w: 0.69, type: 'opening' },
+      { at: 3.23, w: 1.60, type: 'opening' },
     ] },
     { x0: 7.16, y0: 0, x1: 7.16, y1: 3.15 },
     { x0: 0, y0: 3.15, x1: 9.80, y1: 3.15, openings: [
-      { at: 2.15, w: 4.40, type: 'opening' },
-      { at: 7.20, w: 0.80, type: 'door', hinge: 'start', swing: -1, kind: 'service' },
+      { at: 2.15, w: 0.90, type: 'opening' },
+      { at: 3.23, w: 3.24, type: 'opening' },
+      { at: 7.24, w: 0.75, type: 'opening' },
     ] },
     { x0: 9.80, y0: 3.15, x1: 9.80, y1: 9.50 },
     { x0: 0, y0: 9.50, x1: 9.80, y1: 9.50, openings: [
@@ -65,8 +66,8 @@ window.UNIT = {
       { at: 7.06, w: 2.00, type: 'window' },
     ] },
     { x0: 3.13, y0: 0, x1: 3.13, y1: 9.50, openings: [
-      { at: 2.01, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
-      { at: 6.20, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
+      { at: 2.01, w: 0.90, type: 'door', hinge: 'end', swing: -1 },
+      { at: 6.21, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.55, y0: 3.15, x1: 6.55, y1: 9.50, openings: [
       { at: 3.05, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
@@ -74,7 +75,7 @@ window.UNIT = {
     { x0: 0, y0: 6.03, x1: 3.13, y1: 6.03 },
     { x0: 0, y0: 4.55, x1: 3.13, y1: 4.55 },
     { x0: 6.55, y0: 4.92, x1: 9.80, y1: 4.92, openings: [
-      { at: 0.73, w: 0.88, type: 'door', hinge: 'start', swing: -1 },
+      { at: 0.76, w: 0.80, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 6.55, y0: 6.20, x1: 9.80, y1: 6.20 },
   ],

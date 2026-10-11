@@ -2,8 +2,8 @@
 // No millimetre arrow. Outer wall-centre polygon is scaled to 810 sqft
 // (s = 0.01022 m/px). Origin is the south-west outer centre. +y is toward
 // the top of the sheet (living / dining). No pink hammer.
-// A hinged leaf is used only on a measured door-width break in the wall
-// stroke. Wider breaks are openings. The south break is the entrance.
+// A hinged leaf is placed only where the quarter-circle swing lies on
+// the ink. The south break has no swing, so it stays an opening.
 window.UNIT = {
   id: 'type-b',
   project: 'Aster Residence',
@@ -56,20 +56,20 @@ window.UNIT = {
     ] },
     { x0: 8.66, y0: 0, x1: 8.66, y1: 9.54 },
     { x0: 0, y0: 0, x1: 8.66, y1: 0, openings: [
-      { at: 5.56, w: 0.90, type: 'door', hinge: 'start', swing: 1, kind: 'entry' },
-      { at: 6.46, w: 0.48, type: 'opening' },
+      { at: 5.56, w: 1.38, type: 'opening' },
     ] },
     { x0: 1.22, y0: 6.71, x1: 5.47, y1: 6.71, openings: [
-      { at: 2.69, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
+      { at: 2.69, w: 0.89, type: 'door', hinge: 'end', swing: -1 },
     ] },
     { x0: 1.22, y0: 5.23, x1: 5.47, y1: 5.23, openings: [
-      { at: 3.17, w: 1.05, type: 'opening' },
+      { at: 3.17, w: 0.99, type: 'opening' },
     ] },
     { x0: 0, y0: 2.60, x1: 5.47, y1: 2.60, openings: [
-      { at: 0.78, w: 1.72, type: 'opening' },
+      { at: 0.78, w: 0.60, type: 'opening' },
+      { at: 1.60, w: 0.69, type: 'opening' },
     ] },
     { x0: 5.47, y0: 0, x1: 5.47, y1: 9.54, openings: [
-      { at: 0.91, w: 0.89, type: 'door', hinge: 'start', swing: -1 },
+      { at: 0.91, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
       { at: 5.31, w: 1.33, type: 'opening' },
     ] },
     { x0: 2.38, y0: 2.60, x1: 2.38, y1: 5.23 },

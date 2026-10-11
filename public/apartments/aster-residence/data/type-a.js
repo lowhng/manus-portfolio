@@ -3,8 +3,9 @@
 // polygon set to 650 sqft (s = 0.00919 m/px). The drawn stroke is about
 // 200 mm. Origin is the south-west outer centre. +x right, +y toward the
 // master/living end of the plan. No pink hammer on this sheet.
-// A hinged leaf is placed only on a gap where the plan breaks the wall
-// for a swing. Tan marks are not doors.
+// A hinged leaf is placed only where a quarter-circle swing was measured
+// on the ink (hinge on the jamb, radius equal to the gap). The south
+// break has no swing, so it stays an opening.
 window.UNIT = {
   id: 'type-a',
   project: 'Aster Residence',
@@ -50,8 +51,7 @@ window.UNIT = {
     { x0: 0, y0: 0, x1: 0, y1: 3.40 },
     // South edge. The measured gap is the entrance; the leaf is the west part of that gap.
     { x0: 0, y0: 0, x1: 7.75, y1: 0, openings: [
-      { at: 4.65, w: 0.90, type: 'door', hinge: 'start', swing: 1, kind: 'entry' },
-      { at: 5.55, w: 0.50, type: 'opening' },
+      { at: 4.63, w: 1.40, type: 'opening' },
     ] },
     { x0: 7.75, y0: 0, x1: 7.75, y1: 8.70 },
     { x0: 1.15, y0: 8.70, x1: 7.75, y1: 8.70, openings: [
@@ -59,7 +59,7 @@ window.UNIT = {
       { at: 3.60, w: 1.80, type: 'window' },
     ] },
     { x0: 1.15, y0: 0, x1: 1.15, y1: 8.70, openings: [
-      { at: 4.30, w: 0.70, type: 'opening' },
+      { at: 4.30, w: 0.61, type: 'opening' },
     ] },
     { x0: 0, y0: 3.40, x1: 1.15, y1: 3.40 },
     // Master south wall. The gray stroke is continuous here, so this is a
@@ -73,9 +73,11 @@ window.UNIT = {
       { at: 1.70, w: 0.80, type: 'opening' },
       { at: 2.55, w: 0.80, type: 'opening' },
     ] },
-    { x0: 2.70, y0: 3.40, x1: 2.70, y1: 5.75 },
+    { x0: 2.70, y0: 3.40, x1: 2.70, y1: 5.75, openings: [
+      { at: 1.38, w: 0.82, type: 'door', hinge: 'end', swing: -1 },
+    ] },
     { x0: 4.55, y0: 0, x1: 4.55, y1: 8.70, openings: [
-      { at: 0.69, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
+      { at: 0.69, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
       { at: 4.48, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.10, y0: 0, x1: 6.10, y1: 1.60 },
