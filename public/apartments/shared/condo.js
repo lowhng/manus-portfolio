@@ -72,7 +72,15 @@ if (!condo) {
   intro.textContent = condo.intro || '';
   main.append(h1, intro);
 
+  let seenGroup = null;
   for (const unit of condo.units || []) {
+    if (unit.group && unit.group !== seenGroup) {
+      seenGroup = unit.group;
+      const tower = document.createElement('h2');
+      tower.className = 'tower';
+      tower.textContent = unit.group;
+      main.append(tower);
+    }
     const h2 = document.createElement('h2');
     const link = document.createElement('a');
     link.href = unit.page;

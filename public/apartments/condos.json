@@ -40,6 +40,27 @@
         { "id": "type-b", "name": "Type B", "beds": 3, "baths": 2, "sqft": 926, "plan": "type-b-926sf.png", "page": "type-b.html" },
         { "id": "type-c", "name": "Type C", "beds": "3+1", "baths": 2, "sqft": 1076, "plan": "type-c-1076sf.png", "page": "type-c.html" }
       ]
+    },
+    {
+      "slug": "emerald-9",
+      "name": "Emerald 9",
+      "location": "Cheras, Selangor",
+      "developer": "GuocoLand (Malaysia) Berhad",
+      "intro": "Jalan You City, Batu 9 Cheras. Freehold. Towers C and D (vacant possession Q2 2026) and Tower E (Q2 2027). Each plan is its own model: the Tower C and Tower D pairs are mirrors or shifted, not the same layout. One model runs at a time; click a plan to explore it.",
+      "sourceUrl": "https://guocoland.com.my/emerald9/",
+      "units": [
+        { "id": "tower-c-type-a", "group": "Tower C", "name": "Type A", "beds": 2, "baths": 1, "sqft": 675, "plan": "tower-c-type-a-675sf.jpg", "page": "tower-c-type-a.html" },
+        { "id": "tower-c-type-b", "group": "Tower C", "name": "Type B", "beds": "2+1", "baths": 2, "sqft": 852, "plan": "tower-c-type-b-852sf.jpg", "page": "tower-c-type-b.html" },
+        { "id": "tower-c-type-c", "group": "Tower C", "name": "Type C", "beds": 3, "baths": 2, "sqft": 1052, "plan": "tower-c-type-c-1052sf.jpg", "page": "tower-c-type-c.html" },
+        { "id": "tower-c-type-c1", "group": "Tower C", "name": "Type C1", "beds": 3, "baths": 2, "sqft": 1052, "plan": "tower-c-type-c1-1052sf.jpg", "page": "tower-c-type-c1.html" },
+        { "id": "tower-c-type-d", "group": "Tower C", "name": "Type D", "beds": "3+1", "baths": 3, "sqft": 1304, "plan": "tower-c-type-d-1304sf.jpg", "page": "tower-c-type-d.html" },
+        { "id": "tower-d-type-a", "group": "Tower D", "name": "Type A", "beds": 2, "baths": 1, "sqft": 675, "plan": "tower-d-type-a-675sf.png", "page": "tower-d-type-a.html" },
+        { "id": "tower-d-type-b", "group": "Tower D", "name": "Type B", "beds": "2+1", "baths": 2, "sqft": 852, "plan": "tower-d-type-b-852sf.png", "page": "tower-d-type-b.html" },
+        { "id": "tower-d-type-b1", "group": "Tower D", "name": "Type B1", "beds": "2+1", "baths": 2, "sqft": 851, "plan": "tower-d-type-b1-851sf.png", "page": "tower-d-type-b1.html" },
+        { "id": "tower-d-type-c", "group": "Tower D", "name": "Type C", "beds": 3, "baths": 2, "sqft": 1052, "plan": "tower-d-type-c-1052sf.png", "page": "tower-d-type-c.html" },
+        { "id": "tower-d-type-d", "group": "Tower D", "name": "Type D", "beds": "3+1", "baths": 3, "sqft": 1300, "plan": "tower-d-type-d-1300sf.png", "page": "tower-d-type-d.html" },
+        { "id": "tower-e", "group": "Tower E", "name": "Tower E", "beds": 2, "baths": 1, "sqft": 550, "plan": "tower-e-550sf.png", "page": "tower-e.html" }
+      ]
     }
   ]
 }
