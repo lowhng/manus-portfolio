@@ -29,8 +29,8 @@ window.UNIT = {
     { name: 'Living', c: [6.15, 7.20], box: [4.70, 5.90, 7.60, 8.50] },
     { name: 'Dining', c: [6.15, 4.95], box: [4.70, 4.35, 7.60, 5.60] },
     { name: 'Kitchen', c: [6.15, 2.90], box: [4.70, 1.75, 7.60, 4.05] },
-    { name: 'Bath 1', c: [3.60, 4.55], box: [2.85, 3.55, 4.40, 5.60] },
-    { name: 'Bath 2', c: [1.90, 4.55], box: [1.30, 3.55, 2.55, 5.60] },
+    { name: 'Bath 2', c: [3.60, 4.55], box: [2.85, 3.55, 4.40, 5.60] },
+    { name: 'Bath 1', c: [1.90, 4.55], box: [1.30, 3.55, 2.55, 5.60] },
     { name: 'Bedroom 2', c: [2.85, 1.70], box: [1.30, 0.20, 4.40, 3.25] },
     { name: 'A/C Ledge', c: [0.55, 1.70], box: [0.15, 0.15, 1.00, 3.25] },
     { name: 'Foyer', c: [5.30, 0.80], box: [4.70, 0.15, 5.95, 1.45] },
@@ -41,8 +41,8 @@ window.UNIT = {
     { name: 'Living', box: [4.55, 5.75, 7.75, 8.70] },
     { name: 'Dining', box: [4.55, 4.20, 7.75, 5.75] },
     { name: 'Kitchen', box: [4.55, 1.60, 7.75, 4.20] },
-    { name: 'Bath 1', box: [2.70, 3.40, 4.55, 5.75] },
-    { name: 'Bath 2', box: [1.15, 3.40, 2.70, 5.75] },
+    { name: 'Bath 2', box: [2.70, 3.40, 4.55, 5.75] },
+    { name: 'Bath 1', box: [1.15, 3.40, 2.70, 5.75] },
     { name: 'Bedroom 2', box: [1.15, 0, 4.55, 3.40] },
     { name: 'A/C Ledge', box: [0, 0, 1.15, 3.40] },
     { name: 'Foyer', box: [4.55, 0, 6.10, 1.60] },
@@ -67,13 +67,13 @@ window.UNIT = {
     { x0: 1.15, y0: 5.75, x1: 4.55, y1: 5.75, openings: [
       { at: 0.25, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
     ] },
-    // Bedroom 2 (west) and Bath 1, both swinging south into those rooms.
+    // Bedroom 2 (west) and Bath 2 (east of it), both swinging south into those rooms.
     { x0: 1.15, y0: 3.40, x1: 4.55, y1: 3.40, openings: [
       { at: 0.20, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
       { at: 1.70, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
       { at: 2.55, w: 0.80, type: 'opening' },
     ] },
-    // Wall between the two baths. Arc into Bath 1, hinge on the south jamb.
+    // Wall between the two baths. Arc into Bath 2, hinge on the south jamb.
     { x0: 2.70, y0: 3.40, x1: 2.70, y1: 5.75, openings: [
       { at: 1.38, w: 0.82, type: 'door', hinge: 'start', swing: -1 },
     ] },

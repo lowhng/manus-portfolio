@@ -24,26 +24,27 @@ window.UNIT = {
   rooms: [
     { name: 'Bedroom 2', c: [1.50, 7.80], box: [0.20, 6.20, 2.95, 9.30] },
     { name: 'Living', c: [4.80, 7.70], box: [3.30, 6.20, 6.35, 9.30] },
-    { name: 'Bedroom 3', c: [8.10, 7.60], box: [6.75, 6.20, 9.60, 9.30] },
-    { name: 'Bath 1', c: [1.50, 5.30], box: [0.20, 4.70, 2.95, 6.00] },
+    { name: 'Master Bedroom', c: [8.10, 7.60], box: [6.75, 6.20, 9.60, 9.30] },
+    { name: 'Bath 2', c: [1.50, 5.30], box: [0.20, 4.70, 2.95, 6.00] },
     { name: 'Dining', c: [4.80, 5.20], box: [3.30, 4.00, 6.35, 6.20] },
-    { name: 'Bath 2', c: [1.50, 3.80], box: [0.20, 3.30, 2.95, 4.50] },
+    { name: 'Master Bath', c: [8.10, 5.55], box: [6.75, 5.05, 9.60, 6.10] },
+    { name: 'Bath 3', c: [1.50, 3.80], box: [0.20, 3.30, 2.95, 4.50] },
     { name: 'Kitchen', c: [8.10, 4.00], box: [6.75, 3.30, 9.60, 4.80] },
-    { name: 'Master Bedroom', c: [1.50, 1.60], box: [0.20, 0.20, 2.95, 3.00] },
+    { name: 'Bedroom 3', c: [1.50, 1.60], box: [0.20, 0.20, 2.95, 3.00] },
     { name: 'Foyer', c: [4.80, 1.40], box: [3.30, 0.20, 6.35, 2.90] },
     { name: 'Utility', c: [6.00, 0.70], box: [5.20, 0.15, 7.00, 1.40] },
   ],
   floors: [
     { name: 'Bedroom 2', box: [0, 6.03, 3.13, 9.50] },
     { name: 'Living', box: [3.13, 6.20, 6.55, 9.50] },
-    { name: 'Bedroom 3', box: [6.55, 6.20, 9.80, 9.50] },
-    { name: 'Bath 1', box: [0, 4.55, 3.13, 6.03] },
+    { name: 'Master Bedroom', box: [6.55, 6.20, 9.80, 9.50] },
+    { name: 'Bath 2', box: [0, 4.55, 3.13, 6.03] },
     { name: 'Dining', box: [3.13, 3.15, 6.55, 6.20] },
-    { name: 'Bath 2', box: [0, 3.15, 3.13, 4.55] },
+    { name: 'Bath 3', box: [0, 3.15, 3.13, 4.55] },
     { name: 'Kitchen', box: [6.55, 3.15, 9.80, 4.92] },
-    { name: 'Master Bedroom', box: [0, 0, 3.13, 3.15] },
+    { name: 'Bedroom 3', box: [0, 0, 3.13, 3.15] },
     { name: 'Foyer', box: [3.13, 0, 7.16, 3.15] },
-    { name: 'Yard', box: [6.55, 4.92, 9.80, 6.20] },
+    { name: 'Master Bath', box: [6.55, 4.92, 9.80, 6.20] },
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 9.50, openings: [
@@ -56,7 +57,8 @@ window.UNIT = {
     ] },
     { x0: 7.16, y0: 0, x1: 7.16, y1: 3.15 },
     { x0: 0, y0: 3.15, x1: 9.80, y1: 3.15, openings: [
-      { at: 2.15, w: 0.90, type: 'opening' },
+      // Bath 3 south wall. West jamb, swing south into Bedroom 3.
+      { at: 2.20, w: 0.72, type: 'door', hinge: 'start', swing: -1 },
       { at: 3.23, w: 3.24, type: 'opening' },
       { at: 7.24, w: 0.75, type: 'opening' },
     ] },
@@ -66,19 +68,23 @@ window.UNIT = {
       { at: 7.06, w: 2.00, type: 'window' },
     ] },
     { x0: 3.13, y0: 0, x1: 3.13, y1: 9.50, openings: [
-      // Master east wall. Hinge on the south jamb, swing east into the foyer.
+      // Bedroom 3 east wall. Hinge on the south jamb, swing east into the foyer.
       { at: 2.01, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
       // Bedroom 2 east wall. Hinge on the south jamb, swing west into the room.
       { at: 6.21, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.55, y0: 3.15, x1: 6.55, y1: 9.50, openings: [
-      // Bedroom 3 west wall, hinge on the north jamb, swing west out to the living side.
+      // Master Bedroom west wall, hinge on the north jamb, swing west out to the living side.
       { at: 3.05, w: 0.90, type: 'door', hinge: 'end', swing: 1 },
     ] },
-    { x0: 0, y0: 6.03, x1: 3.13, y1: 6.03 },
+    // Bath 2 north wall. East jamb, swing south into the bath.
+    { x0: 0, y0: 6.03, x1: 3.13, y1: 6.03, openings: [
+      { at: 2.20, w: 0.72, type: 'door', hinge: 'end', swing: 1 },
+    ] },
     { x0: 0, y0: 4.55, x1: 3.13, y1: 4.55 },
     { x0: 6.55, y0: 4.92, x1: 9.80, y1: 4.92, openings: [
-      { at: 0.76, w: 0.80, type: 'door', hinge: 'end', swing: 1 },
+      // Hinge on the east jamb, swing north into the master bath.
+      { at: 0.76, w: 0.80, type: 'door', hinge: 'end', swing: -1 },
     ] },
     { x0: 6.55, y0: 6.20, x1: 9.80, y1: 6.20 },
   ],
@@ -90,13 +96,13 @@ window.UNIT = {
     ['TV_Unit', 3.55, 7.80, 2, 0.70, 0.85],
     ['Coffee_Table', 4.70, 7.70, 0, 0.60, 0.60],
     ['Sofa', 5.70, 7.85, 0, 0.80, 0.85],
-    // Bedroom 3 — head north, wardrobe on the east wall, desk on the south wall
-    ['Bed1_Bed', 8.05, 7.90, 3, 0.80, 0.80],
-    // East wall, front west into the room.
-    ['Bed1_Wardrobe', 9.35, 7.60, 3, 0.55, 0.80],
+    // Master Bedroom — head north, wardrobe on the east wall, desk on the south wall
+    ['Master_Bed', 8.05, 7.90, 1, 0.80, 0.80],
+    // East wall, long north-south, front west.
+    ['Master_Wardrobe', 9.35, 7.60, 2, 0.55, 0.80],
     ['Master_Desk', 8.00, 6.55, 0],
     ['Master_DeskChair', 8.00, 7.05, 2],
-    // Bath 1
+    // Bath 2
     ['Bath1_Shower', 0.55, 5.55, 0, 0.50, 0.60],
     ['Bath1_Vanity', 2.40, 5.40, 1, 0.60, 0.50],
     ['Bath1_Toilet', 1.50, 5.15, 0, 0.45, 0.50],
@@ -108,7 +114,7 @@ window.UNIT = {
     ['Dining_Chair_R1', 4.10, 4.65, 1],
     ['Dining_Chair_R2', 4.80, 4.65, 1],
     ['Dining_Chair_R3', 5.50, 4.65, 1],
-    // Bath 2
+    // Bath 3
     ['Bath1_Shower', 0.55, 4.10, 2, 0.50, 0.55],
     ['Bath1_Vanity', 2.40, 3.85, 1, 0.60, 0.50],
     ['Bath1_Toilet', 1.50, 3.60, 0, 0.45, 0.50],
@@ -116,9 +122,13 @@ window.UNIT = {
     ['Kitchen_Run', 9.40, 4.00, 3, 0.75, 0.50],
     ['Kitchen_Run', 8.00, 3.40, 0, 0.70, 0.45],
     ['Fridge', 9.30, 4.55, 3, 0.60, 0.60],
-    // Master — head west (rot 0), wardrobe on the south wall
-    ['Master_Bed', 1.50, 1.70, 0, 0.85, 0.80],
-    ['Master_Wardrobe', 1.70, 0.45, 3, 0.80, 0.50],
+    // Master bath — shower north-west, toilet south-west, vanity on the east wall
+    ['MBath_Shower', 7.20, 5.80, 0, 0.50, 0.55],
+    ['MBath_Toilet', 7.25, 5.25, 2, 0.45, 0.50],
+    ['MBath_Vanity', 9.35, 5.45, 0, 0.55, 0.50],
+    // Bedroom 3 — head west, wardrobe on the south wall
+    ['Bed1_Bed', 1.50, 1.70, 2, 0.85, 0.80],
+    ['Bed1_Wardrobe', 1.70, 0.45, 0, 0.80, 0.50],
     ['Shoe_Cabinet', 4.20, 0.70, 0, 0.70, 0.55],
     ['Yard_Washer', 6.50, 0.55, 0, 0.55, 0.55],
   ],
