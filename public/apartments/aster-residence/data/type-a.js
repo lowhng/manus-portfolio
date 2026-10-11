@@ -3,9 +3,10 @@
 // polygon set to 650 sqft (s = 0.00919 m/px). The drawn stroke is about
 // 200 mm. Origin is the south-west outer centre. +x right, +y toward the
 // master/living end of the plan. No pink hammer on this sheet.
-// A hinged leaf is placed only where a quarter-circle swing was measured
-// on the ink (hinge on the jamb, radius equal to the gap). The south
-// break has no swing, so it stays an opening.
+// Hinged leaves follow the thin grey quarter-circles: master (into the
+// room), the bath partition, Bath 1, Bedroom 2, and the foyer entrance
+// (hinge on the east jamb). The spine breaks are sliding panels, so they
+// stay openings.
 window.UNIT = {
   id: 'type-a',
   project: 'Aster Residence',
@@ -49,9 +50,9 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 3.40 },
-    // South edge. The measured gap is the entrance; the leaf is the west part of that gap.
+    // Entrance. Hinge on the east jamb, leaf swings north into the foyer.
     { x0: 0, y0: 0, x1: 7.75, y1: 0, openings: [
-      { at: 4.63, w: 1.40, type: 'opening' },
+      { at: 4.63, w: 1.40, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
     ] },
     { x0: 7.75, y0: 0, x1: 7.75, y1: 8.70 },
     { x0: 1.15, y0: 8.70, x1: 7.75, y1: 8.70, openings: [
@@ -62,23 +63,24 @@ window.UNIT = {
       { at: 4.30, w: 0.61, type: 'opening' },
     ] },
     { x0: 0, y0: 3.40, x1: 1.15, y1: 3.40 },
-    // Master south wall. The gray stroke is continuous here, so this is a
-    // cased opening rather than a hinged leaf.
+    // Master south wall. Arc inside the room, hinge on the west jamb.
     { x0: 1.15, y0: 5.75, x1: 4.55, y1: 5.75, openings: [
-      { at: 0.25, w: 0.90, type: 'opening' },
+      { at: 0.25, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
     ] },
-    // Bedroom 2 / baths. Same: the stroke does not break for a swing.
+    // Bedroom 2 (west) and Bath 1, both swinging south into those rooms.
     { x0: 1.15, y0: 3.40, x1: 4.55, y1: 3.40, openings: [
-      { at: 0.20, w: 0.90, type: 'opening' },
-      { at: 1.70, w: 0.80, type: 'opening' },
+      { at: 0.20, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
+      { at: 1.70, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
       { at: 2.55, w: 0.80, type: 'opening' },
     ] },
+    // Wall between the two baths. Arc into Bath 1, hinge on the south jamb.
     { x0: 2.70, y0: 3.40, x1: 2.70, y1: 5.75, openings: [
-      { at: 1.38, w: 0.82, type: 'door', hinge: 'end', swing: -1 },
+      { at: 1.38, w: 0.82, type: 'door', hinge: 'start', swing: -1 },
     ] },
+    // Spine breaks are sliding panels, not hinged leaves.
     { x0: 4.55, y0: 0, x1: 4.55, y1: 8.70, openings: [
-      { at: 0.69, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
-      { at: 4.48, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
+      { at: 0.69, w: 0.90, type: 'opening' },
+      { at: 4.48, w: 0.90, type: 'opening' },
     ] },
     { x0: 6.10, y0: 0, x1: 6.10, y1: 1.60 },
     { x0: 4.55, y0: 1.60, x1: 7.75, y1: 1.60, openings: [
@@ -86,32 +88,36 @@ window.UNIT = {
     ] },
     { x0: 4.55, y0: 4.20, x1: 7.75, y1: 4.20 },
   ],
+  // Master head -X (rot 0 faces west). Bed2 head +X (rot 3 faces north).
+  // Sofa back +X. TV screen -X. Wardrobe long Z, front +X.
   furniture: [
-    ['Master_Bed', 2.80, 7.15, 0, 0.85, 0.90],
-    ['Master_Bedside_L', 1.70, 7.40, 0, 0.70, 0.70],
-    ['Master_Bedside_R', 3.90, 7.40, 0, 0.70, 0.70],
-    ['Master_Wardrobe', 1.55, 6.20, 1, 0.70, 1.10],
-    ['Sofa', 6.30, 7.30, 2, 0.70, 0.95],
-    ['Coffee_Table', 6.20, 6.50, 0, 0.70, 0.70],
-    ['TV_Unit', 7.30, 7.20, 1, 0.55, 1.20],
-    ['Dining_Table', 6.20, 5.00, 0, 0.70, 0.85],
-    ['Dining_Chair_L1', 5.70, 5.30, 1],
-    ['Dining_Chair_R1', 6.70, 5.30, 3],
-    ['Dining_Chair_L2', 5.70, 4.70, 1],
-    ['Dining_Chair_R2', 6.70, 4.70, 3],
-    ['Kitchen_Run', 6.40, 1.90, 0, 0.35, 0.90],
-    ['Fridge', 7.35, 3.50, 1, 0.70, 0.70],
-    ['Bed2_Bed', 2.70, 1.80, 0, 0.80, 0.85],
-    ['Bed2_Wardrobe', 1.50, 2.60, 1, 0.55, 1.00],
-    ['Bed2_Bedside', 3.80, 2.20, 0, 0.65, 0.65],
-    ['MBath_Shower', 1.70, 5.20, 0, 0.55, 0.70],
-    ['MBath_Vanity', 1.70, 4.00, 0, 0.70, 0.55],
-    ['MBath_Toilet', 2.30, 4.70, 1, 0.50, 0.70],
-    ['Bath1_Shower', 3.20, 5.20, 0, 0.55, 0.70],
-    ['Bath1_Vanity', 3.90, 4.00, 0, 0.70, 0.55],
-    ['Bath1_Toilet', 3.30, 4.50, 1, 0.50, 0.70],
-    ['Shoe_Cabinet', 5.20, 1.20, 0, 0.80, 0.70],
-    ['Yard_Washer', 7.20, 0.70, 0, 0.70, 0.70],
+    ['Master_Bed', 2.70, 7.30, 0, 0.90, 0.85],
+    ['Master_Bedside_L', 2.70, 8.15, 0, 0.65, 0.65],
+    ['Master_Bedside_R', 2.70, 6.40, 0, 0.65, 0.65],
+    ['Master_Wardrobe', 2.80, 6.05, 3, 0.90, 0.55],
+    ['Sofa', 6.70, 7.40, 0, 0.80, 0.90],
+    ['Coffee_Table', 6.10, 7.20, 0, 0.65, 0.65],
+    ['TV_Unit', 5.00, 7.30, 2, 0.70, 0.90],
+    ['Rug_Living', 6.20, 7.30, 0, 0.65, 0.70],
+    ['Dining_Table', 6.20, 5.00, 1, 0.75, 0.90],
+    ['Dining_Chair_L1', 5.55, 5.45, 1],
+    ['Dining_Chair_R1', 6.85, 5.45, 1],
+    ['Dining_Chair_L2', 5.55, 4.55, 1],
+    ['Dining_Chair_R2', 6.85, 4.55, 1],
+    ['Kitchen_Run', 7.35, 2.80, 3, 0.80, 0.50],
+    ['Kitchen_Run', 6.20, 1.85, 0, 0.65, 0.45],
+    ['Fridge', 7.30, 3.70, 3, 0.65, 0.65],
+    ['Bed2_Bed', 2.60, 1.70, 3, 0.85, 0.80],
+    ['Bed2_Wardrobe', 3.90, 2.40, 3, 0.70, 0.60],
+    ['Bed2_Bedside', 3.50, 1.70, 0, 0.60, 0.60],
+    ['MBath_Shower', 1.70, 5.15, 0, 0.55, 0.65],
+    ['MBath_Vanity', 1.65, 4.00, 1, 0.60, 0.50],
+    ['MBath_Toilet', 2.20, 4.55, 3, 0.50, 0.55],
+    ['Bath1_Shower', 3.15, 5.15, 0, 0.55, 0.65],
+    ['Bath1_Vanity', 3.90, 4.00, 1, 0.60, 0.50],
+    ['Bath1_Toilet', 3.40, 4.50, 0, 0.50, 0.55],
+    ['Shoe_Cabinet', 5.20, 1.15, 0, 0.75, 0.55],
+    ['Yard_Washer', 7.15, 0.70, 0, 0.65, 0.65],
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-1.6, -2.2, 12], tgt: [3.8, 4.2, 0.4], fov: 36 },

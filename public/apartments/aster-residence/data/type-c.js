@@ -52,7 +52,7 @@ window.UNIT = {
       { at: 5.37, w: 0.60, type: 'opening' },
     ] },
     { x0: 0, y0: 0, x1: 7.16, y1: 0, openings: [
-      { at: 3.23, w: 1.60, type: 'opening' },
+      { at: 3.23, w: 1.60, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
     ] },
     { x0: 7.16, y0: 0, x1: 7.16, y1: 3.15 },
     { x0: 0, y0: 3.15, x1: 9.80, y1: 3.15, openings: [
@@ -66,11 +66,14 @@ window.UNIT = {
       { at: 7.06, w: 2.00, type: 'window' },
     ] },
     { x0: 3.13, y0: 0, x1: 3.13, y1: 9.50, openings: [
-      { at: 2.01, w: 0.90, type: 'door', hinge: 'end', swing: -1 },
+      // Master east wall. Hinge on the south jamb, swing east into the foyer.
+      { at: 2.01, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
+      // Bedroom 2 east wall. Hinge on the south jamb, swing west into the room.
       { at: 6.21, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.55, y0: 3.15, x1: 6.55, y1: 9.50, openings: [
-      { at: 3.05, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
+      // Bedroom 3 west wall, hinge on the north jamb, swing west out to the living side.
+      { at: 3.05, w: 0.90, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 0, y0: 6.03, x1: 3.13, y1: 6.03 },
     { x0: 0, y0: 4.55, x1: 3.13, y1: 4.55 },
@@ -80,30 +83,43 @@ window.UNIT = {
     { x0: 6.55, y0: 6.20, x1: 9.80, y1: 6.20 },
   ],
   furniture: [
-    ['Bed2_Bed', 1.50, 7.80, 1, 0.80, 0.85],
-    ['Bed2_Wardrobe', 2.50, 6.60, 0, 0.60, 0.80],
-    ['Sofa', 4.80, 8.00, 2, 0.75, 0.90],
-    ['Coffee_Table', 4.70, 7.00, 0, 0.60, 0.60],
-    ['TV_Unit', 6.10, 7.80, 1, 0.45, 1.00],
-    ['Bed1_Bed', 8.10, 7.70, 0, 0.80, 0.85],
-    ['Bed1_Wardrobe', 7.10, 8.60, 0, 0.55, 0.80],
-    ['Bath1_Shower', 0.60, 5.50, 0, 0.50, 0.70],
-    ['Bath1_Vanity', 2.40, 5.20, 0, 0.70, 0.50],
-    ['Bath1_Toilet', 1.50, 5.10, 0, 0.45, 0.55],
-    ['Dining_Table', 4.80, 5.10, 0, 0.75, 0.80],
-    ['Dining_Chair_L1', 4.20, 5.40, 1],
-    ['Dining_Chair_R1', 5.40, 5.40, 3],
-    ['Dining_Chair_L2', 4.20, 4.70, 1],
-    ['Dining_Chair_R2', 5.40, 4.70, 3],
-    ['Bath1_Shower', 0.60, 4.00, 2, 0.50, 0.60],
-    ['Bath1_Vanity', 2.40, 3.70, 0, 0.70, 0.50],
-    ['Bath1_Toilet', 1.50, 3.60, 0, 0.45, 0.55],
-    ['Kitchen_Run', 8.40, 3.50, 0, 0.40, 1.00],
-    ['Fridge', 9.30, 4.40, 1, 0.55, 0.60],
-    ['Master_Bed', 1.50, 1.70, 1, 0.80, 0.90],
-    ['Master_Wardrobe', 2.50, 0.70, 0, 0.60, 0.80],
-    ['Shoe_Cabinet', 4.00, 0.70, 0, 0.70, 0.60],
-    ['Yard_Washer', 6.40, 0.60, 0, 0.55, 0.55],
+    // Bedroom 2 — head on the west wall, wardrobe along the south wall
+    ['Bed2_Bed', 1.45, 7.90, 2, 0.85, 0.80],
+    ['Bed2_Wardrobe', 1.80, 6.45, 0, 0.85, 0.55],
+    // Living — TV on the west side, sofa opposite facing west
+    ['TV_Unit', 3.55, 7.80, 2, 0.70, 0.85],
+    ['Coffee_Table', 4.70, 7.70, 0, 0.60, 0.60],
+    ['Sofa', 5.70, 7.85, 0, 0.80, 0.85],
+    // Bedroom 3 — head north, wardrobe on the east wall, desk on the south wall
+    ['Bed1_Bed', 8.05, 7.90, 3, 0.80, 0.80],
+    ['Bed1_Wardrobe', 9.35, 7.60, 1, 0.55, 0.80],
+    ['Master_Desk', 8.00, 6.55, 0],
+    ['Master_DeskChair', 8.00, 7.05, 2],
+    // Bath 1
+    ['Bath1_Shower', 0.55, 5.55, 0, 0.50, 0.60],
+    ['Bath1_Vanity', 2.40, 5.40, 1, 0.60, 0.50],
+    ['Bath1_Toilet', 1.50, 5.15, 0, 0.45, 0.50],
+    // Dining — table long east-west, three chairs each side
+    ['Dining_Table', 4.80, 5.15, 1, 0.80, 1.00],
+    ['Dining_Chair_L1', 4.10, 5.65, 1],
+    ['Dining_Chair_L2', 4.80, 5.65, 1],
+    ['Dining_Chair_L3', 5.50, 5.65, 1],
+    ['Dining_Chair_R1', 4.10, 4.65, 1],
+    ['Dining_Chair_R2', 4.80, 4.65, 1],
+    ['Dining_Chair_R3', 5.50, 4.65, 1],
+    // Bath 2
+    ['Bath1_Shower', 0.55, 4.10, 2, 0.50, 0.55],
+    ['Bath1_Vanity', 2.40, 3.85, 1, 0.60, 0.50],
+    ['Bath1_Toilet', 1.50, 3.60, 0, 0.45, 0.50],
+    // Kitchen L, fridge at the north end of the east run
+    ['Kitchen_Run', 9.40, 4.00, 3, 0.75, 0.50],
+    ['Kitchen_Run', 8.00, 3.40, 0, 0.70, 0.45],
+    ['Fridge', 9.30, 4.55, 3, 0.60, 0.60],
+    // Master — head west, wardrobe on the south wall
+    ['Master_Bed', 1.50, 1.70, 2, 0.85, 0.80],
+    ['Master_Wardrobe', 1.70, 0.45, 3, 0.80, 0.50],
+    ['Shoe_Cabinet', 4.20, 0.70, 0, 0.70, 0.55],
+    ['Yard_Washer', 6.50, 0.55, 0, 0.55, 0.55],
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-2.0, -2.4, 14], tgt: [4.8, 4.6, 0.4], fov: 36 },
