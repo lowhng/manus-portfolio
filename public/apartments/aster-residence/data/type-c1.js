@@ -71,10 +71,14 @@ window.UNIT = {
     { x0: 0, y0: 4.60, x1: 3.00, y1: 4.60 },
     { x0: 0, y0: 1.70, x1: 3.00, y1: 1.70 },
     { x0: 6.16, y0: 3.20, x1: 9.35, y1: 3.20 },
-    { x0: 6.16, y0: 7.40, x1: 9.35, y1: 7.40 },
-    // Extra C1 partition between dining and the kitchen bay.
+    // Balcony slider. Two clear gaps, no quarter-circle, so they stay openings.
+    { x0: 6.16, y0: 7.40, x1: 9.35, y1: 7.40, openings: [
+      { at: 0.54, w: 0.60, type: 'opening' },
+      { at: 2.46, w: 0.60, type: 'opening' },
+    ] },
+    // Kitchen partition. Grey arc hinges on the south jamb and swings east into the kitchen.
     { x0: 7.38, y0: 3.20, x1: 7.38, y1: 7.40, openings: [
-      { at: 0.50, w: 0.80, type: 'opening' },
+      { at: 0.50, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
     ] },
   ],
   furniture: [
@@ -101,7 +105,8 @@ window.UNIT = {
     ['Bath1_Shower', 0.50, 4.05, 2, 0.50, 0.55],
     ['Bath1_Vanity', 2.35, 3.50, 1, 0.60, 0.50],
     ['Bath1_Toilet', 1.40, 3.20, 0, 0.45, 0.50],
-    ['Master_Bed', 1.45, 0.90, 2, 0.80, 0.70],
+    // Head on the west wall.
+    ['Master_Bed', 1.45, 0.90, 0, 0.80, 0.70],
     ['Master_Wardrobe', 2.30, 0.40, 3, 0.65, 0.45],
     ['Shoe_Cabinet', 7.60, 1.40, 0, 0.70, 0.55],
     ['Yard_Washer', 4.40, 0.55, 0, 0.55, 0.55],

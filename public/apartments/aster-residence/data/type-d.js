@@ -71,8 +71,9 @@ window.UNIT = {
         ] },
         { x0: 2.70, y0: 5.20, x1: 4.75, y1: 5.20 },
         { x0: 3.68, y0: 5.20, x1: 3.68, y1: 7.70 },
+        // Bath door. Hinge on the south jamb, swing west into the bath.
         { x0: 4.75, y0: 3.98, x1: 4.75, y1: 7.70, openings: [
-          { at: 1.54, w: 1.08, type: 'opening' },
+          { at: 1.74, w: 0.70, type: 'door', hinge: 'start', swing: 1 },
         ] },
         { x0: 5.61, y0: 0, x1: 5.61, y1: 7.70, openings: [
           { at: 2.91, w: 2.40, type: 'opening' },
@@ -104,7 +105,8 @@ window.UNIT = {
         ['Coffee_Table', 1.40, 0.45, 0, 0.50, 0.50],
         ['TV_Unit', 0.40, 1.10, 1, 0.45, 0.70],
         ['Master_Bed', 4.40, 1.35, 1, 0.80, 0.75],
-        ['Master_Wardrobe', 5.75, 2.20, 1, 0.50, 0.75],
+        // East wall, long north-south, front west.
+        ['Master_Wardrobe', 5.80, 1.40, 2, 0.50, 0.85],
         ['Master_Bedside_L', 3.40, 1.90, 0, 0.50, 0.50],
         ['Master_Bedside_R', 5.40, 1.90, 0, 0.50, 0.50],
       ],
@@ -136,8 +138,9 @@ window.UNIT = {
           { at: 2.18, w: 0.87, type: 'opening' },
           { at: 3.75, w: 0.78, type: 'door', hinge: 'start', swing: 1 },
         ] },
+        // Bath door. Hinge on the south jamb, swing east into the bath.
         { x0: 4.69, y0: 2.18, x1: 4.69, y1: 7.70, openings: [
-          { at: 1.49, w: 2.20, type: 'opening' },
+          { at: 0.47, w: 0.68, type: 'door', hinge: 'start', swing: -1 },
         ] },
         { x0: 5.61, y0: 0, x1: 5.61, y1: 7.70, openings: [
           { at: 2.04, w: 3.20, type: 'opening' },
@@ -147,8 +150,9 @@ window.UNIT = {
         ] },
         { x0: 2.70, y0: 6.06, x1: 4.69, y1: 6.06 },
         { x0: 4.69, y0: 4.48, x1: 6.20, y1: 4.48 },
+        // Bedroom 2 door swings north into the hall. The eastern door swings south.
         { x0: 0, y0: 3.62, x1: 4.69, y1: 3.62, openings: [
-          { at: 1.78, w: 0.87, type: 'opening' },
+          { at: 1.78, w: 0.87, type: 'door', hinge: 'start', swing: 1 },
           { at: 3.33, w: 0.78, type: 'door', hinge: 'start', swing: -1 },
         ] },
         { x0: 4.70, y0: 2.18, x1: 6.20, y1: 2.18 },

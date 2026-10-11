@@ -92,7 +92,8 @@ window.UNIT = {
     ['Sofa', 5.70, 7.85, 0, 0.80, 0.85],
     // Bedroom 3 — head north, wardrobe on the east wall, desk on the south wall
     ['Bed1_Bed', 8.05, 7.90, 3, 0.80, 0.80],
-    ['Bed1_Wardrobe', 9.35, 7.60, 1, 0.55, 0.80],
+    // East wall, front west into the room.
+    ['Bed1_Wardrobe', 9.35, 7.60, 3, 0.55, 0.80],
     ['Master_Desk', 8.00, 6.55, 0],
     ['Master_DeskChair', 8.00, 7.05, 2],
     // Bath 1
@@ -115,8 +116,8 @@ window.UNIT = {
     ['Kitchen_Run', 9.40, 4.00, 3, 0.75, 0.50],
     ['Kitchen_Run', 8.00, 3.40, 0, 0.70, 0.45],
     ['Fridge', 9.30, 4.55, 3, 0.60, 0.60],
-    // Master — head west, wardrobe on the south wall
-    ['Master_Bed', 1.50, 1.70, 2, 0.85, 0.80],
+    // Master — head west (rot 0), wardrobe on the south wall
+    ['Master_Bed', 1.50, 1.70, 0, 0.85, 0.80],
     ['Master_Wardrobe', 1.70, 0.45, 3, 0.80, 0.50],
     ['Shoe_Cabinet', 4.20, 0.70, 0, 0.70, 0.55],
     ['Yard_Washer', 6.50, 0.55, 0, 0.55, 0.55],
