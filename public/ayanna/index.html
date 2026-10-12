@@ -177,7 +177,7 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>
-<div id="fpsHint" hidden>WASD or arrows to move · mouse to look · ESC to exit</div>
+<div id="fpsHint" hidden>Click to start · WASD to move · mouse to look · ESC to exit</div>
 <div id="mobileControls" hidden>
   <div id="moveJoystick">
     <button class="move-btn" data-dir="forward">▲</button>
@@ -441,15 +441,15 @@ function setFpsMode(enabled) {
   
   if (enabled) {
     controls.enabled = false;
-    if (!isMobile) {
-      pointerLockControls.lock();
-    }
     labelsEl.classList.add('off');
     hintEl.hidden = true;
-    fpsHintEl.hidden = isMobile;
     if (isMobile) {
+      fpsHintEl.hidden = true;
       mobileControlsEl.hidden = false;
       renderer.domElement.style.cursor = 'crosshair';
+    } else {
+      fpsHintEl.hidden = false;
+      renderer.domElement.style.cursor = 'pointer';
     }
   } else {
     if (pointerLockControls.isLocked) pointerLockControls.unlock();
@@ -963,6 +963,13 @@ window.addEventListener('pointerup', (e) => {
   }
 });
 window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
+
+// Click canvas to start FPS mode (required for pointer lock)
+renderer.domElement.addEventListener('click', () => {
+  if (fpsMode && !pointerLockControls.isLocked) {
+    pointerLockControls.lock();
+  }
+});
 
 // FPS keyboard controls
 window.addEventListener('keydown', (e) => {
