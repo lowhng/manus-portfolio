@@ -251,6 +251,7 @@ let dragStartY = 0;
 // Pinch zoom tracking
 const activePointers = new Map();
 let lastPinchDistance = 0;
+let panoramaPointerId = null;
 
 // Sun: Blender rotation (50°, 10°, -160°), light shines along local -Z
 const e = new THREE.Euler(0.8726646, 0.1745329, -2.7925267, 'XYZ');
@@ -946,7 +947,6 @@ window.addEventListener('pointerup', (e) => {
 window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
 
 // Panorama mode: drag to look around + pinch to zoom
-let panoramaPointerId = null;
 renderer.domElement.addEventListener('pointerdown', (e) => {
   if (!panoramaMode || editMode) return;
   
