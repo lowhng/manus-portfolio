@@ -4,7 +4,8 @@
 //   s = 8.500 / 892 m/px
 // Origin is the south-west outer centre. +x right, +y toward the balcony.
 // A hinged leaf is placed only where a quarter-circle swing is drawn.
-// This sheet has no pink hammer.
+// The balcony front is a parapet; the living walk-out is a two-panel slider.
+// The foyer screen is open to the kitchen (no second swing). This sheet has no pink hammer.
 window.UNIT = {
   id: 'type-a',
   project: 'Quartz Queensville',
@@ -22,6 +23,14 @@ window.UNIT = {
   windowHead: 2.1,
   wallT: 0.2,
   explicitWalls: true,
+  // Image pixel of world (0, 0). mx, my are metres per pixel; image +y is down.
+  plan: {
+    file: 'type-a-702sf.png',
+    ox: 147.5,
+    oy: 1053.5,
+    mx: 8.500 / 892,
+    my: 8.495 / (1053.5 - 162.0),
+  },
   rooms: [
     { name: 'BALCONY', c: [7.05, 8.12], box: [5.65, 7.85, 8.35, 8.40] },
     { name: 'MASTER BEDROOM', c: [1.45, 6.85], box: [0.20, 4.20, 2.75, 8.35] },
@@ -50,17 +59,17 @@ window.UNIT = {
   walls: [
     // West exterior, from the master-bathroom south wall up to the north wall.
     { x0: 0, y0: 2.512, x1: 0, y1: 8.495 },
-    // North wall. Bedroom windows keep a sill; the balcony front is a railing.
+    // North wall. Bedroom windows keep a sill. The balcony front is a railing.
     { x0: 0, y0: 8.495, x1: 8.5, y1: 8.495, openings: [
       { at: 0.719, w: 1.811, type: 'window', sill: 0.9, head: 2.1 },
       { at: 3.426, w: 1.801, type: 'window', sill: 0.9, head: 2.1 },
-      { at: 6.618, w: 1.763, type: 'window', sill: 1.0, head: 2.1 },
+      { at: 6.63, w: 1.74, type: 'rail', h: 1.05 },
     ] },
     { x0: 8.5, y0: 0, x1: 8.5, y1: 8.495 },
     // South exterior. The notch under the master bathroom starts at the yard wall.
     // Entrance: hinge on the east jamb, arc drawn inside the foyer.
     { x0: 2.773, y0: 0, x1: 8.5, y1: 0, openings: [
-      { at: 4.478, w: 1.12, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
+      { at: 4.457, w: 1.14, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
     ] },
     // Yard / bathroom spine. Exterior below the baths, the bath partition above.
     { x0: 2.773, y0: 0, x1: 2.773, y1: 4.016 },
@@ -71,65 +80,65 @@ window.UNIT = {
     { x0: 5.5, y0: 2.512, x1: 5.5, y1: 4.016 },
     // Header under the bedrooms. Bedroom 1 leaf: hinge on the living jamb, swing into the room.
     { x0: 2.9, y0: 5.165, x1: 5.5, y1: 5.165, openings: [
-      { at: 1.574, w: 0.905, type: 'door', hinge: 'end', swing: -1 },
+      { at: 1.58, w: 0.89, type: 'door', hinge: 'end', swing: -1 },
     ] },
-    // Master door pier. The drawn arc sits on the pier, hinge at its lower end, swing west.
+    // Master door pier. Arc in the bedroom, hinge on the upper jamb, swing west.
     { x0: 3.492, y0: 4.016, x1: 3.492, y1: 5.165, openings: [
-      { at: 0.12, w: 0.86, type: 'door', hinge: 'start', swing: 1 },
+      { at: 0.134, w: 0.89, type: 'door', hinge: 'end', swing: -1 },
     ] },
-    // Bath north wall. Both leaves swing south into the bathrooms.
+    // Bath north wall. Both arcs sit in the bathrooms, hinge on the east jamb.
     { x0: 0, y0: 4.016, x1: 5.5, y1: 4.016, openings: [
-      { at: 1.80, w: 0.74, type: 'door', hinge: 'end', swing: 1 },
-      { at: 3.569, w: 0.858, type: 'door', hinge: 'start', swing: -1 },
+      { at: 1.86, w: 0.78, type: 'door', hinge: 'end', swing: 1 },
+      { at: 3.64, w: 0.78, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 0, y0: 2.512, x1: 5.5, y1: 2.512 },
-    // Balcony / living. The break is the sliding door, drawn without a swing.
+    // Balcony / living. Two sliding panels, drawn without a swing.
     { x0: 5.5, y0: 7.747, x1: 8.5, y1: 7.747, openings: [
-      { at: 1.118, w: 1.706, type: 'opening' },
+      { at: 1.21, w: 1.60, type: 'slider' },
     ] },
-    // Yard / kitchen. The dashed arc sits in the yard: hinge on the lower jamb, swing west.
+    // Yard / kitchen. Windows flank the door. The arc is in the yard, hinge on the upper jamb.
     { x0: 3.77, y0: 0, x1: 3.77, y1: 2.512, openings: [
-      { at: 0.77, w: 0.77, type: 'door', hinge: 'start', swing: 1 },
+      { at: 0.14, w: 0.58, type: 'window', sill: 0.9, head: 2.1 },
+      { at: 0.79, w: 0.78, type: 'door', hinge: 'end', swing: -1 },
+      { at: 1.63, w: 0.54, type: 'window', sill: 1.2, head: 2.1 },
     ] },
-    // Foyer screen, and the open mouth into the kitchen.
+    // Foyer screen. The inner mouth lines up with the entry leaf and has no swing of its own.
     { x0: 7.189, y0: 0, x1: 7.189, y1: 0.824 },
     { x0: 7.189, y0: 0.824, x1: 8.5, y1: 0.824, openings: [
-      { at: 0.12, w: 1.05, type: 'opening' },
+      { at: 0.041, w: 1.14, type: 'opening', noDoor: 'open-plan arch' },
     ] },
   ],
+  // Heads against the drawn side. Wall-backed backs sit 1 cm off the inner face.
   furniture: [
-    ['Master_Bed', 1.45, 6.95, 0, 0.85, 0.95],
-    ['Master_Bedside_L', 0.55, 7.55, 0, 0.7, 0.7],
-    ['Master_Bedside_R', 2.35, 7.55, 0, 0.7, 0.7],
-    ['Master_Wardrobe', 1.35, 5.45, 0, 0.85, 0.7],
-    ['Bed2_Bed', 4.15, 6.95, 0, 0.78, 0.95],
-    ['Bed2_Bedside', 3.35, 7.45, 0, 0.7, 0.7],
-    ['Bed2_Wardrobe', 4.20, 5.50, 0, 0.7, 0.65],
-    ['Sofa', 6.15, 6.45, 1, 0.85, 0.9],
-    ['Armchair', 6.15, 5.55, 1, 0.8, 0.8],
-    ['Coffee_Table', 7.05, 6.35, 0, 0.85, 0.9],
-    ['TV_Unit', 8.05, 6.45, 0, 1.15, 0.75],
-    ['Dining_Table', 6.90, 3.55, 0, 0.85, 0.9],
-    ['Dining_Chair_L1', 6.35, 4.15, 0],
-    ['Dining_Chair_L2', 6.90, 4.15, 0],
-    ['Dining_Chair_L3', 7.45, 4.15, 0],
-    ['Dining_Chair_R1', 6.35, 2.95, 2],
-    ['Dining_Chair_R2', 6.90, 2.95, 2],
-    ['Dining_Chair_R3', 7.45, 2.95, 2],
-    ['MBath_Vanity', 0.55, 2.75, 1, 0.7, 1.3],
-    ['MBath_Toilet', 1.55, 2.85, 1, 0.55, 0.85],
-    ['MBath_Shower', 2.25, 3.55, 0, 0.7, 0.85],
-    ['Bath1_Vanity', 4.85, 2.75, 1, 0.7, 1.2],
-    ['Bath1_Toilet', 3.35, 2.85, 1, 0.55, 0.85],
-    ['Bath1_Shower', 3.20, 3.55, 0, 0.75, 0.85],
-    ['Kitchen_Run', 5.40, 0.48, 0, 0.55, 0.9],
-    ['Kitchen_Run', 4.25, 1.30, 1, 0.42, 0.9],
-    ['Fridge', 4.60, 1.55, 1, 0.95, 0.9],
-    ['Yard_Washer', 3.20, 1.05, 0, 0.9, 0.9],
-    ['Shoe_Cabinet', 7.55, 0.40, 0, 0.7, 0.85],
-    ['Balcony_Chair_1', 6.40, 8.15, 2, 0.5, 0.5],
-    ['Balcony_SideTable', 6.95, 8.15, 0, 0.65, 0.65],
-    ['Balcony_Chair_2', 7.50, 8.15, 0, 0.5, 0.5],
+    // Master — bed x 0.27–2.10, y 6.21–7.81, head on the west. Wardrobe on the bath wall, x 0.18–1.58.
+    ['Master_Bed', 1.03, 7.01, 0, 0.84, 0.77],
+    ['Master_Wardrobe', 0.88, 4.38, 3, 0.83, 0.58],
+    // Bedroom 1 — bed head on the west; wardrobe on the south wall, left of the door.
+    ['Bed2_Bed', 3.97, 7.16, 2, 0.86, 0.89],
+    ['Bed2_Wardrobe', 3.75, 5.56, 0, 0.93, 0.90],
+    // Living — sofa on the west wall, coffee table centred, TV on the east wall.
+    ['Sofa', 6.02, 6.44, 2, 0.84, 0.89],
+    ['Coffee_Table', 7.22, 6.38, 0, 0.71, 1.24],
+    ['TV_Unit', 8.19, 6.40, 0, 1, 1],
+    // Dining — table long east-west; three chairs each side.
+    ['Dining_Table', 6.71, 3.26, 1, 0.84, 0.74],
+    ['Dining_Chair_L1', 6.15, 3.79, 1],
+    ['Dining_Chair_L2', 6.72, 3.79, 1],
+    ['Dining_Chair_L3', 7.29, 3.79, 1],
+    ['Dining_Chair_R1', 6.15, 2.73, 1],
+    ['Dining_Chair_R2', 6.72, 2.73, 1],
+    ['Dining_Chair_R3', 7.29, 2.73, 1],
+    // Baths — vanity and toilet tanks on the south wall; showers in the far corner.
+    ['MBath_Vanity', 0.62, 2.86, 1],
+    ['MBath_Toilet', 1.40, 2.98, 1],
+    ['MBath_Shower', 2.22, 3.05, 0],
+    ['Bath1_Toilet', 3.30, 2.98, 1],
+    ['Bath1_Shower', 4.05, 2.99, 0],
+    ['Bath1_Vanity', 4.95, 2.86, 1],
+    // Kitchen — stove run on the south wall, sink under the bath wall, fridge at the tall unit.
+    ['Kitchen_Run', 5.05, 0.40, 0, 0.46, 0.92],
+    ['Kitchen_Run', 4.30, 2.19, 2, 0.15, 0.68],
+    ['Fridge', 6.68, 0.53, 0, 1.10, 1.10],
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-2.2, -2.4, 14], tgt: [4.2, 4.2, 0.4], fov: 34 },
