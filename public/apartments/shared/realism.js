@@ -479,6 +479,10 @@ function checkDoors(graph, floor, unit, issues, ambiguous) {
       const type = op.type === 'open' ? 'opening' : op.type;
       if (type !== 'opening' && type !== 'door') continue;
       const [a, b] = openingSides(run, op, floor);
+      if (op.ambiguous) {
+        const where = `${a.name || a.where} / ${b.name || b.where}`;
+        ambiguous.push(`wall ${run.index} opening at ${op.at.toFixed(2)} (${where}) has no drawn swing`);
+      }
       if (a.where !== 'indoor' || b.where !== 'indoor') continue;
       if (op.w < 0.45) continue;
       passages.push({ run, op, type });
