@@ -166,7 +166,7 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>
-<div id="panoramaHint" hidden>Drag to look around · pinch or scroll to zoom · ESC to exit</div>
+<div id="panoramaHint" hidden>Drag to look around · scroll to zoom</div>
 <div id="picker" role="toolbar" aria-label="Selected furniture" hidden>
   <span id="pickName"></span>
   <button class="chip" id="rotBtn" title="Rotate 90° (R)">Rotate<kbd>R</kbd></button>
@@ -217,7 +217,6 @@ const VIEWS = [
   { id: 'dining', name: 'Dining & kitchen', pos: new THREE.Vector3(5.75, 1.6, -6.5), tgt: new THREE.Vector3(5.822, 1.24, -3.523), hfov: 96.7 },
   { id: 'master', name: 'Master bedroom', pos: new THREE.Vector3(2.3, 1.55, -3), tgt: new THREE.Vector3(0.582, 0.827, -5.351), hfov: 96.7 },
   { id: 'bed1', name: 'Bedroom 1', pos: new THREE.Vector3(7.35, 1.55, -6.35), tgt: new THREE.Vector3(9.942, 0.946, -7.735), hfov: 96.7 },
-  { id: 'explore', name: 'Look around', pos: new THREE.Vector3(2.6, 1.6, 1.45), tgt: new THREE.Vector3(2.6, 1.6, -1.45), fov: 75, panorama: true },
 ];
 
 // ---------- renderer ----------
@@ -433,20 +432,22 @@ function setPanoramaMode(enabled) {
 function goView(v, instant) {
   currentView = v;
   setActive(v.id);
-  interior = !!v.hfov || !!v.panorama; syncLabels();
+  interior = !!v.hfov; syncLabels();
   
-  if (v.panorama) {
-    controls.maxPolarAngle = Math.PI * 0.495;
+  if (v.hfov) {
+    // Interior view: use panorama mode (drag to look around)
+    controls.maxPolarAngle = Math.PI * 0.95;
     camera.position.copy(v.pos);
     camera.lookAt(v.tgt);
-    camera.fov = v.fov;
+    camera.fov = vfovFrom(v);
     camera.updateProjectionMatrix();
     panoramaEuler.setFromQuaternion(camera.quaternion);
     anim = null;
     setPanoramaMode(true);
   } else {
+    // Exterior view: use orbit controls
     setPanoramaMode(false);
-    controls.maxPolarAngle = v.hfov ? Math.PI * 0.95 : Math.PI * 0.495;
+    controls.maxPolarAngle = Math.PI * 0.495;
     flyTo(v.pos, v.tgt, vfovFrom(v), instant);
   }
 }
@@ -936,17 +937,17 @@ renderer.domElement.addEventListener('wheel', (e) => {
   camera.updateProjectionMatrix();
 }, { passive: false });
 
-// ESC to exit panorama mode
+// ESC to exit panorama mode or furniture editing
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (panoramaMode && currentView && currentView.panorama) {
+    if (panoramaMode) {
       goView(VIEWS[0]);
-    } else if (!editMode) {
-      return;
-    } else if (drag) {
-      cancelDrag();
-    } else {
-      select(null);
+    } else if (editMode) {
+      if (drag) {
+        cancelDrag();
+      } else {
+        select(null);
+      }
     }
   } else if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
     return;
