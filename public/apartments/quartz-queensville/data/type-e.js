@@ -700,11 +700,11 @@ window.UNIT = {
     ] },
     { x0: 1.703, y0: 0, x1: 1.703, y1: 2.286 },
     { x0: 3.155, y0: 0.216, x1: 3.155, y1: 12.234, openings: [
-      { at: 0.06, w: 1.04, type: 'door', hinge: 'end', swing: 1, kind: 'entry' },
+      { at: 0.06, w: 1.04, type: 'door', hinge: 'start', swing: -1, kind: 'entry' },
       { at: 7.35, w: 0.88, type: 'door', hinge: 'end', swing: -1 },
     ] },
     { x0: 4.465, y0: 0.216, x1: 4.465, y1: 3.475, openings: [
-      { at: 0.76, w: 0.88, type: 'door', hinge: 'start', swing: -1 },
+      { at: 0.76, w: 0.88, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 6.26, y0: 5.214, x1: 6.26, y1: 7.43, openings: [
       { at: 1.35, w: 0.80, type: 'door', hinge: 'end', swing: 1 },
@@ -733,7 +733,7 @@ window.UNIT = {
       { at: 0.15, w: 2.20, type: 'window', sill: 0.9, head: 2.1 },
     ] },
     { x0: 6.26, y0: 8.933, x1: 10.21, y1: 8.933, openings: [
-      { at: 0.15, w: 0.88, type: 'door', hinge: 'end', swing: -1 },
+      { at: 0.15, w: 0.88, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.70, y0: 3.475, x1: 6.70, y1: 5.214 },
     { x0: 0, y0: 8.626, x1: 0.524, y1: 8.626 },
@@ -741,7 +741,7 @@ window.UNIT = {
       { at: 0.20, w: 0.72, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 6.26, y0: 5.214, x1: 9.832, y1: 5.214, openings: [
-      { at: 0.35, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
+      { at: 0.35, w: 0.80, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 0, y0: 4.997, x1: 1.503, y1: 4.997 },
     { x0: 4.465, y0: 3.475, x1: 9.832, y1: 3.475 },

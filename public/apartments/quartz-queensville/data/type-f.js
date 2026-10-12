@@ -809,10 +809,10 @@ window.UNIT = {
       { at: 2.94, w: 0.88, type: 'door', hinge: 'end', swing: -1 },
     ] },
     { x0: 0.066, y0: 8.346, x1: 3.958, y1: 8.346, openings: [
-      { at: 3.00, w: 0.68, type: 'door', hinge: 'end', swing: 1 },
+      { at: 3.00, w: 0.68, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 7.261, y0: 7.962, x1: 10.306, y1: 7.962, openings: [
-      { at: 1.35, w: 0.83, type: 'door', hinge: 'start', swing: -1 },
+      { at: 1.35, w: 0.83, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 7.261, y0: 6.456, x1: 10.306, y1: 6.456 },
     { x0: 0.066, y0: 5.601, x1: 3.958, y1: 5.601 },
