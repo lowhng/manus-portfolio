@@ -57,15 +57,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft)}
 .toggle input{accent-color:var(--accent);width:15px;height:15px;margin:0}
 .foot{font-size:11px;color:var(--ink-faint);line-height:1.5}
-#hint,#fpsHint{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:400 11px/1 var(--mono);color:var(--ink-soft);background:var(--panel);border:1px solid var(--panel-line);padding:8px 10px;border-radius:8px;backdrop-filter:blur(10px)}
-#mobileControls{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:none}
-#moveJoystick{position:relative;width:120px;height:120px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:4px}
-.move-btn{background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--panel-line);border-radius:10px;font-size:20px;color:var(--ink);cursor:pointer;padding:0;touch-action:none;user-select:none}
-.move-btn:active{background:var(--accent);color:var(--accent-ink)}
-.move-btn[data-dir="forward"]{grid-column:2;grid-row:1}
-.move-btn[data-dir="left"]{grid-column:1;grid-row:2}
-.move-btn[data-dir="backward"]{grid-column:2;grid-row:3}
-.move-btn[data-dir="right"]{grid-column:3;grid-row:2}
+#hint,#panoramaHint{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:400 11px/1 var(--mono);color:var(--ink-soft);background:var(--panel);border:1px solid var(--panel-line);padding:8px 10px;border-radius:8px;backdrop-filter:blur(10px)}
 #loader{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none}
 #loader div{font:500 12px/1 var(--mono);color:var(--ink-soft);letter-spacing:.06em}
 #collapse{display:none}
@@ -80,7 +72,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   #picker{flex-wrap:wrap;justify-content:center;padding:8px 10px}
   #pickName{flex-basis:100%;text-align:center}
   kbd{display:none}
-  #mobileControls{left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px))}
 }
 #picker{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--panel-line);border-radius:12px;padding:8px 8px 8px 14px;max-width:calc(100% - 32px)}
 #pickName{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:4px}
@@ -175,15 +166,7 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>
-<div id="fpsHint" hidden>Click to start · WASD to move · mouse to look · ESC to exit</div>
-<div id="mobileControls" hidden>
-  <div id="moveJoystick">
-    <button class="move-btn" data-dir="forward">▲</button>
-    <button class="move-btn" data-dir="left">◄</button>
-    <button class="move-btn" data-dir="backward">▼</button>
-    <button class="move-btn" data-dir="right">►</button>
-  </div>
-</div>
+<div id="panoramaHint" hidden>Drag to look around · pinch or scroll to zoom · ESC to exit</div>
 <div id="picker" role="toolbar" aria-label="Selected furniture" hidden>
   <span id="pickName"></span>
   <button class="chip" id="rotBtn" title="Rotate 90° (R)">Rotate<kbd>R</kbd></button>
@@ -207,7 +190,6 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
@@ -235,7 +217,7 @@ const VIEWS = [
   { id: 'dining', name: 'Dining & kitchen', pos: new THREE.Vector3(5.75, 1.6, -6.5), tgt: new THREE.Vector3(5.822, 1.24, -3.523), hfov: 96.7 },
   { id: 'master', name: 'Master bedroom', pos: new THREE.Vector3(2.3, 1.55, -3), tgt: new THREE.Vector3(0.582, 0.827, -5.351), hfov: 96.7 },
   { id: 'bed1', name: 'Bedroom 1', pos: new THREE.Vector3(7.35, 1.55, -6.35), tgt: new THREE.Vector3(9.942, 0.946, -7.735), hfov: 96.7 },
-  { id: 'explore', name: 'Explore (walk)', pos: new THREE.Vector3(2.6, 1.6, 1.45), tgt: new THREE.Vector3(2.6, 1.6, -1.45), fov: 75, fps: true },
+  { id: 'explore', name: 'Look around', pos: new THREE.Vector3(2.6, 1.6, 1.45), tgt: new THREE.Vector3(2.6, 1.6, -1.45), fov: 75, panorama: true },
 ];
 
 // ---------- renderer ----------
@@ -261,15 +243,12 @@ controls.dampingFactor = 0.08;
 controls.maxPolarAngle = Math.PI * 0.495;
 controls.maxDistance = 45;
 
-// FPS controls
-const pointerLockControls = new PointerLockControls(camera, renderer.domElement);
-let fpsMode = false;
-const fpsVelocity = new THREE.Vector3();
-const fpsDirection = new THREE.Vector3();
-const moveState = { forward: false, backward: false, left: false, right: false };
-const EYE_HEIGHT = 1.6;
-const MOVE_SPEED = 3.0;
-const RADIUS = 0.3;
+// Panorama look-around mode
+let panoramaMode = false;
+let panoramaEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
 
 // Sun: Blender rotation (50°, 10°, -160°), light shines along local -Z
 const e = new THREE.Euler(0.8726646, 0.1745329, -2.7925267, 'XYZ');
@@ -398,7 +377,6 @@ function placeLabels() {
 
 // ---------- camera moves ----------
 let anim = null;
-let lastTime = performance.now();
 function vfovFrom(v) {
   const aspect = camera.aspect;
   if (v.hfov) {
@@ -430,51 +408,44 @@ const viewsEl = document.getElementById('views');
 const chipEls = {};
 let currentView = VIEWS[0];
 function setActive(id) { for (const k in chipEls) chipEls[k].setAttribute('aria-pressed', String(k === id)); }
-function setFpsMode(enabled) {
-  fpsMode = enabled;
+function setPanoramaMode(enabled) {
+  panoramaMode = enabled;
   const hintEl = document.getElementById('hint');
-  const fpsHintEl = document.getElementById('fpsHint');
-  const mobileControlsEl = document.getElementById('mobileControls');
-  const isMobile = matchMedia('(max-width: 640px), (pointer: coarse)').matches;
+  const panoramaHintEl = document.getElementById('panoramaHint');
   
   if (enabled) {
     controls.enabled = false;
     labelsEl.classList.add('off');
     hintEl.hidden = true;
-    if (isMobile) {
-      fpsHintEl.hidden = true;
-      mobileControlsEl.hidden = false;
-      renderer.domElement.style.cursor = 'crosshair';
-    } else {
-      fpsHintEl.hidden = false;
-      renderer.domElement.style.cursor = 'pointer';
-    }
+    panoramaHintEl.hidden = false;
+    renderer.domElement.style.cursor = 'grab';
+    renderer.domElement.style.touchAction = 'none';
   } else {
-    if (pointerLockControls.isLocked) pointerLockControls.unlock();
     controls.enabled = true;
     syncLabels();
     hintEl.hidden = false;
-    fpsHintEl.hidden = true;
-    mobileControlsEl.hidden = true;
+    panoramaHintEl.hidden = true;
     renderer.domElement.style.cursor = '';
-    Object.keys(moveState).forEach(k => moveState[k] = false);
+    renderer.domElement.style.touchAction = '';
+    isDragging = false;
   }
 }
 function goView(v, instant) {
   currentView = v;
   setActive(v.id);
-  interior = !!v.hfov || !!v.fps; syncLabels();
+  interior = !!v.hfov || !!v.panorama; syncLabels();
   
-  if (v.fps) {
+  if (v.panorama) {
     controls.maxPolarAngle = Math.PI * 0.495;
     camera.position.copy(v.pos);
     camera.lookAt(v.tgt);
     camera.fov = v.fov;
     camera.updateProjectionMatrix();
+    panoramaEuler.setFromQuaternion(camera.quaternion);
     anim = null;
-    setFpsMode(true);
+    setPanoramaMode(true);
   } else {
-    setFpsMode(false);
+    setPanoramaMode(false);
     controls.maxPolarAngle = v.hfov ? Math.PI * 0.95 : Math.PI * 0.495;
     flyTo(v.pos, v.tgt, vfovFrom(v), instant);
   }
@@ -591,52 +562,6 @@ function footBox(it, cx, cz, rot, shrink) {
 const overFloor = (x, z) => floors.some((f) => x >= f.min.x - 0.01 && x <= f.max.x + 0.01 && z >= f.min.z - 0.01 && z <= f.max.z + 0.01);
 // chairs may slide under tables and desks
 const tucks = (a, b) => (a.chair && b.table) || (b.chair && a.table);
-
-// ---------- FPS mode helpers ----------
-function canMoveTo(x, z) {
-  if (!overFloor(x, z)) return false;
-  const testBox = new THREE.Box3(
-    new THREE.Vector3(x - RADIUS, EYE_HEIGHT - 1.5, z - RADIUS),
-    new THREE.Vector3(x + RADIUS, EYE_HEIGHT + 0.1, z + RADIUS)
-  );
-  if (solids.some(s => testBox.intersectsBox(s))) return false;
-  if (items.some(it => !it.flat && testBox.intersectsBox(footBox(it, it.cx, it.cz, it.rot, 0)))) return false;
-  return true;
-}
-
-function updateFpsMovement(delta) {
-  if (!fpsMode) return; // Allow movement without pointer lock for testing
-  
-  fpsVelocity.x -= fpsVelocity.x * 8.0 * delta;
-  fpsVelocity.z -= fpsVelocity.z * 8.0 * delta;
-  
-  fpsDirection.z = Number(moveState.forward) - Number(moveState.backward);
-  fpsDirection.x = Number(moveState.right) - Number(moveState.left);
-  fpsDirection.normalize();
-  
-  if (moveState.forward || moveState.backward) fpsVelocity.z -= fpsDirection.z * MOVE_SPEED * delta;
-  if (moveState.left || moveState.right) fpsVelocity.x -= fpsDirection.x * MOVE_SPEED * delta;
-  
-  const forward = new THREE.Vector3();
-  camera.getWorldDirection(forward);
-  forward.y = 0;
-  forward.normalize();
-  
-  const right = new THREE.Vector3();
-  right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
-  
-  const moveVector = new THREE.Vector3();
-  moveVector.addScaledVector(forward, -fpsVelocity.z);
-  moveVector.addScaledVector(right, -fpsVelocity.x);
-  
-  const newX = camera.position.x + moveVector.x;
-  const newZ = camera.position.z + moveVector.z;
-  
-  if (canMoveTo(newX, camera.position.z)) camera.position.x = newX;
-  if (canMoveTo(camera.position.x, newZ)) camera.position.z = newZ;
-  
-  camera.position.y = EYE_HEIGHT;
-}
 
 function fits(it, cx, cz, rot) {
   const b = footBox(it, cx, cz, rot, TOL);
@@ -962,101 +887,76 @@ window.addEventListener('pointerup', (e) => {
 });
 window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
 
-// Click canvas to start FPS mode (required for pointer lock)
-renderer.domElement.addEventListener('click', () => {
-  if (fpsMode && !pointerLockControls.isLocked) {
-    pointerLockControls.lock();
-  }
+// Panorama mode: drag to look around
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  if (!panoramaMode || editMode) return;
+  isDragging = true;
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  renderer.domElement.style.cursor = 'grabbing';
+  e.preventDefault();
 });
 
-// FPS keyboard controls
-window.addEventListener('keydown', (e) => {
-  if (fpsMode && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-  if (fpsMode) {
-    switch(e.key) {
-      case 'w': case 'W': case 'ArrowUp': moveState.forward = true; break;
-      case 's': case 'S': case 'ArrowDown': moveState.backward = true; break;
-      case 'a': case 'A': case 'ArrowLeft': moveState.left = true; break;
-      case 'd': case 'D': case 'ArrowRight': moveState.right = true; break;
-      case 'Escape': if (currentView && currentView.fps) goView(VIEWS[0]); break;
-    }
-  }
+renderer.domElement.addEventListener('pointermove', (e) => {
+  if (!panoramaMode || !isDragging || editMode) return;
+  
+  const deltaX = e.clientX - dragStartX;
+  const deltaY = e.clientY - dragStartY;
+  
+  panoramaEuler.y -= deltaX * 0.003;
+  panoramaEuler.x -= deltaY * 0.003;
+  panoramaEuler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, panoramaEuler.x));
+  
+  camera.quaternion.setFromEuler(panoramaEuler);
+  
+  dragStartX = e.clientX;
+  dragStartY = e.clientY;
+  e.preventDefault();
 });
 
-window.addEventListener('keyup', (e) => {
-  if (fpsMode) {
-    switch(e.key) {
-      case 'w': case 'W': case 'ArrowUp': moveState.forward = false; break;
-      case 's': case 'S': case 'ArrowDown': moveState.backward = false; break;
-      case 'a': case 'A': case 'ArrowLeft': moveState.left = false; break;
-      case 'd': case 'D': case 'ArrowRight': moveState.right = false; break;
-    }
-  }
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (!panoramaMode) return;
+  isDragging = false;
+  renderer.domElement.style.cursor = 'grab';
+  e.preventDefault();
 });
 
-window.addEventListener('keydown', (e) => {
-  if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-  if ((e.key === 'r' || e.key === 'R') && selected) { rotate(selected); e.preventDefault(); }
-  else if ((e.key === 'Delete' || e.key === 'Backspace') && selected) { deletePiece(selected); e.preventDefault(); }
-  else if (e.key === 'Escape') { if (drag) cancelDrag(); else select(null); }
+renderer.domElement.addEventListener('pointercancel', () => {
+  if (!panoramaMode) return;
+  isDragging = false;
+  renderer.domElement.style.cursor = 'grab';
 });
 
-// Mobile FPS controls
-document.querySelectorAll('.move-btn').forEach(btn => {
-  const dir = btn.dataset.dir;
-  btn.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    if (dir === 'forward') moveState.forward = true;
-    else if (dir === 'backward') moveState.backward = true;
-    else if (dir === 'left') moveState.left = true;
-    else if (dir === 'right') moveState.right = true;
-  });
-  btn.addEventListener('pointerup', (e) => {
-    e.preventDefault();
-    if (dir === 'forward') moveState.forward = false;
-    else if (dir === 'backward') moveState.backward = false;
-    else if (dir === 'left') moveState.left = false;
-    else if (dir === 'right') moveState.right = false;
-  });
-  btn.addEventListener('pointercancel', (e) => {
-    e.preventDefault();
-    if (dir === 'forward') moveState.forward = false;
-    else if (dir === 'backward') moveState.backward = false;
-    else if (dir === 'left') moveState.left = false;
-    else if (dir === 'right') moveState.right = false;
-  });
-});
-
-// Mobile touch look controls
-let touchLookStart = null;
-canvas.addEventListener('touchstart', (e) => {
-  if (!fpsMode || editMode) return;
-  if (e.touches.length === 1) {
-    touchLookStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    e.preventDefault();
-  }
+// Panorama mode: pinch/wheel zoom via FOV
+renderer.domElement.addEventListener('wheel', (e) => {
+  if (!panoramaMode || editMode) return;
+  e.preventDefault();
+  const fovDelta = e.deltaY * 0.05;
+  camera.fov = Math.max(30, Math.min(120, camera.fov + fovDelta));
+  camera.updateProjectionMatrix();
 }, { passive: false });
 
-canvas.addEventListener('touchmove', (e) => {
-  if (!fpsMode || !touchLookStart || editMode) return;
-  if (e.touches.length === 1) {
-    const deltaX = e.touches[0].clientX - touchLookStart.x;
-    const deltaY = e.touches[0].clientY - touchLookStart.y;
-    
-    const euler = new THREE.Euler(0, 0, 0, 'YXZ');
-    euler.setFromQuaternion(camera.quaternion);
-    euler.y -= deltaX * 0.002;
-    euler.x -= deltaY * 0.002;
-    euler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, euler.x));
-    camera.quaternion.setFromEuler(euler);
-    
-    touchLookStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+// ESC to exit panorama mode
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (panoramaMode && currentView && currentView.panorama) {
+      goView(VIEWS[0]);
+    } else if (!editMode) {
+      return;
+    } else if (drag) {
+      cancelDrag();
+    } else {
+      select(null);
+    }
+  } else if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+    return;
+  } else if ((e.key === 'r' || e.key === 'R') && selected) {
+    rotate(selected);
+    e.preventDefault();
+  } else if ((e.key === 'Delete' || e.key === 'Backspace') && selected) {
+    deletePiece(selected);
     e.preventDefault();
   }
-}, { passive: false });
-
-canvas.addEventListener('touchend', () => {
-  touchLookStart = null;
 });
 
 editToggle.disabled = true;
@@ -1102,11 +1002,7 @@ fetch('ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); re
 }).catch(onFail);
 
 renderer.setAnimationLoop((now) => {
-  const delta = Math.min((now - lastTime) / 1000, 0.1);
-  lastTime = now;
-  
   stepAnim(now);
-  updateFpsMovement(delta);
   controls.update();
   renderer.render(scene, camera);
   placeLabels();
