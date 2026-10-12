@@ -23,6 +23,13 @@ window.UNIT = {
   windowHead: 2.1,
   wallT: 0.20,
   explicitWalls: true,
+  plan: {
+    file: 'type-b-810sf.jpg',
+    ox: 410,
+    oy: 1106,
+    mx: 8.66 / 847,
+    my: 8.66 / 847,
+  },
   rooms: [
     { name: 'Bedroom 2', c: [3.30, 8.10], box: [1.40, 6.90, 5.30, 9.35] },
     { name: 'Living', c: [7.05, 8.15], box: [5.65, 6.90, 8.50, 9.35] },
@@ -51,8 +58,9 @@ window.UNIT = {
     { name: 'Utility', box: [7.00, 0, 8.66, 2.07] },
   ],
   walls: [
-    { x0: 0, y0: 0, x1: 0, y1: 3.59 },
-    { x0: 0, y0: 3.59, x1: 1.22, y1: 3.59 },
+    { x0: 0, y0: 0, x1: 0, y1: 2.60 },
+    { x0: 0, y0: 2.60, x1: 0, y1: 3.59, rail: 1.05 },
+    { x0: 0, y0: 3.59, x1: 1.22, y1: 3.59, rail: 1.05 },
     { x0: 1.22, y0: 3.59, x1: 1.22, y1: 9.54 },
     { x0: 1.22, y0: 9.54, x1: 8.66, y1: 9.54, openings: [
       { at: 1.03, w: 2.19, type: 'window' },
@@ -63,23 +71,22 @@ window.UNIT = {
     { x0: 0, y0: 0, x1: 8.66, y1: 0, openings: [
       { at: 5.56, w: 1.38, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
     ] },
-    // Bedroom 2 south wall. The break has no quarter-circle, so it stays open.
+    // Bedroom 2 south wall. The break has no quarter-circle.
     { x0: 1.22, y0: 6.71, x1: 5.47, y1: 6.71, openings: [
-      { at: 2.69, w: 0.89, type: 'opening' },
+      { at: 2.69, w: 0.89, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
     ] },
     // Bedroom 3 north wall. Arc inside the room, hinge at the north-east corner.
     { x0: 1.22, y0: 5.23, x1: 5.47, y1: 5.23, openings: [
       { at: 3.17, w: 0.89, type: 'door', hinge: 'end', swing: 1 },
     ] },
     { x0: 0, y0: 2.60, x1: 5.47, y1: 2.60, openings: [
-      { at: 0.78, w: 0.59, type: 'opening' },
-      { at: 1.60, w: 0.70, type: 'opening' },
+      { at: 0.78, w: 0.59, type: 'window', sill: 0.9, head: 2.1 },
+      { at: 1.60, w: 0.70, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
     ] },
-    // Spine. Both breaks are openings: the master has no swing, and the
-    // upper one is the wide way into the living room.
+    // Spine. The master break has no swing. The upper break is the open way into the living room.
     { x0: 5.47, y0: 0, x1: 5.47, y1: 9.54, openings: [
-      { at: 0.91, w: 0.89, type: 'opening' },
-      { at: 5.31, w: 1.33, type: 'opening' },
+      { at: 0.91, w: 0.89, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+      { at: 5.31, w: 1.33, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
     ] },
     // Bath 2 east wall. Arc in the hall, hinge on the north jamb.
     { x0: 3.79, y0: 5.23, x1: 3.79, y1: 6.71, openings: [
@@ -98,13 +105,13 @@ window.UNIT = {
   // Dining table long Z. Fridge back +Z. DeskChair faces -Z.
   furniture: [
     // Bedroom 2 — queen, pillows on the west wall; desk in the north-east corner; wardrobe on the east wall
-    ['Bed2_Bed', 2.70, 8.05, 2, 0.90, 0.75],
+    ['Bed2_Bed', 2.325, 8.05, 2, 0.90, 0.75],
     ['Bed2_Bedside', 2.55, 8.85, 2, 0.70, 0.70],
-    ['Master_Desk', 4.55, 8.70, 1],
-    ['Master_DeskChair', 4.05, 8.70, 1],
-    ['Bed2_Wardrobe', 4.85, 7.35, 3, 0.85, 0.70],
+    ['Master_Desk', 5.12, 8.70, 1],
+    ['Master_DeskChair', 4.70, 8.70, 1],
+    ['Bed2_Wardrobe', 5.131, 7.50, 3, 0.85, 0.70],
     // Living — sofa on the east wall facing the TV on the spine
-    ['TV_Unit', 5.85, 8.20, 2, 0.85, 0.90],
+    ['TV_Unit', 5.760, 8.20, 2, 0.85, 0.90],
     ['Coffee_Table', 6.90, 8.15, 1, 0.75, 0.70],
     ['Sofa', 7.70, 8.20, 0, 0.85, 0.95],
     ['Rug_Living', 7.00, 8.15, 0, 0.70, 0.75],
@@ -117,29 +124,29 @@ window.UNIT = {
     ['Dining_Chair_R2', 7.15, 5.15, 1],
     ['Dining_Chair_R3', 7.90, 5.15, 1],
     // Bath 2 — basin and WC against the west wall
-    ['Bath1_Vanity', 1.65, 6.30, 3, 0.70, 0.55],
-    ['Bath1_Toilet', 1.70, 5.55, 3, 0.55, 0.55],
+    ['Bath1_Vanity', 1.65, 6.422, 3, 0.70, 0.55],
+    ['Bath1_Toilet', 2.10, 6.395, 3, 0.55, 0.55],
     // Bedroom 3 — bed head to the south, wardrobe on the east wall
-    ['Bed1_Bed', 3.35, 3.85, 1, 0.85, 0.80],
+    ['Bed1_Bed', 3.35, 3.650, 1, 0.85, 0.80],
     ['Bed1_Bedside_A', 2.40, 3.15, 1, 0.65, 0.65],
     ['Bed1_Bedside_B', 4.30, 3.15, 1, 0.65, 0.65],
-    ['Bed1_Wardrobe', 5.05, 4.20, 3, 0.80, 0.65],
+    ['Bed1_Wardrobe', 5.147, 4.20, 3, 0.80, 0.65],
     // Kitchen — L along the east wall and the wall above the foyer; fridge at the north end of the east run
-    ['Kitchen_Run', 8.30, 3.50, 3, 0.85, 0.55],
-    ['Kitchen_Run', 6.90, 2.30, 0, 0.70, 0.50],
-    ['Fridge', 8.25, 4.55, 3, 0.70, 0.70],
+    ['Kitchen_Run', 8.370, 2.975, 3, 0.301, 0.55],
+    ['Kitchen_Run', 7.60, 2.345, 0, 0.207, 0.50],
+    ['Fridge', 8.283, 4.05, 3, 0.70, 0.70],
     // Master — head to the north, wardrobe against the bath wall
-    ['Master_Bed', 3.50, 1.25, 1, 0.90, 0.80],
+    ['Master_Bed', 3.50, 1.495, 1, 0.90, 0.80],
     ['Master_Bedside_L', 2.40, 2.05, 1, 0.65, 0.65],
     ['Master_Bedside_R', 4.55, 2.05, 1, 0.65, 0.65],
-    ['Master_Wardrobe', 1.95, 1.15, 0, 0.75, 0.85],
+    ['Master_Wardrobe', 1.884, 1.15, 0, 0.75, 0.85],
     // Bath 1 — fittings inside the west room
-    ['Bath1_Vanity', 0.45, 0.55, 1, 0.60, 0.50],
-    ['Bath1_Toilet', 1.05, 0.55, 1, 0.50, 0.50],
-    ['Bath1_Shower', 0.70, 1.90, 0, 0.55, 0.65],
+    ['Bath1_Vanity', 0.45, 0.264, 1, 0.60, 0.50],
+    ['Bath1_Toilet', 1.05, 0.297, 1, 0.50, 0.50],
+    ['Bath1_Shower', 0.70, 2.239, 0, 0.55, 0.65],
     // Foyer shoe cabinet, utility washer
-    ['Shoe_Cabinet', 6.15, 1.45, 0, 0.75, 0.55],
-    ['Yard_Washer', 7.85, 0.85, 0, 0.65, 0.65],
+    ['Shoe_Cabinet', 6.15, 0.216, 0, 0.75, 0.55],
+    ['Yard_Washer', 7.85, 0.326, 0, 0.65, 0.65],
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-1.8, -2.4, 13], tgt: [4.2, 4.6, 0.4], fov: 36 },

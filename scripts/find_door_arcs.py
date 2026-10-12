@@ -57,24 +57,27 @@ def find_arcs(path, ox, oy, mx, my, walls):
                     bx, by = nsign * nx, nsign * ny
                     for radius in radii:
                         ok = 0
+                        inner = 0
                         for t in angles:
                             ang = t * np.pi / 2
-                            px = hx + radius * (np.cos(ang) * ax + np.sin(ang) * bx)
-                            py = hy + radius * (np.cos(ang) * ay + np.sin(ang) * by)
-                            ix = int(round(ox + px / mx))
-                            iy = int(round(oy - py / my))
-                            found = False
-                            for oy_ in range(-2, 3):
-                                for ox_ in range(-2, 3):
-                                    yy, xx = iy + oy_, ix + ox_
-                                    if 0 <= yy < height and 0 <= xx < width and stroke[yy, xx]:
-                                        found = True
-                                        break
-                                if found:
-                                    break
-                            if found:
+                            cang, sang = np.cos(ang), np.sin(ang)
+                            def on_stroke(rad):
+                                px = hx + rad * (cang * ax + sang * bx)
+                                py = hy + rad * (cang * ay + sang * by)
+                                ix = int(round(ox + px / mx))
+                                iy = int(round(oy - py / my))
+                                for oy_ in range(-2, 3):
+                                    for ox_ in range(-2, 3):
+                                        yy, xx = iy + oy_, ix + ox_
+                                        if 0 <= yy < height and 0 <= xx < width and stroke[yy, xx]:
+                                            return True
+                                return False
+                            if on_stroke(radius):
                                 ok += 1
-                        if ok >= 16:
+                            # A swing is empty inside. Wardrobe louvres fill the quadrant.
+                            if on_stroke(radius * 0.45):
+                                inner += 1
+                        if ok >= 16 and inner <= 5:
                             hits.append((ok, hx, hy, radius))
             s += 0.12
     hits.sort(reverse=True)

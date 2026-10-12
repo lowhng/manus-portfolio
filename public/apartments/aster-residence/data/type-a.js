@@ -24,6 +24,13 @@ window.UNIT = {
   windowHead: 2.1,
   wallT: 0.20,
   explicitWalls: true,
+  plan: {
+    file: 'type-a-650sf.jpg',
+    ox: 411,
+    oy: 1168,
+    mx: 7.75 / 844,
+    my: 7.75 / 844,
+  },
   rooms: [
     { name: 'Master Bedroom', c: [2.85, 7.20], box: [1.30, 5.90, 4.40, 8.50] },
     { name: 'Living', c: [6.15, 7.20], box: [4.70, 5.90, 7.60, 8.50] },
@@ -49,7 +56,7 @@ window.UNIT = {
     { name: 'Utility', box: [6.10, 0, 7.75, 1.60] },
   ],
   walls: [
-    { x0: 0, y0: 0, x1: 0, y1: 3.40 },
+    { x0: 0, y0: 0, x1: 0, y1: 3.40, rail: 1.05 },
     // Entrance. Hinge on the east jamb, leaf swings north into the foyer.
     { x0: 0, y0: 0, x1: 7.75, y1: 0, openings: [
       { at: 4.63, w: 1.40, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
@@ -60,7 +67,7 @@ window.UNIT = {
       { at: 3.60, w: 1.80, type: 'window' },
     ] },
     { x0: 1.15, y0: 0, x1: 1.15, y1: 8.70, openings: [
-      { at: 4.30, w: 0.61, type: 'opening' },
+      { at: 4.30, w: 0.61, type: 'window', sill: 0.9, head: 2.1 },
     ] },
     { x0: 0, y0: 3.40, x1: 1.15, y1: 3.40 },
     // Master south wall. Arc inside the room, hinge on the west jamb.
@@ -71,54 +78,54 @@ window.UNIT = {
     { x0: 1.15, y0: 3.40, x1: 4.55, y1: 3.40, openings: [
       { at: 0.20, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
       { at: 1.70, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
-      { at: 2.55, w: 0.80, type: 'opening' },
+      { at: 2.55, w: 0.80, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
     ] },
     // Wall between the two baths. Arc into Bath 2, hinge on the south jamb.
     { x0: 2.70, y0: 3.40, x1: 2.70, y1: 5.75, openings: [
       { at: 1.38, w: 0.82, type: 'door', hinge: 'start', swing: -1 },
     ] },
-    // Spine breaks are sliding panels, not hinged leaves.
+    // Spine breaks are sliding panels. No quarter-circle is drawn, so the leaf is marked ambiguous.
     { x0: 4.55, y0: 0, x1: 4.55, y1: 8.70, openings: [
-      { at: 0.69, w: 0.90, type: 'opening' },
-      { at: 4.48, w: 0.90, type: 'opening' },
+      { at: 0.69, w: 0.90, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+      { at: 4.48, w: 0.90, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
     ] },
     { x0: 6.10, y0: 0, x1: 6.10, y1: 1.60 },
     { x0: 4.55, y0: 1.60, x1: 7.75, y1: 1.60, openings: [
-      { at: 0.30, w: 0.90, type: 'opening' },
+      { at: 0.30, w: 0.90, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
     ] },
     { x0: 4.55, y0: 4.20, x1: 7.75, y1: 4.20 },
   ],
   // Master head -X (rot 0 faces west). Bed2 head +X (rot 3 faces north).
   // Sofa back +X. TV screen -X. Wardrobe long Z, front +X.
   furniture: [
-    ['Master_Bed', 2.70, 7.30, 0, 0.90, 0.85],
+    ['Master_Bed', 2.255, 7.34, 0, 0.90, 0.85],
     ['Master_Bedside_L', 2.70, 8.15, 0, 0.65, 0.65],
-    ['Master_Bedside_R', 2.70, 6.40, 0, 0.65, 0.65],
-    ['Master_Wardrobe', 2.80, 6.05, 3, 0.90, 0.55],
+    ['Master_Bedside_R', 3.55, 6.70, 0, 0.65, 0.65],
+    ['Master_Wardrobe', 2.80, 6.151, 3, 0.90, 0.55],
     ['Sofa', 6.70, 7.40, 0, 0.80, 0.90],
-    ['Coffee_Table', 6.10, 7.20, 0, 0.65, 0.65],
-    ['TV_Unit', 5.00, 7.30, 2, 0.70, 0.90],
+    ['Coffee_Table', 5.70, 7.20, 0, 0.65, 0.65],
+    ['TV_Unit', 4.810, 7.30, 2, 0.70, 0.90],
     ['Rug_Living', 6.20, 7.30, 0, 0.65, 0.70],
     ['Dining_Table', 6.20, 4.75, 1, 0.75, 0.90],
     ['Dining_Chair_L1', 5.55, 5.20, 1],
     ['Dining_Chair_R1', 6.85, 5.20, 1],
-    ['Dining_Chair_L2', 5.55, 4.30, 1],
-    ['Dining_Chair_R2', 6.85, 4.30, 1],
-    ['Kitchen_Run', 7.35, 2.80, 3, 0.80, 0.50],
-    ['Kitchen_Run', 6.20, 1.85, 0, 0.65, 0.45],
-    ['Fridge', 7.35, 3.95, 3, 0.65, 0.65],
-    ['Bed2_Bed', 2.60, 1.70, 3, 0.85, 0.80],
+    ['Dining_Chair_L2', 5.55, 4.55, 1],
+    ['Dining_Chair_R2', 6.85, 4.55, 1],
+    ['Kitchen_Run', 7.475, 2.625, 3, 0.363, 0.50],
+    ['Kitchen_Run', 5.95, 1.860, 0, 0.498, 0.45],
+    ['Fridge', 7.391, 3.80, 3, 0.65, 0.65],
+    ['Bed2_Bed', 2.60, 2.350, 3, 0.85, 0.80],
     // Wardrobe is drawn on the south wall, long east-west, front north.
-    ['Bed2_Wardrobe', 2.70, 0.42, 0, 0.90, 0.55],
+    ['Bed2_Wardrobe', 2.70, 0.292, 0, 0.90, 0.55],
     ['Bed2_Bedside', 3.50, 1.70, 0, 0.60, 0.60],
-    ['MBath_Shower', 1.70, 5.15, 0, 0.55, 0.65],
-    ['MBath_Vanity', 1.65, 4.00, 1, 0.60, 0.50],
-    ['MBath_Toilet', 2.20, 4.55, 3, 0.50, 0.55],
-    ['Bath1_Shower', 3.15, 5.15, 0, 0.55, 0.65],
-    ['Bath1_Vanity', 3.90, 4.00, 1, 0.60, 0.50],
-    ['Bath1_Toilet', 3.40, 4.50, 0, 0.50, 0.55],
-    ['Shoe_Cabinet', 5.30, 0.50, 0, 0.75, 0.55],
-    ['Yard_Washer', 7.15, 0.70, 0, 0.65, 0.65],
+    ['MBath_Shower', 1.513, 5.15, 0, 0.55, 0.65],
+    ['MBath_Vanity', 1.65, 3.664, 1, 0.60, 0.50],
+    ['MBath_Toilet', 2.20, 5.452, 3, 0.50, 0.55],
+    ['Bath1_Shower', 3.048, 5.15, 0, 0.55, 0.65],
+    ['Bath1_Vanity', 3.90, 3.664, 1, 0.60, 0.50],
+    ['Bath1_Toilet', 4.252, 4.50, 0, 0.50, 0.55],
+    ['Shoe_Cabinet', 5.30, 0.216, 0, 0.75, 0.55],
+    ['Yard_Washer', 7.15, 0.326, 0, 0.65, 0.65],
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-1.6, -2.2, 12], tgt: [3.8, 4.2, 0.4], fov: 36 },
