@@ -18,6 +18,7 @@ import vm from 'vm';
 import { fileURLToPath } from 'url';
 import { buildWallGraph } from '../public/apartments/shared/wall-graph.js';
 import { buildFloorGraph, checkFloorCoverage } from '../public/apartments/shared/floor-graph.js';
+import { auditRealism } from './check_realism.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -86,7 +87,7 @@ export function checkDoorPlacement(graph, slab) {
   return issues;
 }
 
-function reportUnit(unit, label) {
+function reportUnit(unit, label, file) {
   const graph = buildWallGraph(unit, {
     ceiling: unit.wallH,
     doorH: unit.doorH,
@@ -121,6 +122,12 @@ function reportUnit(unit, label) {
       failed = 1;
     }
   }
+  if (file) {
+    const real = auditRealism(unit, file);
+    for (const issue of real.issues) console.error(`  ${issue}`);
+    for (const note of real.ambiguous) console.log(`  AMBIGUOUS ${note}`);
+    if (real.issues.length) failed = 1;
+  }
   if (!failed) console.log('OK');
   return failed;
 }
@@ -134,10 +141,13 @@ function report(file) {
         ...unit,
         walls: level.walls || [],
         floors: level.floors || [],
-        rooms: level.rooms || [],
+        rooms: level.rooms || (unit.rooms || []).filter((r) => !r.level || r.level === level.id),
         voids: level.voids || [],
+        furniture: level.furniture || [],
+        procedural: level.procedural || [],
+        plan: level.plan || null,
       };
-      failed |= reportUnit(spec, `${unit.id}/${level.id}`);
+      failed |= reportUnit(spec, `${unit.id}/${level.id}`, file);
       for (const hole of spec.voids) {
         const [x0, y0, x1, y1] = hole.box || [];
         if (![x0, y0, x1, y1].every((n) => Number.isFinite(n)) || x1 <= x0 || y1 <= y0) {
@@ -161,7 +171,7 @@ function report(file) {
     }
     return failed;
   }
-  return reportUnit(unit, unit.id);
+  return reportUnit(unit, unit.id, file);
 }
 
 function selfTest() {
@@ -287,7 +297,10 @@ function selfTest() {
   return 0;
 }
 
-const arg = process.argv[2];
-if (arg === '--self-test') process.exit(selfTest());
-const file = path.resolve(root, arg || 'public/apartments/sunway-cochrane/data/type-a.js');
-process.exit(report(file));
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) {
+  const arg = process.argv[2];
+  if (arg === '--self-test') process.exit(selfTest());
+  const file = path.resolve(root, arg || 'public/apartments/sunway-cochrane/data/type-a.js');
+  process.exit(report(file));
+}

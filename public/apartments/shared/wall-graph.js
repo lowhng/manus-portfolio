@@ -3,9 +3,15 @@
  *
  * A run is one centreline from (x0, y0) to (x1, y1). Openings sit on it by
  * distance `at` from the start and width `w`:
- *   { at, w, type: 'door' | 'window' | 'opening',
- *     sill, head,          // windows
- *     hinge: 'start'|'end', swing: 1|-1, kind }  // doors
+ *   { at, w, type: 'door' | 'window' | 'opening' | 'slider' | 'rail',
+ *     sill, head,          // windows and sliders
+ *     hinge: 'start'|'end', swing: 1|-1, kind,  // doors
+ *     noDoor,              // openings: why there is no leaf
+ *     h }                  // rail: parapet height
+ *
+ * `slider` is a sliding glass door: glazing from a floor threshold up to the
+ * head, with a frame drawn by the viewer. `rail` is a parapet in that span.
+ * A whole run can be a balcony railing with `rail: 1.05` (metres).
  *
  * `hackable: true` tints the whole run (a wall the plan marks with a hammer,
  * removable). `hackable: [{ at, w }]` tints only those stretches of the run.
@@ -66,6 +72,7 @@ function cloneRuns(unit) {
       len,
       // Openings stay tied to the authored start until ends have been snapped.
       openings: (w.openings || []).map((o) => ({ ...o })),
+      rail: Number.isFinite(w.rail) ? w.rail : null,
       hackable: w.hackable === true ? true : (w.hackable || []).map((h) => ({ ...h })),
       anchorX: w.x0,
       anchorY: w.y0,
@@ -182,20 +189,30 @@ export function buildWallGraph(unit, opts = {}) {
         if (b >= run.len - 1e-4 && run.join1) b += run.join1.t / 2;
         const seg = spanEnds(run, a, b);
         if (Math.hypot(seg.x1 - seg.x0, seg.y1 - seg.y0) > 0.01) {
-          segments.push({ ...seg, h: ceiling, yBase: 0, role: 'solid', hackable: spanHackable(run, a, b) });
+          if (run.rail != null) {
+            const railH = Math.min(run.rail, ceiling);
+            segments.push({ ...seg, h: railH, yBase: 0, role: 'rail', hackable: spanHackable(run, a, b) });
+          } else {
+            segments.push({ ...seg, h: ceiling, yBase: 0, role: 'solid', hackable: spanHackable(run, a, b) });
+          }
         }
         continue;
       }
       const box = spanEnds(run, a, b);
       const hackable = spanHackable(run, a, b);
-      if (span.kind === 'window') {
-        const sill = span.op.sill ?? 0.12;
-        const head = span.op.head ?? windowHead;
+      if (span.kind === 'rail') {
+        const railH = Math.min(span.op.h || span.op.rail || 1.05, ceiling);
+        segments.push({ ...box, h: railH, yBase: 0, role: 'rail', hackable });
+        continue;
+      }
+      if (span.kind === 'window' || span.kind === 'slider') {
+        const sill = span.op.sill ?? (span.kind === 'slider' ? 0 : 0.12);
+        const head = span.op.head ?? (span.kind === 'slider' ? Math.max(doorH, windowHead) : windowHead);
         if (sill > 0.02) {
           segments.push({ ...box, h: Math.min(sill, ceiling), yBase: 0, role: 'sill', hackable });
         }
         const g1 = Math.min(head, ceiling);
-        if (g1 > sill + 0.02) glass.push({ ...box, sill, head: g1 });
+        if (g1 > sill + 0.02) glass.push({ ...box, sill, head: g1, kind: span.kind });
         if (ceiling > head + 0.02) {
           segments.push({ ...box, h: ceiling - head, yBase: head, role: 'header', hackable });
         }
@@ -255,7 +272,7 @@ export function checkWallGraph(graph) {
     for (let i = 0; i < ops.length; i++) {
       const op = ops[i];
       const type = op.type === 'open' ? 'opening' : op.type;
-      if (type !== 'door' && type !== 'window' && type !== 'opening') {
+      if (type !== 'door' && type !== 'window' && type !== 'opening' && type !== 'slider' && type !== 'rail') {
         issues.push(`wall ${run.index} opening ${i} has no door, window, or opening type`);
       }
       if (!(op.w > 0)) issues.push(`wall ${run.index} opening ${i} has no width`);

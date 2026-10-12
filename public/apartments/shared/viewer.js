@@ -182,6 +182,7 @@ const doorGroups = [doorGroup];
 let host = { walls: wallGroup, glass: glassGroup, doors: doorGroup, floors: floorGroup };
 const matLeaf = new THREE.MeshStandardMaterial({ color: 0xd4c4ae, roughness: 0.7 });
 const matHandle = new THREE.MeshStandardMaterial({ color: 0x2c2e32, roughness: 0.35, metalness: 0.65 });
+const matFrame = matHandle;
 const matEntry = new THREE.MeshStandardMaterial({ color: 0xb4532a, roughness: 0.58 });
 const doorPivots = [];
 // Full ceiling is the default. walls=low (or walls=cut) drops to cutH.
@@ -215,15 +216,94 @@ function addWallSeg(x0, y0, x1, y1, h, t = U.wallT, yBase = 0, hackable = false)
 const glassMat = new THREE.MeshStandardMaterial({
   color: 0xb7d4e4, transparent: true, opacity: 0.32, roughness: 0.08, metalness: 0, depthWrite: false,
 });
-function addGlass(x0, y0, x1, y1, sill, head) {
+function addGlass(x0, y0, x1, y1, sill, head, shift = 0) {
   const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
   if (len < 0.05 || head - sill < 0.05) return;
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, head - sill, 0.02), glassMat);
-  mesh.position.set((x0 + x1) / 2, (sill + head) / 2, -(y0 + y1) / 2);
+  const nx = -dy / len, ny = dx / len;
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, head - sill, 0.012), glassMat);
+  mesh.position.set((x0 + x1) / 2 + nx * shift, (sill + head) / 2, -(y0 + y1) / 2 - ny * shift);
   mesh.rotation.y = -Math.atan2(dy, dx);
   mesh.castShadow = false;
   mesh.receiveShadow = true;
   host.glass.add(mesh);
+}
+// Ayanna hardware: a dark metal frame, one mullion on a wide window, two
+// overlapping panes and a pull on a sliding door.
+function addFramedOpening(x0, y0, x1, y1, sill, head, kind) {
+  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+  if (len < 0.08 || head - sill < 0.12) return;
+  const ang = Math.atan2(dy, dx);
+  const frame = 0.045;
+  const depth = 0.055;
+  const ux = dx / len, uy = dy / len;
+  const glassSill = sill + frame;
+  const glassHead = head - frame;
+  const inset = frame;
+  if (kind === 'slider') {
+    const mid = len / 2;
+    const overlap = 0.03;
+    addGlass(x0 + ux * inset, y0 + uy * inset, x0 + ux * (mid + overlap), y0 + uy * (mid + overlap), glassSill, glassHead, 0.012);
+    addGlass(x0 + ux * (mid - overlap), y0 + uy * (mid - overlap), x1 - ux * inset, y1 - uy * inset, glassSill, glassHead, -0.012);
+  } else {
+    addGlass(x0 + ux * inset, y0 + uy * inset, x1 - ux * inset, y1 - uy * inset, glassSill, glassHead, 0);
+  }
+  const group = new THREE.Group();
+  group.position.set((x0 + x1) / 2, 0, -(y0 + y1) / 2);
+  group.rotation.y = -ang;
+  const fh = head - sill;
+  const yMid = (sill + head) / 2;
+  function bar(w, h, d, x, y, z) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), matFrame);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  bar(frame, fh, depth, -len / 2 + frame / 2, yMid, 0);
+  bar(frame, fh, depth, len / 2 - frame / 2, yMid, 0);
+  bar(len, frame, depth, 0, head - frame / 2, 0);
+  bar(len - frame * 2, frame, depth, 0, sill + frame / 2, 0);
+  if (kind === 'slider') {
+    bar(0.04, fh - frame * 2, depth + 0.012, 0, yMid, 0);
+    const pull = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.18, 0.03), matHandle);
+    pull.position.set(len * 0.08, yMid, depth / 2 + 0.01);
+    pull.castShadow = true;
+    group.add(pull);
+  } else if (len > 1.35) {
+    bar(0.03, fh - frame * 2, depth * 0.7, 0, yMid, 0);
+  }
+  host.glass.add(group);
+}
+function addRailing(x0, y0, x1, y1, h, t) {
+  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+  if (len < 0.08 || h < 0.4) return;
+  const group = new THREE.Group();
+  group.position.set((x0 + x1) / 2, 0, -(y0 + y1) / 2);
+  group.rotation.y = -Math.atan2(dy, dx);
+  const curbH = 0.12;
+  const curb = new THREE.Mesh(new THREE.BoxGeometry(len, curbH, Math.min(t || 0.12, 0.12)), wallMat);
+  curb.position.y = curbH / 2;
+  curb.castShadow = true;
+  curb.receiveShadow = true;
+  group.add(curb);
+  function rail(y, depth) {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(len, 0.04, depth), matFrame);
+    mesh.position.y = y;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+  rail(h - 0.02, 0.04);
+  if (h > 0.7) rail(h * 0.55, 0.025);
+  const posts = Math.max(2, Math.round(len / 1.2) + 1);
+  for (let i = 0; i < posts; i++) {
+    const x = -len / 2 + (len * i) / (posts - 1);
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.04, h, 0.04), matFrame);
+    post.position.set(x, h / 2, 0);
+    post.castShadow = true;
+    group.add(post);
+  }
+  host.walls.add(group);
 }
 function floorMatFor(name) {
   const out = /balcony|a\/?c|ledge/i.test(name);
@@ -334,8 +414,11 @@ function drawRuns(unitLike, ceiling, withFloors) {
   if (unitUsesRuns(unitLike)) {
     const graph = buildWallGraph(unitLike, { ceiling, doorH: U.doorH, windowHead: U.windowHead });
     if (graph.issues.length) console.warn(graph.issues.join('\n'));
-    for (const seg of graph.segments) addWallSeg(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t, seg.yBase || 0, !!seg.hackable);
-    for (const g of graph.glass) addGlass(g.x0, g.y0, g.x1, g.y1, g.sill, g.head);
+    for (const seg of graph.segments) {
+      if (seg.role === 'rail') addRailing(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t);
+      else addWallSeg(seg.x0, seg.y0, seg.x1, seg.y1, seg.h, seg.t, seg.yBase || 0, !!seg.hackable);
+    }
+    for (const g of graph.glass) addFramedOpening(g.x0, g.y0, g.x1, g.y1, g.sill, g.head, g.kind || 'window');
     for (const d of graph.leaves) addDoorLeaf(d, ceiling, false);
     if (withFloors) {
       const floors = buildFloorGraph(unitLike);
@@ -368,7 +451,7 @@ function drawRuns(unitLike, ceiling, withFloors) {
       const [x0, y0, x1, y1, sill] = win;
       const h0 = sill != null ? sill : 0.12;
       const head = Math.min(U.windowHead ?? ceiling, ceiling);
-      addGlass(x0, y0, x1, y1, h0, head);
+      addFramedOpening(x0, y0, x1, y1, h0, head, 'window');
       if (sill == null) addHeader(x0, y0, x1, y1, ceiling);
     }
     for (const d of unitLike.doors || []) addDoorLeaf(d, ceiling, true);
@@ -520,6 +603,24 @@ function placeGroup(g, x, y, rot) {
   g.position.set(x, 0, -y);
   g.rotation.y = -rot * Math.PI / 2;
 }
+function makeWallSheet(p) {
+  const g = new THREE.Group();
+  const w = p.w || 0.6;
+  const h = p.h || (p.kind === 'tv' ? 0.5 : 0.8);
+  const center = p.height != null ? p.height : (p.kind === 'tv' ? 1.2 : 1.5);
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.03), matFrame);
+  const paneMat = p.kind === 'tv'
+    ? new THREE.MeshStandardMaterial({ color: 0x1a1c1e, roughness: 0.25, metalness: 0.4 })
+    : new THREE.MeshStandardMaterial({ color: 0xd5dde2, roughness: 0.08, metalness: 0.55 });
+  const pane = new THREE.Mesh(new THREE.BoxGeometry(w - 0.04, h - 0.04, 0.012), paneMat);
+  pane.position.z = 0.012;
+  frame.position.y = center;
+  pane.position.y = center;
+  g.add(frame, pane);
+  g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  placeGroup(g, p.x, p.y, p.rot || 0);
+  scene.add(g);
+}
 
 for (const p of floorsOnly ? [] : (U.procedural || [])) {
   if (p.skip) continue;
@@ -527,6 +628,7 @@ for (const p of floorsOnly ? [] : (U.procedural || [])) {
   else if (p.kind === 'kitchen_island') makeKitchenIsland(p);
   else if (p.kind === 'ottoman') makeOttoman(p);
   else if (p.kind === 'stool') makeStool(p);
+  else if (p.kind === 'mirror' || p.kind === 'tv') makeWallSheet(p);
 }
 
 // ---------- furniture load ----------
@@ -540,7 +642,7 @@ function centreOnFootprint(node) {
   const cx = (fp.min.x + fp.max.x) / 2, cz = (fp.min.z + fp.max.z) / 2;
   node.position.x -= cx;
   node.position.z -= cz;
-  return { hx: (fp.max.x - fp.min.x) / 2, hz: (fp.max.z - fp.min.z) / 2 };
+  return { hx: (fp.max.x - fp.min.x) / 2, hz: (fp.max.z - fp.min.z) / 2, cy: (fp.min.y + fp.max.y) / 2 };
 }
 function applyPatches(root) {
   root.traverse((o) => {
@@ -580,7 +682,7 @@ function applyPatches(root) {
     o.receiveShadow = true;
   });
 }
-function spawn(name, x, y, rot = 0, sx = 1, sz = 1) {
+function spawn(name, x, y, rot = 0, sx = 1, sz = 1, height = null) {
   const tpl = templates[name];
   if (!tpl) { console.warn('Missing furniture:', name); return; }
   const pivot = new THREE.Group();
@@ -600,12 +702,19 @@ function spawn(name, x, y, rot = 0, sx = 1, sz = 1) {
   pivot.rotation.y = -rot * Math.PI / 2;
   pivot.userData.baseX = x;
   pivot.userData.baseY = y;
+  const lift = height != null && tpl.centerY != null ? height - tpl.centerY : 0;
   if (LEVELS && host && host.root) {
     host.root.add(pivot);
-    pivot.position.y = 0;
+    pivot.position.y = lift;
   } else {
+    pivot.position.y = lift;
     scene.add(pivot);
   }
+}
+function placeRow(row) {
+  const meta = row.length > 6 && row[6] && typeof row[6] === 'object' ? row[6] : null;
+  const [name, x, y, rot = 0, sx = 1, sz = 1] = row;
+  spawn(name, x, y, rot, sx, sz, meta && meta.height != null ? meta.height : null);
 }
 
 function onFurniture(gltf) {
@@ -616,22 +725,16 @@ function onFurniture(gltf) {
   const kids = [...root.children];
   for (const node of kids) {
     root.remove(node);
-    centreOnFootprint(node);
-    templates[node.name] = { node, name: node.name };
+    const sized = centreOnFootprint(node);
+    templates[node.name] = { node, name: node.name, centerY: sized.cy };
   }
   if (LEVELS) {
     for (const entry of levelRoots) {
       host = entry;
-      for (const row of entry.level.furniture || []) {
-        const [name, x, y, rot = 0, sx = 1, sz = 1] = row;
-        spawn(name, x, y, rot, sx, sz);
-      }
+      for (const row of entry.level.furniture || []) placeRow(row);
     }
   } else {
-    for (const row of U.furniture || []) {
-      const [name, x, y, rot = 0, sx = 1, sz = 1] = row;
-      spawn(name, x, y, rot, sx, sz);
-    }
+    for (const row of U.furniture || []) placeRow(row);
   }
   document.getElementById('loader').hidden = true;
 }

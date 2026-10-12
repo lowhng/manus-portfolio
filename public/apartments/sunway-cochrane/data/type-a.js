@@ -37,6 +37,14 @@ window.UNIT = {
   windowHead: 2.1,
   wallT: 0.20,
   explicitWalls: true,
+  // Image pixel of world (0, 0). mx, my are metres per pixel; image +y is down.
+  plan: {
+    file: 'type-a-650sf.png',
+    ox: 1033,
+    oy: 880,
+    mx: 8.850 / (1807.5 - 1033),
+    my: 8.470 / (880 - 139),
+  },
   rooms: [
     { name: 'Master Bedroom', c: [1.35, 5.40], box: [0.12, 3.16, 2.78, 7.36] },
     { name: 'Study', c: [4.20, 6.15], box: [3.02, 4.90, 5.48, 7.36] },
@@ -68,21 +76,23 @@ window.UNIT = {
   walls: [
     // West wall of the master, from the south wall up to the north wall.
     { x0: 0, y0: 3.05, x1: 0, y1: 7.47 },
-    // North wall. Windows are the stroke gaps; the balcony slider is the third.
+    // North wall. Bedroom windows keep a sill. The living gap is the balcony slider.
     { x0: 0, y0: 7.47, x1: 8.85, y1: 7.47, openings: [
       { at: 0.36, w: 2.32, type: 'window', sill: 0.12, head: 2.1 },
       { at: 3.17, w: 1.66, type: 'window', sill: 0.12, head: 2.1 },
-      { at: 6.47, w: 2.06, type: 'window', sill: 0.12, head: 2.1 },
+      { at: 6.47, w: 2.06, type: 'slider' },
     ] },
     // East wall. Dining windows keep the sill under legend marks 3 and 4.
-    { x0: 8.85, y0: 0, x1: 8.85, y1: 8.47, openings: [
+    // The balcony's east edge is the glass railing, not the facade.
+    { x0: 8.85, y0: 0, x1: 8.85, y1: 7.47, openings: [
       { at: 2.52, w: 0.61, type: 'window', sill: 0.42, head: 2.1 },
       { at: 3.32, w: 0.66, type: 'window', sill: 0.42, head: 2.1 },
     ] },
-    // Balcony and A/C ledge, north of the living room.
-    { x0: 5.14, y0: 8.47, x1: 8.85, y1: 8.47 },
-    { x0: 5.14, y0: 7.47, x1: 5.14, y1: 8.47 },
-    { x0: 6.33, y0: 7.47, x1: 6.33, y1: 8.47 },
+    { x0: 8.85, y0: 7.47, x1: 8.85, y1: 8.47, rail: 1.05 },
+    // Balcony and A/C ledge. The outer edge and the A/C screen are railings.
+    { x0: 5.14, y0: 8.47, x1: 8.85, y1: 8.47, rail: 1.05 },
+    { x0: 5.14, y0: 7.47, x1: 5.14, y1: 8.47, rail: 1.05 },
+    { x0: 6.33, y0: 7.47, x1: 6.33, y1: 8.47, rail: 1.05 },
     // Master / study partition. The hammer means this wall can be removed.
     { x0: 2.90, y0: 4.77, x1: 2.90, y1: 7.47, hackable: true },
     // Study south wall, then the door into the hall (hinge on the living wall).
@@ -130,11 +140,11 @@ window.UNIT = {
   // Positions are the drawn symbol centres on the plan, in metres.
   furniture: [
     // Master — queen drawn x 0.16–2.10, y 4.95–6.93, head on the west; wardrobe on the south wall
-    ['Master_Bed', 1.15, 6.18, 0, 0.90, 0.96],
-    ['Master_Wardrobe', 1.09, 3.48, 3, 1, 0.77],
+    ['Master_Bed', 1.105, 6.18, 0, 0.90, 0.96],
+    ['Master_Wardrobe', 1.045, 3.48, 3, 1, 0.77],
     // Study — single bed x 3.06–4.92, y 6.20–7.29, head on the west; desk under it; wardrobe on the south wall
-    ['Bed2_Bed', 3.99, 6.88, 2, 0.85, 0.53],
-    ['Master_Desk', 4.05, 6.13, 0],
+    ['Bed2_Bed', 3.95, 6.88, 2, 0.85, 0.53],
+    ['Master_Desk', 4.05, 6.13, 0, 1, 1, { category: 'freestanding' }],
     ['Master_DeskChair', 4.05, 5.61, 0],
     ['Bed2_Wardrobe', 3.64, 5.10, 0, 0.75, 0.75],
     // Living — sofa on the west wall facing the TV on the east wall
@@ -151,7 +161,7 @@ window.UNIT = {
     ['Kitchen_Run', 5.08, 0.42, 0, 0.32, 1],
     ['Fridge', 4.05, 1.40, 1],
     // Bath — shower in the left bay, basin on the south wall, toilet to the right (tank south)
-    ['Bath1_Shower', 2.68, 2.80, 0],
+    ['Bath1_Shower', 2.64, 2.80, 0],
     ['Bath1_Vanity', 3.90, 2.42, 1],
     ['Bath1_Toilet', 5.10, 2.55, 1],
     ['Balcony_Plant_2', 8.15, 7.95, 0, 0.55, 0.55],

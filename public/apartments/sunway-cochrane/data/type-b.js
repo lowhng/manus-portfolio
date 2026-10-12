@@ -8,7 +8,8 @@
 // Origin is the bottom-left of the outer centre lines that do exist: the south
 // wall centre (image y=944) and the west wall (image x=1031.5). +y toward the balcony.
 // The hammer sits on the master / bedroom 2 partition, so that run is solid
-// and hackable. The arc drawn on it is not a door.
+// and hackable. The quarter-circle under it is the master door, swinging
+// into the hall, not a swing on the hammer wall itself.
 window.UNIT = {
   id: 'type-b',
   project: 'Sunway Cochrane',
@@ -26,6 +27,15 @@ window.UNIT = {
   windowHead: 2.1,
   wallT: 0.20,
   explicitWalls: true,
+  // Image pixel of world (0, 0). The drawing is square, so both axes use the
+  // 8900 mm arrow. Image +y is down.
+  plan: {
+    file: 'type-b-732sf.png',
+    ox: 1031.5,
+    oy: 944,
+    mx: 8.900 / (1806.5 - 1031.5),
+    my: 8.900 / (1806.5 - 1031.5),
+  },
   rooms: [
     { name: 'Master Bedroom', c: [1.45, 6.20], box: [0.12, 3.77, 2.79, 7.97] },
     { name: 'Bedroom 2', c: [4.25, 6.40], box: [3.03, 4.87, 5.53, 7.97] },
@@ -57,14 +67,22 @@ window.UNIT = {
     { x0: 0, y0: 8.09, x1: 8.90, y1: 8.09, openings: [
       { at: 0.37, w: 2.31, type: 'window', sill: 0.12, head: 2.1 },
       { at: 3.13, w: 1.70, type: 'window', sill: 0.12, head: 2.1 },
-      { at: 6.51, w: 2.09, type: 'window', sill: 0.12, head: 2.1 },
+      // Living to balcony. Marker 5, full-width sliding glass.
+      { at: 6.51, w: 2.09, type: 'slider' },
     ] },
-    { x0: 8.90, y0: 0, x1: 8.90, y1: 9.17 },
-    { x0: 5.16, y0: 9.17, x1: 8.90, y1: 9.17 },
-    { x0: 5.16, y0: 8.09, x1: 5.16, y1: 9.17 },
-    { x0: 6.38, y0: 8.09, x1: 6.38, y1: 9.17 },
-    // Hammer wall between the master and bedroom 2. The arc is not a door.
+    // East wall. The balcony's east edge is the glass railing.
+    { x0: 8.90, y0: 0, x1: 8.90, y1: 8.09 },
+    { x0: 8.90, y0: 8.09, x1: 8.90, y1: 9.17, rail: 1.05 },
+    // Balcony and A/C ledge. Outer edge, side return and divider are railings.
+    { x0: 5.16, y0: 9.17, x1: 8.90, y1: 9.17, rail: 1.05 },
+    { x0: 5.16, y0: 8.09, x1: 5.16, y1: 9.17, rail: 1.05 },
+    { x0: 6.38, y0: 8.09, x1: 6.38, y1: 9.17, rail: 1.05 },
+    // Hammer wall between the master and bedroom 2.
     { x0: 2.91, y0: 4.78, x1: 2.91, y1: 8.09, hackable: true },
+    // Master door, under the hammer wall, swinging into the hall.
+    { x0: 2.91, y0: 3.65, x1: 2.91, y1: 4.78, openings: [
+      { at: 0.12, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
+    ] },
     // Bedroom 2's south wall stops at the doorway into the hall.
     { x0: 2.91, y0: 4.78, x1: 5.65, y1: 4.78, openings: [
       { at: 1.69, w: 0.77, type: 'door', hinge: 'end', swing: -1 },
@@ -90,28 +108,32 @@ window.UNIT = {
       { at: 0.40, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
     ] },
   ],
+  // Heads sit on the wall the plan draws them against, 2 cm clear of the face.
   furniture: [
-    ['Master_Bed', 1.40, 6.55, 0, 0.88, 0.92],
-    ['Master_Wardrobe', 1.40, 4.15, 0, 0.85, 0.7],
-    ['MBath_Shower', 0.70, 2.85, 0],
-    ['MBath_Vanity', 1.70, 2.40, 1],
-    ['MBath_Toilet', 2.40, 2.70, 1],
-    ['Bed1_Bed', 4.20, 6.70, 2, 0.85, 0.7],
-    ['Bed1_Wardrobe', 3.55, 5.15, 0, 0.8, 0.75],
-    ['Bath1_Shower', 3.55, 2.85, 0],
-    ['Bath1_Vanity', 4.40, 2.40, 1],
-    ['Bath1_Toilet', 5.10, 2.70, 1],
+    // Master — head on the west wall; wardrobe along the bath wall, short of the door.
+    ['Master_Bed', 1.083, 6.05, 0, 0.88, 0.92],
+    ['Master_Wardrobe', 1.264, 4.083, 3, 1, 0.92],
+    ['MBath_Shower', 0.562, 3.143, 0],
+    ['MBath_Vanity', 2.39, 2.41, 1],
+    ['MBath_Toilet', 1.50, 2.525, 1],
+    // Bedroom 2 — head on the hammer wall; wardrobe on the south wall, clear of the door.
+    ['Bed1_Bed', 3.96, 6.85, 2, 0.85, 0.7],
+    ['Bed1_Wardrobe', 3.75, 5.134, 0, 0.8, 0.75],
+    // Bath 2 — shower in the north-east corner, vanity on the south, toilet west of it.
+    ['Bath1_Shower', 4.116, 3.160, 0],
+    ['Bath1_Vanity', 4.23, 2.41, 1],
+    ['Bath1_Toilet', 3.45, 2.525, 1],
     ['Sofa', 6.25, 6.40, 2, 1, 0.9],
     ['Coffee_Table', 7.30, 6.40, 0],
-    ['TV_Unit', 8.55, 6.40, 0],
+    ['TV_Unit', 8.58, 6.40, 0],
     ['Dining_Table', 7.15, 3.20, 3, 1, 0.7],
     ['Dining_Chair_L1', 6.80, 3.85, 1],
     ['Dining_Chair_R1', 7.50, 3.85, 3],
     ['Dining_Chair_L2', 6.80, 2.55, 3],
     ['Dining_Chair_R2', 7.50, 2.55, 1],
     ['Kitchen_Run', 5.20, 0.42, 0, 0.45, 1],
-    ['Fridge', 4.20, 1.30, 1],
-    ['Shoe_Cabinet', 8.40, 0.40, 0],
+    ['Fridge', 4.188, 1.40, 1],
+    ['Shoe_Cabinet', 8.32, 0.295, 0, 0.88, 1],
     ['Balcony_Plant_1', 8.20, 8.65, 0, 0.55, 0.55],
   ],
   views: [
