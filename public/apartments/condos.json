@@ -55,6 +55,23 @@
         { "id": "type-c1", "name": "Type C1", "beds": 3, "baths": 3, "sqft": 957, "plan": "type-c1-957sf.jpg", "page": "type-c1.html" },
         { "id": "type-d", "name": "Type D", "beds": 3, "baths": "2+1", "sqft": 1009, "plan": "type-d-duplex-1009sf.jpg", "page": "type-d.html" }
       ]
+    },
+    {
+      "slug": "the-connaught-one",
+      "name": "The Connaught One",
+      "location": "Taman Connaught, Cheras, Kuala Lumpur",
+      "developer": "UEM Sunrise Berhad",
+      "intro": "Taman Connaught, Cheras, next to MRT Taman Connaught. Freehold serviced apartments by UEM Sunrise. Seven unit types from the developer floor plans. One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://www.uemsunrise.com/property/region/greater-kuala-lumpur/project/the-connaught-one",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 1, "baths": 1, "sqft": 452, "plan": "type-a-452sf.png", "page": "type-a.html" },
+        { "id": "type-a1", "name": "Type A1", "beds": 1, "baths": 1, "sqft": 468, "plan": "type-a1-468sf.png", "page": "type-a1.html" },
+        { "id": "type-a2", "name": "Type A2", "beds": 1, "baths": 1, "sqft": 452, "plan": "type-a2-452sf.png", "page": "type-a2.html" },
+        { "id": "type-b", "name": "Type B", "beds": 2, "baths": 1, "sqft": 708, "plan": "type-b-708sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "3+1", "baths": 2, "sqft": 960, "plan": "type-c-960sf.png", "page": "type-c.html" },
+        { "id": "type-d", "name": "Type D", "beds": 3, "baths": 2, "sqft": 1000, "plan": "type-d-1000sf.png", "page": "type-d.html" },
+        { "id": "type-e", "name": "Type E", "beds": 4, "baths": 3, "sqft": 1270, "plan": "type-e-1270sf.png", "page": "type-e.html" }
+      ]
     }
   ]
 }
