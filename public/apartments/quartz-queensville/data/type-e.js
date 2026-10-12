@@ -740,8 +740,9 @@ window.UNIT = {
     { x0: 6.26, y0: 7.43, x1: 10.145, y1: 7.43, openings: [
       { at: 0.20, w: 0.72, type: 'door', hinge: 'start', swing: -1 },
     ] },
+    // Yard door: the quarter-circle is in the yard. The washer stays in the utility.
     { x0: 6.26, y0: 5.214, x1: 9.832, y1: 5.214, openings: [
-      { at: 0.35, w: 0.80, type: 'door', hinge: 'start', swing: 1 },
+      { at: 0.35, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 0, y0: 4.997, x1: 1.503, y1: 4.997 },
     { x0: 4.465, y0: 3.475, x1: 9.832, y1: 3.475 },
