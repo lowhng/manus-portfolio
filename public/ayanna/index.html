@@ -449,7 +449,7 @@ function setFpsMode(enabled) {
     fpsHintEl.hidden = isMobile;
     if (isMobile) {
       mobileControlsEl.hidden = false;
-      canvas.style.cursor = 'crosshair';
+      renderer.domElement.style.cursor = 'crosshair';
     }
   } else {
     if (pointerLockControls.isLocked) pointerLockControls.unlock();
@@ -458,7 +458,7 @@ function setFpsMode(enabled) {
     hintEl.hidden = false;
     fpsHintEl.hidden = true;
     mobileControlsEl.hidden = true;
-    canvas.style.cursor = '';
+    renderer.domElement.style.cursor = '';
     Object.keys(moveState).forEach(k => moveState[k] = false);
   }
 }
