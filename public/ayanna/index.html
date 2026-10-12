@@ -58,7 +58,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .toggle input{accent-color:var(--accent);width:15px;height:15px;margin:0}
 .foot{font-size:11px;color:var(--ink-faint);line-height:1.5}
 #hint,#fpsHint{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:400 11px/1 var(--mono);color:var(--ink-soft);background:var(--panel);border:1px solid var(--panel-line);padding:8px 10px;border-radius:8px;backdrop-filter:blur(10px)}
-#fpsHint{display:none}
 #mobileControls{position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:none}
 #moveJoystick{position:relative;width:120px;height:120px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:4px}
 .move-btn{background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--panel-line);border-radius:10px;font-size:20px;color:var(--ink);cursor:pointer;padding:0;touch-action:none;user-select:none}
@@ -78,7 +77,6 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   #collapse{display:block;border:0;background:var(--chip);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600}
   h1{font-size:18px}
   #hint{display:none}
-  #fpsHint{display:none}
   #picker{flex-wrap:wrap;justify-content:center;padding:8px 10px}
   #pickName{flex-basis:100%;text-align:center}
   kbd{display:none}
@@ -607,7 +605,7 @@ function canMoveTo(x, z) {
 }
 
 function updateFpsMovement(delta) {
-  if (!fpsMode || !pointerLockControls.isLocked) return;
+  if (!fpsMode) return; // Allow movement without pointer lock for testing
   
   fpsVelocity.x -= fpsVelocity.x * 8.0 * delta;
   fpsVelocity.z -= fpsVelocity.z * 8.0 * delta;
