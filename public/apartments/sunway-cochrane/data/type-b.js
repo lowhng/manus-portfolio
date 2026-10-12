@@ -79,9 +79,11 @@ window.UNIT = {
     { x0: 6.38, y0: 8.09, x1: 6.38, y1: 9.17, rail: 1.05 },
     // Hammer wall between the master and bedroom 2.
     { x0: 2.91, y0: 4.78, x1: 2.91, y1: 8.09, hackable: true },
-    // Master door, under the hammer wall, swinging into the hall.
+    // Master door, under the hammer wall. The leaf is drawn open along
+    // the bath wall, so the hinge is the south jamb and the swing is east
+    // into the hall.
     { x0: 2.91, y0: 3.65, x1: 2.91, y1: 4.78, openings: [
-      { at: 0.12, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
+      { at: 0.12, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
     ] },
     // Bedroom 2's south wall stops at the doorway into the hall.
     { x0: 2.91, y0: 4.78, x1: 5.65, y1: 4.78, openings: [

@@ -2,10 +2,9 @@
 // No millimetre arrow. Outer wall-centre polygon is scaled to 810 sqft
 // (s = 0.01022 m/px). Origin is the south-west outer centre. +y is toward
 // the top of the sheet (living / bedroom 2). No pink hammer.
-// Hinged leaves sit on the thin grey quarter-circles: Bath 2 (into the
-// hall), Bedroom 3 (into the room at the north-east corner), Bath 1
-// (into the bath), and the foyer entrance (hinge on the east jamb).
-// The bedroom 2 and master breaks have no swing, so they stay openings.
+// Hinged leaves sit on the thin grey quarter-circles: Bedroom 2 (north
+// into the room), Bedroom 3, Bath 2, the master (west into the room),
+// Bath 1, and the foyer entrance (hinge on the east jamb).
 window.UNIT = {
   id: 'type-b',
   project: 'Aster Residence',
@@ -71,22 +70,23 @@ window.UNIT = {
     { x0: 0, y0: 0, x1: 8.66, y1: 0, openings: [
       { at: 5.56, w: 1.38, type: 'door', hinge: 'end', swing: -1, kind: 'entry' },
     ] },
-    // Bedroom 2 south wall. The break has no quarter-circle.
+    // Bedroom 2 south wall. Grey quarter-circle hinges on the west jamb and swings north into the room.
     { x0: 1.22, y0: 6.71, x1: 5.47, y1: 6.71, openings: [
-      { at: 2.69, w: 0.89, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
+      { at: 2.69, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
     ] },
     // Bedroom 3 north wall. Arc inside the room, hinge at the north-east corner.
     { x0: 1.22, y0: 5.23, x1: 5.47, y1: 5.23, openings: [
       { at: 3.17, w: 0.89, type: 'door', hinge: 'end', swing: 1 },
     ] },
+    // A/C ledge and Bath 1 glazing. The blue strip is a window, not a bedroom door.
     { x0: 0, y0: 2.60, x1: 5.47, y1: 2.60, openings: [
       { at: 0.78, w: 0.59, type: 'window', sill: 0.9, head: 2.1 },
-      { at: 1.60, w: 0.70, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
     ] },
-    // Spine. The master break has no swing. The upper break is the open way into the living room.
+    // Spine. Master door: grey quarter-circle on the south jamb, swinging west into the room.
+    // The upper break is the open way from the hall into the living room.
     { x0: 5.47, y0: 0, x1: 5.47, y1: 9.54, openings: [
-      { at: 0.91, w: 0.89, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
-      { at: 5.31, w: 1.33, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
+      { at: 0.91, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
+      { at: 5.31, w: 1.33, type: 'opening', noDoor: 'open-plan arch' },
     ] },
     // Bath 2 east wall. Arc in the hall, hinge on the north jamb.
     { x0: 3.79, y0: 5.23, x1: 3.79, y1: 6.71, openings: [

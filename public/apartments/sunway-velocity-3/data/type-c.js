@@ -63,8 +63,8 @@ window.UNIT = {
   ],
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 10.58 },
-    // South edge is the outer foyer opening (the number badge). No swing is drawn there.
-    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.34, w: 0.87, type: 'door', hinge: 'start', swing: 1, kind: 'entry', ambiguous: true }] },
+    // Entrance threshold. Hinge on the west jamb, leaf swings north into the foyer.
+    { x0: 0, y0: 0, x1: 6.40, y1: 0, openings: [{ at: 0.34, w: 0.87, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
     { x0: 6.40, y0: 0, x1: 6.40, y1: 2.60 },
     // South face: study and bath are solid; the recessed A/C ledge is a parapet.
     { x0: 3.65, y0: 2.60, x1: 6.15, y1: 2.60 },
@@ -97,8 +97,8 @@ window.UNIT = {
       { at: 4.91, w: 0.81, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 6.15, y0: 3.70, x1: 8.75, y1: 3.70 },
-    // Wet-kitchen west side is a straight partition, not a hinged leaf.
-    { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'door', hinge: 'start', swing: 1, ambiguous: true }] },
+    // Dry kitchen / wet kitchen. The plan leaves this gap open: no leaf and no sliding panel.
+    { x0: 4.50, y0: 0, x1: 4.50, y1: 2.60, openings: [{ at: 0.65, w: 0.70, type: 'opening', noDoor: 'open-plan arch' }] },
     { x0: 1.70, y0: 0, x1: 1.70, y1: 0.90 },
     // Entrance: dashed arc from the west wall up into the unit. Hinge west, closed along this line.
     { x0: 0, y0: 0.90, x1: 1.70, y1: 0.90, openings: [{ at: 0.28, w: 1.09, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },

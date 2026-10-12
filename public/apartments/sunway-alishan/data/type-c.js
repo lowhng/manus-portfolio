@@ -69,7 +69,8 @@ window.UNIT = {
   walls: [
     { x0: 4.98, y0: 0.08, x1: 11.07, y1: 0.08 },
     { x0: 11.06, y0: 0.69, x1: 15.81, y1: 0.69 },
-    { x0: 2.93, y0: 1.84, x1: 12.33, y1: 1.84, openings: [{ at: 0.50, w: 1.05, type: 'door', hinge: 'end', swing: 1, ambiguous: true }, { at: 5.66, w: 0.83, type: 'door', hinge: 'start', swing: 1, ambiguous: true }, { at: 8.17, w: 0.93, type: 'door', hinge: 'start', swing: -1 }] },
+    // Foyer door: dashed quarter-circle on the west jamb, swinging north. The middle gap is a sliding panel.
+    { x0: 2.93, y0: 1.84, x1: 12.33, y1: 1.84, openings: [{ at: 0.50, w: 1.05, type: 'door', hinge: 'start', swing: 1 }, { at: 5.66, w: 0.83, type: 'slider' }, { at: 8.17, w: 0.93, type: 'door', hinge: 'start', swing: -1 }] },
     { x0: 15.81, y0: 2.48, x1: 18.98, y1: 2.48 },
     { x0: 0.07, y0: 2.93, x1: 2.93, y1: 2.93 },
     { x0: 9.61, y0: 4.11, x1: 18.98, y1: 4.11, openings: [{ at: 0.73, w: 0.77, type: 'door', hinge: 'start', swing: -1 }, { at: 3.28, w: 0.86, type: 'door', hinge: 'end', swing: 1 }, { at: 6.40, w: 0.66, type: 'door', hinge: 'start', swing: -1 }] },

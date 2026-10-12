@@ -66,7 +66,7 @@ window.UNIT = {
     { x0: 0, y0: 3.15, x1: 9.80, y1: 3.15, openings: [
       // Bath 3 south wall. West jamb, swing south into Bedroom 3.
       { at: 2.20, w: 0.72, type: 'door', hinge: 'start', swing: -1 },
-      { at: 3.23, w: 3.24, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
+      { at: 3.23, w: 3.24, type: 'opening', noDoor: 'open-plan arch' },
       { at: 7.24, w: 0.75, type: 'window', sill: 0.9, head: 2.1 },
     ] },
     { x0: 9.80, y0: 3.15, x1: 9.80, y1: 9.50 },

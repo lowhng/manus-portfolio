@@ -63,7 +63,8 @@ window.UNIT = {
   walls: [
     { x0: 0.00, y0: 1.74, x1: 4.56, y1: 1.74 },
     { x0: 4.56, y0: 2.63, x1: 6.40, y1: 2.63, openings: [{ at: 0.24, w: 1.05, type: 'door', hinge: 'end', swing: -1, kind: 'entry' }] },
-    { x0: 0.86, y0: 3.47, x1: 4.56, y1: 3.47, openings: [{ at: 2.65, w: 0.88, type: 'door', hinge: 'start', swing: 1, ambiguous: true }] },
+    // Kitchen / pantry sliding panel: a blue bar with an arrow, no quarter-circle.
+    { x0: 0.86, y0: 3.47, x1: 4.56, y1: 3.47, openings: [{ at: 2.65, w: 0.88, type: 'slider' }] },
     { x0: 6.40, y0: 4.28, x1: 13.23, y1: 4.28 },
     { x0: 0.42, y0: 5.92, x1: 0.86, y1: 5.92 },
     { x0: 10.14, y0: 5.92, x1: 13.23, y1: 5.92, openings: [{ at: 1.01, w: 0.70, type: 'door', hinge: 'start', swing: -1 }] },
@@ -73,7 +74,8 @@ window.UNIT = {
     { x0: 0.86, y0: 11.75, x1: 4.56, y1: 11.75, openings: [{ at: 0.34, w: 2.97, type: 'slider' }] },
     { x0: 4.56, y0: 11.75, x1: 13.23, y1: 11.75, openings: [{ at: 0.30, w: 2.20, type: 'window', sill: 0.9, head: 2.1 }, { at: 3.04, w: 2.20, type: 'window', sill: 0.9, head: 2.1 }, { at: 5.93, w: 2.30, type: 'window', sill: 0.9, head: 2.1 }] },
     { x0: 0.42, y0: 5.92, x1: 0.42, y1: 7.87 },
-    { x0: 0.86, y0: 1.74, x1: 0.86, y1: 11.75, openings: [{ at: 0.96, w: 0.52, type: 'window', sill: 0.9, head: 2.1, ambiguous: true }, { at: 4.28, w: 1.75, type: 'window', sill: 0.85, head: 2.1 }] },
+    // Yard door. Dashed quarter-circle hinges on the north jamb and swings west.
+    { x0: 0.86, y0: 1.74, x1: 0.86, y1: 11.75, openings: [{ at: 0.63, w: 0.85, type: 'door', hinge: 'end', swing: -1, kind: 'service' }, { at: 4.28, w: 1.75, type: 'window', sill: 0.85, head: 2.1 }] },
     { x0: 4.56, y0: 1.74, x1: 4.56, y1: 3.54 },
     { x0: 4.56, y0: 7.87, x1: 4.56, y1: 11.75 },
     { x0: 6.40, y0: 1.64, x1: 6.40, y1: 6.52 },

@@ -72,18 +72,16 @@ window.UNIT = {
       { at: 1.99, w: 0.89, type: 'door', hinge: 'end', swing: -1 },
       { at: 6.13, w: 0.89, type: 'door', hinge: 'start', swing: 1 },
     ] },
+    // Open way from the kitchen side into the foyer.
     { x0: 6.16, y0: 0, x1: 6.16, y1: 9.45, openings: [
-      { at: 0.90, w: 2.16, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
+      { at: 0.90, w: 2.16, type: 'opening', noDoor: 'open-plan arch' },
     ] },
     { x0: 0, y0: 6.20, x1: 3.00, y1: 6.20 },
     { x0: 0, y0: 4.60, x1: 3.00, y1: 4.60 },
     { x0: 0, y0: 1.70, x1: 3.00, y1: 1.70 },
     { x0: 6.16, y0: 3.20, x1: 9.35, y1: 3.20 },
-    // Master bedroom south wall. Two gaps, no quarter-circle.
-    { x0: 6.16, y0: 7.40, x1: 9.35, y1: 7.40, openings: [
-      { at: 0.54, w: 0.60, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
-      { at: 2.46, w: 0.60, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
-    ] },
+    // Master bedroom south wall. The plan draws a solid wall; the bed and wardrobe sit against it.
+    { x0: 6.16, y0: 7.40, x1: 9.35, y1: 7.40 },
     // Master bath partition. Grey arc hinges on the south jamb and swings east into the bath.
     { x0: 7.38, y0: 3.20, x1: 7.38, y1: 7.40, openings: [
       { at: 0.50, w: 0.80, type: 'door', hinge: 'start', swing: -1 },

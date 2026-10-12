@@ -4,9 +4,9 @@
 // 200 mm. Origin is the south-west outer centre. +x right, +y toward the
 // master/living end of the plan. No pink hammer on this sheet.
 // Hinged leaves follow the thin grey quarter-circles: master (into the
-// room), the bath partition, Bath 1, Bedroom 2, and the foyer entrance
-// (hinge on the east jamb). The spine breaks are sliding panels, so they
-// stay openings.
+// room), the bath partition, Bath 1, Bedroom 2, both spine breaks (into
+// the bedrooms), the kitchen/foyer door, and the foyer entrance (hinge
+// on the east jamb).
 window.UNIT = {
   id: 'type-a',
   project: 'Aster Residence',
@@ -75,23 +75,24 @@ window.UNIT = {
       { at: 0.25, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
     ] },
     // Bedroom 2 (west) and Bath 2 (east of it), both swinging south into those rooms.
+    // The wall east of the Bath 2 door is solid; the nightstand sits against it.
     { x0: 1.15, y0: 3.40, x1: 4.55, y1: 3.40, openings: [
       { at: 0.20, w: 0.90, type: 'door', hinge: 'start', swing: -1 },
       { at: 1.70, w: 0.80, type: 'door', hinge: 'start', swing: -1 },
-      { at: 2.55, w: 0.80, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
     ] },
     // Wall between the two baths. Arc into Bath 2, hinge on the south jamb.
     { x0: 2.70, y0: 3.40, x1: 2.70, y1: 5.75, openings: [
       { at: 1.38, w: 0.82, type: 'door', hinge: 'start', swing: -1 },
     ] },
-    // Spine breaks are sliding panels. No quarter-circle is drawn, so the leaf is marked ambiguous.
+    // Spine doors. Each grey quarter-circle hinges on the south jamb and swings west into the bedroom.
     { x0: 4.55, y0: 0, x1: 4.55, y1: 8.70, openings: [
-      { at: 0.69, w: 0.90, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
-      { at: 4.48, w: 0.90, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+      { at: 0.69, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
+      { at: 4.48, w: 0.90, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 6.10, y0: 0, x1: 6.10, y1: 1.60 },
+    // Kitchen / foyer. The grey quarter-circle hinges on the east jamb and swings north into the kitchen.
     { x0: 4.55, y0: 1.60, x1: 7.75, y1: 1.60, openings: [
-      { at: 0.30, w: 0.90, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+      { at: 0.30, w: 0.90, type: 'door', hinge: 'end', swing: -1 },
     ] },
     { x0: 4.55, y0: 4.20, x1: 7.75, y1: 4.20 },
   ],

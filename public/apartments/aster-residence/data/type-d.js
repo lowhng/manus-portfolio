@@ -72,8 +72,9 @@ window.UNIT = {
           { at: 5.68, w: 0.52, type: 'window', sill: 0.9, head: 2.1 },
         ] },
         { x0: 0, y0: 0, x1: 0, y1: 7.70 },
+        // Stair bay, open to the foyer.
         { x0: 2.70, y0: 0, x1: 2.70, y1: 7.70, openings: [
-          { at: 4.03, w: 1.70, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
+          { at: 4.03, w: 1.70, type: 'opening', noDoor: 'open-plan arch' },
         ] },
         { x0: 2.70, y0: 5.20, x1: 4.75, y1: 5.20 },
         { x0: 3.68, y0: 5.20, x1: 3.68, y1: 7.70 },
@@ -91,9 +92,7 @@ window.UNIT = {
           { at: 1.05, w: 0.78, type: 'door', hinge: 'start', swing: -1 },
         ] },
         { x0: 5.61, y0: 2.86, x1: 6.20, y1: 2.86 },
-        { x0: 0, y0: 2.20, x1: 2.70, y1: 2.20, openings: [
-          { at: 0.40, w: 0.85, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
-        ] },
+        // Dining and living are one room on the plan. No wall crosses the table.
       ],
       furniture: [
         ['Shoe_Cabinet', 1.30, 7.494, 2, 0.70, 0.55],
@@ -148,19 +147,18 @@ window.UNIT = {
         ] },
         { x0: 0, y0: 0, x1: 0, y1: 7.70 },
         { x0: 2.70, y0: 0, x1: 2.70, y1: 7.70, openings: [
-          { at: 2.18, w: 0.87, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+          { at: 2.18, w: 0.87, type: 'window', sill: 0.9, head: 2.1 },
           { at: 3.75, w: 0.78, type: 'door', hinge: 'start', swing: 1 },
         ] },
         // Bath door. Hinge on the south jamb, swing east into the bath.
         { x0: 4.69, y0: 2.18, x1: 4.69, y1: 7.70, openings: [
           { at: 0.47, w: 0.68, type: 'door', hinge: 'start', swing: -1 },
         ] },
-        { x0: 5.61, y0: 0, x1: 5.61, y1: 7.70, openings: [
-          { at: 2.04, w: 3.20, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
-        ] },
-        { x0: 0, y0: 6.41, x1: 2.70, y1: 6.41, openings: [
-          { at: 0.30, w: 0.80, type: 'door', hinge: 'start', swing: -1, ambiguous: true },
-        ] },
+        // The curve inside Bath 2 is the shower screen. The wall stops at the bath.
+        { x0: 5.61, y0: 0, x1: 5.61, y1: 2.18 },
+        { x0: 5.61, y0: 4.48, x1: 5.61, y1: 7.70 },
+        // Bedroom 3 north side is the solid outer wall. The window is on the exterior run.
+        { x0: 0, y0: 6.41, x1: 2.70, y1: 6.41 },
         { x0: 2.70, y0: 6.06, x1: 4.69, y1: 6.06 },
         { x0: 4.69, y0: 4.48, x1: 6.20, y1: 4.48 },
         // West door swings north into the hall. Eastern door swings south into Bedroom 2.

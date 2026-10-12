@@ -56,7 +56,8 @@ window.UNIT = {
   walls: [
     { x0: 0, y0: 0, x1: 0, y1: 8.70 },
     // South edge is the outer foyer opening (the number badge). No swing is drawn there.
-    { x0: 0, y0: 0, x1: 5.55, y1: 0, openings: [{ at: 0.34, w: 0.86, type: 'door', hinge: 'start', swing: 1, kind: 'entry', ambiguous: true }] },
+    // Entrance threshold. Hinge on the west jamb, leaf swings north into the foyer.
+    { x0: 0, y0: 0, x1: 5.55, y1: 0, openings: [{ at: 0.34, w: 0.86, type: 'door', hinge: 'start', swing: 1, kind: 'entry' }] },
     { x0: 5.55, y0: 0, x1: 5.55, y1: 2.15 },
     { x0: 3.15, y0: 2.15, x1: 8.95, y1: 2.15 },
     { x0: 8.95, y0: 2.15, x1: 8.95, y1: 7.98 },

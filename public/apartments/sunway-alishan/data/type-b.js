@@ -71,7 +71,8 @@ window.UNIT = {
     { x0: 2.31, y0: 0.09, x1: 8.85, y1: 0.09 },
     { x0: 8.85, y0: 1.28, x1: 10.68, y1: 1.28, openings: [{ at: 0.46, w: 1.05, type: 'door', hinge: 'start', swing: 1 }] },
     { x0: 3.16, y0: 1.67, x1: 4.80, y1: 1.67 },
-    { x0: 4.80, y0: 2.02, x1: 15.49, y1: 2.02, openings: [{ at: 2.45, w: 0.87, type: 'door', hinge: 'start', swing: 1, ambiguous: true }, { at: 4.15, w: 0.42, type: 'opening' }, { at: 4.62, w: 0.84, type: 'door', hinge: 'start', swing: 1 }, { at: 5.49, w: 0.30, type: 'opening' }] },
+    // The west gap is a sliding panel (blue bar and arrow). The hinged leaf is the door further east.
+    { x0: 4.80, y0: 2.02, x1: 15.49, y1: 2.02, openings: [{ at: 2.45, w: 0.87, type: 'slider' }, { at: 4.15, w: 0.42, type: 'opening' }, { at: 4.62, w: 0.84, type: 'door', hinge: 'start', swing: 1 }, { at: 5.49, w: 0.30, type: 'opening' }] },
     { x0: 0.11, y0: 2.94, x1: 3.16, y1: 2.94 },
     { x0: 3.16, y0: 4.74, x1: 6.38, y1: 4.74, openings: [{ at: 2.34, w: 0.66, type: 'door', hinge: 'end', swing: 1 }] },
     { x0: 12.54, y0: 5.24, x1: 15.49, y1: 5.24, openings: [{ at: 0.25, w: 0.70, type: 'door', hinge: 'end', swing: 1 }, { at: 0.96, w: 0.94, type: 'door', hinge: 'start', swing: -1 }] },

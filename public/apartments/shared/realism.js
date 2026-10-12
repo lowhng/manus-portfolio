@@ -21,8 +21,8 @@
  *
  * Doors. A hole between two indoor rooms needs a leaf, or `noDoor` set to an
  * open-plan arch. At most one such arch, and never more than 5% of the
- * passages. A drawn quarter-circle that matches no leaf is reported by
- * unmatchedArcs.
+ * passages. A drawn quarter-circle centred on a passage, and matching no
+ * leaf, is reported by unmatchedArcs. A stroke on a solid wall is not.
  */
 
 import { buildWallGraph } from './wall-graph.js';
@@ -492,7 +492,9 @@ function checkDoors(graph, floor, unit, issues, ambiguous) {
       } else if (!archReason(op)) {
         issues.push(`wall ${run.index} opening at ${op.at.toFixed(2)} has noDoor "${op.noDoor}"; the only reason is an open-plan arch`);
       }
-      if (op.ambiguous || archReason(op)) {
+      // A decided open-plan arch is not an open question. Only an opening
+      // still flagged ambiguous is reported for a look at the plan.
+      if (op.ambiguous) {
         ambiguous.push(`wall ${run.index} opening at ${op.at.toFixed(2)} (${a.name || 'room'} / ${b.name || 'room'}) has no door leaf${op.noDoor ? `: ${op.noDoor}` : ''}`);
       }
     }
@@ -504,20 +506,32 @@ function checkDoors(graph, floor, unit, issues, ambiguous) {
   }
 }
 
+function nearJamb(run, op, arc, reach) {
+  for (const s of [op.at, op.at + op.w]) {
+    const x = run.x0 + run.ux * s;
+    const y = run.y0 + run.uy * s;
+    if (Math.hypot(x - arc.x, y - arc.y) <= reach) return true;
+  }
+  return false;
+}
+
 export function unmatchedArcs(graph, arcs) {
   const issues = [];
   for (const arc of arcs || []) {
+    // A wardrobe corner or a bed edge can trace a quarter-circle on a solid
+    // wall. A swing only needs a leaf when its centre sits on a passage.
+    const onPassage = graph.openings.some((op) => {
+      const type = op.type === 'open' ? 'opening' : op.type;
+      if (type !== 'door' && type !== 'opening') return false;
+      const run = graph.runs[op.run];
+      return run && nearJamb(run, op, arc, 0.45);
+    });
+    if (!onPassage) continue;
     const matched = graph.openings.some((op) => {
       if (op.type !== 'door') return false;
       if (Math.abs(op.w - arc.r) > 0.35) return false;
       const run = graph.runs[op.run];
-      if (!run) return false;
-      for (const s of [op.at, op.at + op.w]) {
-        const x = run.x0 + run.ux * s;
-        const y = run.y0 + run.uy * s;
-        if (Math.hypot(x - arc.x, y - arc.y) <= 0.45) return true;
-      }
-      return false;
+      return run && nearJamb(run, op, arc, 0.45);
     });
     if (!matched) {
       issues.push(`drawn arc at (${arc.x.toFixed(2)}, ${arc.y.toFixed(2)}) radius ${arc.r.toFixed(2)} m has no door leaf`);
