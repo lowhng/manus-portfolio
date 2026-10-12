@@ -398,52 +398,6 @@ function placeLabels() {
   }
 }
 
-// ---------- FPS mode helpers ----------
-function canMoveTo(x, z) {
-  if (!overFloor(x, z)) return false;
-  const testBox = new THREE.Box3(
-    new THREE.Vector3(x - RADIUS, EYE_HEIGHT - 1.5, z - RADIUS),
-    new THREE.Vector3(x + RADIUS, EYE_HEIGHT + 0.1, z + RADIUS)
-  );
-  if (solids.some(s => testBox.intersectsBox(s))) return false;
-  if (items.some(it => !it.flat && testBox.intersectsBox(footBox(it, it.cx, it.cz, it.rot, 0)))) return false;
-  return true;
-}
-
-function updateFpsMovement(delta) {
-  if (!fpsMode || !pointerLockControls.isLocked) return;
-  
-  fpsVelocity.x -= fpsVelocity.x * 8.0 * delta;
-  fpsVelocity.z -= fpsVelocity.z * 8.0 * delta;
-  
-  fpsDirection.z = Number(moveState.forward) - Number(moveState.backward);
-  fpsDirection.x = Number(moveState.right) - Number(moveState.left);
-  fpsDirection.normalize();
-  
-  if (moveState.forward || moveState.backward) fpsVelocity.z -= fpsDirection.z * MOVE_SPEED * delta;
-  if (moveState.left || moveState.right) fpsVelocity.x -= fpsDirection.x * MOVE_SPEED * delta;
-  
-  const forward = new THREE.Vector3();
-  camera.getWorldDirection(forward);
-  forward.y = 0;
-  forward.normalize();
-  
-  const right = new THREE.Vector3();
-  right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
-  
-  const moveVector = new THREE.Vector3();
-  moveVector.addScaledVector(forward, -fpsVelocity.z);
-  moveVector.addScaledVector(right, -fpsVelocity.x);
-  
-  const newX = camera.position.x + moveVector.x;
-  const newZ = camera.position.z + moveVector.z;
-  
-  if (canMoveTo(newX, camera.position.z)) camera.position.x = newX;
-  if (canMoveTo(camera.position.x, newZ)) camera.position.z = newZ;
-  
-  camera.position.y = EYE_HEIGHT;
-}
-
 // ---------- camera moves ----------
 let anim = null;
 let lastTime = performance.now();
@@ -639,6 +593,52 @@ function footBox(it, cx, cz, rot, shrink) {
 const overFloor = (x, z) => floors.some((f) => x >= f.min.x - 0.01 && x <= f.max.x + 0.01 && z >= f.min.z - 0.01 && z <= f.max.z + 0.01);
 // chairs may slide under tables and desks
 const tucks = (a, b) => (a.chair && b.table) || (b.chair && a.table);
+
+// ---------- FPS mode helpers ----------
+function canMoveTo(x, z) {
+  if (!overFloor(x, z)) return false;
+  const testBox = new THREE.Box3(
+    new THREE.Vector3(x - RADIUS, EYE_HEIGHT - 1.5, z - RADIUS),
+    new THREE.Vector3(x + RADIUS, EYE_HEIGHT + 0.1, z + RADIUS)
+  );
+  if (solids.some(s => testBox.intersectsBox(s))) return false;
+  if (items.some(it => !it.flat && testBox.intersectsBox(footBox(it, it.cx, it.cz, it.rot, 0)))) return false;
+  return true;
+}
+
+function updateFpsMovement(delta) {
+  if (!fpsMode || !pointerLockControls.isLocked) return;
+  
+  fpsVelocity.x -= fpsVelocity.x * 8.0 * delta;
+  fpsVelocity.z -= fpsVelocity.z * 8.0 * delta;
+  
+  fpsDirection.z = Number(moveState.forward) - Number(moveState.backward);
+  fpsDirection.x = Number(moveState.right) - Number(moveState.left);
+  fpsDirection.normalize();
+  
+  if (moveState.forward || moveState.backward) fpsVelocity.z -= fpsDirection.z * MOVE_SPEED * delta;
+  if (moveState.left || moveState.right) fpsVelocity.x -= fpsDirection.x * MOVE_SPEED * delta;
+  
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
+  forward.y = 0;
+  forward.normalize();
+  
+  const right = new THREE.Vector3();
+  right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+  
+  const moveVector = new THREE.Vector3();
+  moveVector.addScaledVector(forward, -fpsVelocity.z);
+  moveVector.addScaledVector(right, -fpsVelocity.x);
+  
+  const newX = camera.position.x + moveVector.x;
+  const newZ = camera.position.z + moveVector.z;
+  
+  if (canMoveTo(newX, camera.position.z)) camera.position.x = newX;
+  if (canMoveTo(camera.position.x, newZ)) camera.position.z = newZ;
+  
+  camera.position.y = EYE_HEIGHT;
+}
 
 function fits(it, cx, cz, rot) {
   const b = footBox(it, cx, cz, rot, TOL);
