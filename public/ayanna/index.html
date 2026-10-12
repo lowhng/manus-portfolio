@@ -889,17 +889,21 @@ window.addEventListener('pointerup', (e) => {
 window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
 
 // Panorama mode: drag to look around
+let panoramaPointerId = null;
 renderer.domElement.addEventListener('pointerdown', (e) => {
   if (!panoramaMode || editMode) return;
   isDragging = true;
+  panoramaPointerId = e.pointerId;
   dragStartX = e.clientX;
   dragStartY = e.clientY;
   renderer.domElement.style.cursor = 'grabbing';
+  renderer.domElement.setPointerCapture(e.pointerId);
   e.preventDefault();
+  e.stopPropagation();
 });
 
 renderer.domElement.addEventListener('pointermove', (e) => {
-  if (!panoramaMode || !isDragging || editMode) return;
+  if (!panoramaMode || !isDragging || e.pointerId !== panoramaPointerId) return;
   
   const deltaX = e.clientX - dragStartX;
   const deltaY = e.clientY - dragStartY;
@@ -913,19 +917,29 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   dragStartX = e.clientX;
   dragStartY = e.clientY;
   e.preventDefault();
+  e.stopPropagation();
 });
 
 renderer.domElement.addEventListener('pointerup', (e) => {
-  if (!panoramaMode) return;
+  if (!panoramaMode || e.pointerId !== panoramaPointerId) return;
   isDragging = false;
+  panoramaPointerId = null;
   renderer.domElement.style.cursor = 'grab';
+  if (renderer.domElement.hasPointerCapture(e.pointerId)) {
+    renderer.domElement.releasePointerCapture(e.pointerId);
+  }
   e.preventDefault();
+  e.stopPropagation();
 });
 
-renderer.domElement.addEventListener('pointercancel', () => {
-  if (!panoramaMode) return;
+renderer.domElement.addEventListener('pointercancel', (e) => {
+  if (!panoramaMode || e.pointerId !== panoramaPointerId) return;
   isDragging = false;
+  panoramaPointerId = null;
   renderer.domElement.style.cursor = 'grab';
+  if (renderer.domElement.hasPointerCapture(e.pointerId)) {
+    renderer.domElement.releasePointerCapture(e.pointerId);
+  }
 });
 
 // Panorama mode: pinch/wheel zoom via FOV
@@ -1004,7 +1018,9 @@ fetch('ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); re
 
 renderer.setAnimationLoop((now) => {
   stepAnim(now);
-  controls.update();
+  if (!panoramaMode) {
+    controls.update();
+  }
   renderer.render(scene, camera);
   placeLabels();
 });
