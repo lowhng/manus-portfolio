@@ -79,7 +79,7 @@ window.UNIT = {
     ] },
     // Bath north wall. Both leaves swing south into the bathrooms.
     { x0: 0, y0: 4.016, x1: 5.5, y1: 4.016, openings: [
-      { at: 1.796, w: 0.858, type: 'door', hinge: 'end', swing: 1 },
+      { at: 1.80, w: 0.74, type: 'door', hinge: 'end', swing: 1 },
       { at: 3.569, w: 0.858, type: 'door', hinge: 'start', swing: -1 },
     ] },
     { x0: 0, y0: 2.512, x1: 5.5, y1: 2.512 },
@@ -89,7 +89,7 @@ window.UNIT = {
     ] },
     // Yard / kitchen. The dashed arc sits in the yard: hinge on the lower jamb, swing west.
     { x0: 3.77, y0: 0, x1: 3.77, y1: 2.512, openings: [
-      { at: 0.872, w: 0.648, type: 'door', hinge: 'start', swing: 1 },
+      { at: 0.77, w: 0.77, type: 'door', hinge: 'start', swing: 1 },
     ] },
     // Foyer screen, and the open mouth into the kitchen.
     { x0: 7.189, y0: 0, x1: 7.189, y1: 0.824 },
@@ -105,8 +105,9 @@ window.UNIT = {
     ['Bed2_Bed', 4.15, 6.95, 0, 0.78, 0.95],
     ['Bed2_Bedside', 3.35, 7.45, 0, 0.7, 0.7],
     ['Bed2_Wardrobe', 4.20, 5.50, 0, 0.7, 0.65],
-    ['Sofa', 6.15, 6.45, 1, 0.7, 0.85],
-    ['Coffee_Table', 7.05, 6.35, 0, 0.7, 0.85],
+    ['Sofa', 6.15, 6.45, 1, 0.85, 0.9],
+    ['Armchair', 6.15, 5.55, 1, 0.8, 0.8],
+    ['Coffee_Table', 7.05, 6.35, 0, 0.85, 0.9],
     ['TV_Unit', 8.05, 6.45, 0, 1.15, 0.75],
     ['Dining_Table', 6.90, 3.55, 0, 0.85, 0.9],
     ['Dining_Chair_L1', 6.35, 4.15, 0],
@@ -121,8 +122,10 @@ window.UNIT = {
     ['Bath1_Vanity', 4.85, 2.75, 1, 0.7, 1.2],
     ['Bath1_Toilet', 3.35, 2.85, 1, 0.55, 0.85],
     ['Bath1_Shower', 3.20, 3.55, 0, 0.75, 0.85],
-    ['Kitchen_Run', 5.40, 0.38, 0, 0.38, 0.72],
-    ['Kitchen_Run', 3.22, 2.15, 2, 0.22, 0.7],
+    ['Kitchen_Run', 5.40, 0.48, 0, 0.55, 0.9],
+    ['Kitchen_Run', 3.40, 1.75, 1, 0.42, 0.9],
+    ['Fridge', 4.60, 1.55, 1, 0.95, 0.9],
+    ['Yard_Washer', 3.20, 1.05, 0, 0.9, 0.9],
     ['Shoe_Cabinet', 7.55, 0.40, 0, 0.7, 0.85],
     ['Balcony_Chair_1', 6.40, 8.15, 2, 0.5, 0.5],
     ['Balcony_SideTable', 6.95, 8.15, 0, 0.65, 0.65],
