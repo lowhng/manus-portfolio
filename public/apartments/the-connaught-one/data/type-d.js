@@ -60,7 +60,7 @@ window.UNIT = {
     { x0: 2.797, y0: 6.222, x1: 7.302, y1: 6.222, openings: [{ at: 0, w: 0.923, type: 'door', hinge: "end", swing: -1 }, { at: 1.983, w: 0.703, type: 'door', hinge: "start", swing: 1 }] },
     { x0: 0.0, y0: 5.052, x1: 5.414, y1: 5.052, openings: [{ at: 3.02, w: 0.70, type: 'door', hinge: 'end', swing: 1 }] },
     { x0: 5.07, y0: 3.262, x1: 5.414, y1: 3.262 },
-    { x0: 0.0, y0: 2.313, x1: 6.131, y1: 2.313, openings: [{ at: 4.119, w: 0.4, type: 'window', sill: 0.9, head: 2.1 }, { at: 5.524, w: 0.482, type: 'window', sill: 0.9, head: 2.1 }] },
+    { x0: 0.0, y0: 2.313, x1: 7.41, y1: 2.313, freeEnd: 'end', openings: [{ at: 4.119, w: 0.4, type: 'window', sill: 0.9, head: 2.1 }, { at: 5.524, w: 0.482, type: 'window', sill: 0.9, head: 2.1 }] },
     { x0: 8.789, y0: 0.702, x1: 10.498, y1: 0.702, openings: [{ at: 0.51, w: 0.951, type: 'door', hinge: "end", swing: -1 }] },
     { x0: 4.725, y0: 0.0, x1: 6.131, y1: 0.0 },
     { x0: 6.131, y0: 0.0, x1: 10.498, y1: 0.0, openings: [{ at: 0.15, w: 2.20, type: 'window', sill: 0.9, head: 2.1 }, { at: 2.80, w: 1.40, type: 'window', sill: 0.9, head: 2.1 }] },

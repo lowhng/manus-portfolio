@@ -65,7 +65,7 @@ window.UNIT = {
     { x0: 5.67, y0: 8.514, x1: 9.369, y1: 8.514, openings: [
       { at: 0.55, w: 2.15, type: 'window', sill: 0, head: 2.1 },
     ] },
-    { x0: 3.308, y0: 4.758, x1: 5.67, y1: 4.758, openings: [
+    { x0: 3.308, y0: 4.758, x1: 5.54, y1: 4.758, freeEnd: 'end', openings: [
       { at: 0.27, w: 0.70, type: 'door', hinge: 'start', swing: 1 },
     ] },
     { x0: 1.58, y0: 4.141, x1: 3.308, y1: 4.141 },
@@ -89,8 +89,8 @@ window.UNIT = {
       { at: 2.00, w: 1.07, type: 'opening', noDoor: 'open-plan arch from the foyer into the living' },
     ] },
     { x0: 5.312, y0: 3.071, x1: 5.312, y1: 4.758 },
-    { x0: 5.67, y0: 4.758, x1: 5.67, y1: 9.899, openings: [
-      { at: 4.08, w: 0.60, type: 'window', sill: 0.9, head: 2.1 },
+    { x0: 5.67, y0: 5.76, x1: 5.67, y1: 9.899, freeEnd: 'start', openings: [
+      { at: 3.078, w: 0.60, type: 'window', sill: 0.9, head: 2.1 },
     ] },
     { x0: 6.029, y0: 0.0, x1: 6.029, y1: 0.727 },
     { x0: 9.369, y0: 0.0, x1: 9.369, y1: 9.502 },
