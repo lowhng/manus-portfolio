@@ -70,7 +70,7 @@ window.UNIT = {
     { x0: 1.653, y0: 9.247, x1: 10.559, y1: 9.247 },
     { x0: 1.653, y0: 3.959, x1: 3.417, y1: 3.959, openings: [{ at: 0.18, w: 1.404, type: "opening" }] },
     { x0: 2.425, y0: 3.384, x1: 2.425, y1: 3.959 },
-    { x0: 8.718, y0: 3.384, x1: 8.718, y1: 4.991, openings: [{ at: 0.474, w: 0.712, type: "door", hinge: "start", swing: -1 }] },
+    { x0: 8.718, y0: 3.384, x1: 8.718, y1: 4.991, openings: [{ at: 0.254, w: 0.712, type: "door", hinge: "start", swing: 1 }] },
   ],
   furniture: [
     ["Bed2_Bed", 6.087, 8.184, 3, 0.87, 0.56],
