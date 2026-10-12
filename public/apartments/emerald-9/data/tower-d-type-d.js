@@ -82,7 +82,7 @@ window.UNIT = {
     { x0: 12.524, y0: 2.812, x1: 12.524, y1: 3.854 },
     { x0: 12.814, y0: 0.977, x1: 12.814, y1: 9.689 },
     { x0: 1.683, y0: 0, x1: 11.072, y1: 0 },
-    { x0: 11.072, y0: 0.977, x1: 12.814, y1: 0.977, openings: [{ at: 0.446, w: 1.071, type: "door", hinge: "start", swing: 1, kind: "entry" }] },
+    { x0: 11.072, y0: 0.977, x1: 12.814, y1: 0.977, openings: [{ at: 0.446, w: 1.071, type: "door", hinge: "end", swing: -1, kind: "entry" }] },
     { x0: 0, y0: 2.493, x1: 4.263, y1: 2.493 },
     { x0: 0, y0: 2.812, x1: 0.914, y1: 2.812, openings: [{ at: 0.384, w: 0.51, type: "window", sill: 0.9, head: 2.1 }] },
     { x0: 9.448, y0: 2.812, x1: 12.814, y1: 2.812, openings: [{ at: 0.738, w: 0.855, type: "door", hinge: "start", swing: 1 }] },

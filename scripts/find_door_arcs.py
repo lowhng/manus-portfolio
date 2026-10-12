@@ -104,7 +104,9 @@ def strokes(path):
     lum = arr.mean(axis=2)
     chroma = arr.max(axis=2) - arr.min(axis=2)
     # Brochure ink: black or dark grey, nearly neutral. Dashed swings live here.
-    dark = (lum < 130) & (chroma < 50)
+    # Navy swings on the Emerald sheets sit around chroma 54–83. Tan
+    # furniture is lighter than lum 130, so it stays off this mask.
+    dark = (lum < 130) & (chroma < 90)
     ink = linked(thin_mask(dark, 4, 18))
     # Rendered plans draw the swing as a thin grey line, only a little darker
     # than the wood floor, and the line breaks over the grain. Keep the thin
