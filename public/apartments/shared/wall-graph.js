@@ -21,6 +21,10 @@
  * the boxes overlap and close corners and T-junctions. Door leaves are cut
  * from the opening, so the leaf width is the opening width.
  *
+ * `freeEnd: 'start' | 'end' | 'both'` is an end that stops in open floor.
+ * That end is not snapped and is not required to meet another wall. Its
+ * solid stops on the centreline, so the rendered box keeps a square cap.
+ *
  * Array segments ([x0, y0, x1, y1]) are the legacy format (Types B–D) and
  * are left untouched.
  */
@@ -81,8 +85,14 @@ function cloneRuns(unit) {
       join0: null,
       join1: null,
       moved: 0,
+      freeEnd: w.freeEnd === 'start' || w.freeEnd === 'end' || w.freeEnd === 'both' ? w.freeEnd : null,
     };
   });
+}
+
+function endIsFree(run, which) {
+  const flag = run.freeEnd;
+  return flag === 'both' || (which === 0 && flag === 'start') || (which === 1 && flag === 'end');
 }
 
 function applyParams(run) {
@@ -97,6 +107,9 @@ function snapRuns(runs) {
   for (let iter = 0; iter < 6; iter++) {
     for (const run of runs) {
       for (const which of [0, 1]) {
+        // A free end stays where it was drawn. Snapping it would set a join
+        // and push the solid past the centreline instead of leaving a square cap.
+        if (endIsFree(run, which)) continue;
         const sEnd = which === 0 ? run.s0 : run.s1;
         let best = null;
         for (const other of runs) {
@@ -262,7 +275,7 @@ export function checkWallGraph(graph) {
         if (other === run) continue;
         nearest = Math.min(nearest, pointToSeg(x, y, other));
       }
-      if (nearest > ATTACH_M) {
+      if (nearest > ATTACH_M && !endIsFree(run, which)) {
         issues.push(
           `wall ${run.index} ${which === 0 ? 'start' : 'end'} (${x.toFixed(3)}, ${y.toFixed(3)}) is unattached (${(nearest * 100).toFixed(1)} cm from the nearest wall)`,
         );
