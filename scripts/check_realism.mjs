@@ -178,13 +178,22 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPat
 if (isMain) {
   const arg = process.argv[2];
   if (arg === '--self-test') process.exit(selfTest());
-  const { report } = await import('./check_walls.mjs');
+  // check_walls imports this file, so a direct import back deadlocks.
+  const checker = path.join(root, 'scripts', 'check_walls.mjs');
   const target = path.resolve(root, arg || 'public/apartments/sunway-cochrane/data/type-a.js');
+  const files = [];
   if (fs.existsSync(target) && fs.statSync(target).isDirectory()) {
-    const files = fs.readdirSync(path.join(target, 'data')).filter((name) => name.endsWith('.js')).sort();
-    let failed = 0;
-    for (const name of files) failed |= report(path.join(target, 'data', name));
-    process.exit(failed ? 1 : 0);
+    const dir = fs.existsSync(path.join(target, 'data')) ? path.join(target, 'data') : target;
+    for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.js')).sort()) {
+      files.push(path.join(dir, name));
+    }
+  } else {
+    files.push(target);
   }
-  process.exit(report(target));
+  let failed = 0;
+  for (const file of files) {
+    const run = spawnSync(process.execPath, [checker, file], { stdio: 'inherit' });
+    if (run.status) failed = 1;
+  }
+  process.exit(failed);
 }

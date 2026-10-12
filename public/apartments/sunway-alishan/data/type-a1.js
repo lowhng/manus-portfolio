@@ -24,6 +24,15 @@ window.UNIT = {
   windowHead: 2.1,
   wallT: 0.20,
   explicitWalls: true,
+  // The 12500 mm arrow is 1094 px. Its left end is not x=0; the south wall
+  // (y=0.09, x=1.74) is the image run at about (1413, 1300).
+  plan: {
+    file: 'type-a1-1216sf.png',
+    ox: 1261,
+    oy: 1308,
+    mx: 12.500 / 1094,
+    my: 12.500 / 1094,
+  },
   rooms: [
     { name: 'Bedroom 2', c: [1.45, 6.80], box: [0.06, 5.36, 2.93, 10.03] },
     { name: 'Bedroom 3', c: [4.40, 8.40], box: [3.05, 6.80, 5.70, 10.03] },
@@ -35,7 +44,7 @@ window.UNIT = {
     { name: 'Pantry', c: [5.90, 1.70], box: [4.60, 1.20, 7.30, 2.45] },
     { name: 'Kitchen', c: [3.10, 0.90], box: [1.85, 0.20, 4.30, 1.60] },
     { name: 'Yard', c: [3.00, 2.10], box: [1.85, 1.70, 4.30, 2.50] },
-    { name: 'Foyer', c: [8.20, 0.55], box: [7.54, 0.15, 9.30, 0.95] },
+    { name: 'Foyer', c: [8.40, 1.35], box: [7.64, 1.08, 9.28, 1.70] },
     { name: 'Balcony', c: [7.50, 10.90], box: [5.70, 10.03, 9.38, 11.81] },
   ],
   floors: [
@@ -49,13 +58,16 @@ window.UNIT = {
     { name: 'Pantry', box: [4.60, 1.15, 7.40, 2.45] },
     { name: 'Kitchen', box: [1.90, 0.25, 4.30, 1.55] },
     { name: 'Yard', box: [1.90, 1.70, 4.30, 2.45] },
-    { name: 'Foyer', box: [7.70, 0.20, 9.20, 0.90] },
+    { name: 'Foyer', box: [7.64, 1.08, 9.28, 1.70] },
     { name: 'Balcony', box: [5.85, 10.15, 9.25, 11.65] },
   ],
   walls: [
     { x0: 1.74, y0: 0.09, x1: 7.54, y1: 0.09 },
     { x0: 7.54, y0: 0.98, x1: 9.38, y1: 0.98, openings: [{ at: 0.27, w: 1.05, type: 'door', hinge: 'end', swing: -1, kind: 'entry' }] },
-    { x0: 1.74, y0: 2.61, x1: 12.44, y1: 2.61, openings: [{ at: 5.72, w: 1.83, type: 'opening' }] },
+    { x0: 1.74, y0: 2.61, x1: 12.44, y1: 2.61, openings: [
+      // Dining / pantry. No swing is drawn; the opening is the full bay.
+      { at: 5.72, w: 1.83, type: 'opening', noDoor: 'open-plan arch', ambiguous: true },
+    ] },
     { x0: 9.38, y0: 4.24, x1: 12.44, y1: 4.24, openings: [{ at: 1.12, w: 0.66, type: 'door', hinge: 'end', swing: 1 }] },
     { x0: 0.06, y0: 5.36, x1: 4.10, y1: 5.36 },
     { x0: 3.94, y0: 6.69, x1: 5.70, y1: 6.69 },
@@ -65,7 +77,10 @@ window.UNIT = {
     { x0: 0.06, y0: 5.35, x1: 0.06, y1: 10.03 },
     { x0: 1.74, y0: 0.09, x1: 1.74, y1: 2.61 },
     { x0: 2.93, y0: 2.61, x1: 2.93, y1: 10.03, openings: [{ at: 2.97, w: 0.90, type: 'door', hinge: 'start', swing: 1 }] },
-    { x0: 4.46, y0: 0.09, x1: 4.46, y1: 2.61, openings: [{ at: 0.73, w: 0.83, type: 'opening' }] },
+    { x0: 4.46, y0: 0.09, x1: 4.46, y1: 2.61, openings: [
+      // Kitchen / pantry. No arc is drawn; a leaf is assumed.
+      { at: 0.73, w: 0.83, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+    ] },
     { x0: 5.20, y0: 2.61, x1: 5.20, y1: 5.39 },
     { x0: 5.70, y0: 6.69, x1: 5.70, y1: 11.81 },
     { x0: 7.54, y0: 0.09, x1: 7.54, y1: 0.98 },
@@ -73,9 +88,15 @@ window.UNIT = {
     { x0: 12.44, y0: 2.61, x1: 12.44, y1: 10.03 },
     { x0: 7.54, y0: 0.09, x1: 7.54, y1: 0.98 },
     { x0: 9.38, y0: 0.00, x1: 9.38, y1: 0.98 },
-    { x0: 1.74, y0: 2.61, x1: 2.93, y1: 2.61 },
+    { x0: 1.74, y0: 1.62, x1: 4.46, y1: 1.62, openings: [
+      // Kitchen / yard. The inset splits them; no swing is drawn on this crop.
+      { at: 0.90, w: 0.80, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+    ] },
     { x0: 12.44, y0: 2.61, x1: 12.44, y1: 4.24 },
-    { x0: 4.10, y0: 5.36, x1: 5.20, y1: 5.36, openings: [{ at: 0.08, w: 0.94, type: 'opening' }] },
+    { x0: 4.10, y0: 5.36, x1: 5.20, y1: 5.36, openings: [
+      // Bedroom 3 / bath. No arc is drawn; a leaf is assumed.
+      { at: 0.08, w: 0.94, type: 'door', hinge: 'start', swing: 1, ambiguous: true },
+    ] },
     { x0: 3.94, y0: 6.69, x1: 5.70, y1: 6.69 },
     { x0: 5.70, y0: 10.03, x1: 5.70, y1: 11.81 },
     { x0: 9.38, y0: 10.03, x1: 9.38, y1: 11.81 },
@@ -84,24 +105,22 @@ window.UNIT = {
   ],
   furniture: [
     // Bedroom 2 — 1.57 square, head north; wardrobe on the west wall; desk on the south wall
-    ['Bed2_Bed', 1.33, 8.55, 3, 0.71, 0.89],
+    ['Bed2_Bed', 1.33, 9.133, 3, 0.71, 0.89],
     ['Bed2_Wardrobe', 0.46, 6.68, 1, 0.91, 0.95],
-    ['Master_Desk', 0.89, 5.70, 0],
+    ['Master_Desk', 0.89, 5.73, 2],
     ['Master_DeskChair', 1.45, 6.15, 2],
-    // Bedroom 3 — head north, desk just north of the bay wall
-    ['Bed1_Bed', 4.45, 8.63, 3, 0.71, 0.89],
-    ['Master_Desk', 4.89, 7.01, 0],
-    ['Master_DeskChair', 4.89, 7.50, 2],
-    // Master — 1.27 x 1.94, head north; wardrobe on the east wall
-    ['Master_Bed', 11.02, 8.46, 1, 0.89, 0.61],
-    ['Master_Wardrobe', 12.05, 6.54, 2, 1, 0.47],
+    ['Bed1_Bed', 4.45, 9.133, 3, 0.71, 0.89],
+    ['Master_Desk', 4.89, 7.06, 2],
+    ['Master_DeskChair', 4.89, 7.55, 2],
+    ['Master_Bed', 11.02, 8.936, 1, 0.89, 0.61],
+    ['Master_Wardrobe', 12.008, 6.54, 2, 1, 0.47],
     ['Master_Bedside_R', 10.40, 9.15, 1],
     // Living — rug 2.07 x 2.73
     ['Rug_Living', 7.90, 8.36, 0, 0.70, 0.85],
     ['Sofa', 6.55, 8.40, 2, 0.90, 0.85],
-    ['Armchair', 8.83, 7.50, 3],
+    ['Armchair', 8.15, 7.20, 3],
     ['Coffee_Table', 7.66, 8.46, 0],
-    ['TV_Unit', 9.05, 8.40, 0, 0.90, 0.80],
+    ['TV_Unit', 9.08, 8.40, 0, 0.90, 0.80],
     // Dining — table 0.80 x 2.14, three chairs each long side
     ['Dining_Table', 7.06, 4.32, 0, 0.89, 1.19],
     ['Dining_Chair_L1', 6.48, 5.03, 0],
@@ -111,28 +130,28 @@ window.UNIT = {
     ['Dining_Chair_R2', 7.66, 4.33, 0],
     ['Dining_Chair_R1', 7.66, 3.64, 0],
     // Kitchen bay and the south counter under the pantry (2.21 m)
-    ['Kitchen_Run', 3.10, 0.48, 0, 0.35, 1],
-    ['Kitchen_Run', 5.63, 0.46, 0, 0.46, 1],
-    ['Fridge', 4.15, 1.35, 3],
-    ['Yard_Washer', 2.22, 2.04, 0],
-    ['Shoe_Cabinet', 8.40, 0.45, 0, 0.80, 1],
-    ['Balcony_Chair_1', 6.79, 10.91, 2],
+    ['Kitchen_Run', 3.10, 0.52, 0, 0.35, 1],
+    ['Kitchen_Run', 5.75, 0.52, 0, 0.46, 1],
+    ['Fridge', 3.972, 1.17, 3],
+    ['Yard_Washer', 2.178, 2.04, 1],
+    ['Shoe_Cabinet', 8.40, 1.275, 0, 0.80, 1],
+    ['Balcony_Chair_1', 6.65, 10.91, 2],
     ['Balcony_SideTable', 7.35, 10.88, 0],
-    ['Balcony_Chair_2', 7.92, 10.89, 2],
+    ['Balcony_Chair_2', 8.05, 10.89, 2],
     ['Balcony_Plant_2', 9.04, 10.85, 0, 0.45, 0.45],
     ['Bath1_Shower', 3.45, 4.67, 0],
-    ['Bath1_Vanity', 4.20, 3.10, 1],
-    ['Bath1_Toilet', 4.70, 3.50, 1],
-    ['MBath_Shower', 10.20, 3.70, 0],
-    ['MBath_Vanity', 10.91, 2.99, 1],
-    ['MBath_Toilet', 12.00, 3.30, 3],
+    ['Bath1_Vanity', 4.20, 2.97, 1],
+    ['Bath1_Toilet', 4.70, 3.085, 1],
+    ['MBath_Shower', 9.942, 3.12, 0],
+    ['MBath_Vanity', 10.91, 2.97, 1],
+    ['MBath_Toilet', 12.00, 3.765, 3],
   ],
   procedural: [
     // Island drawn 2.94 x 0.61; stools on the north edge
-    { kind: 'kitchen_island', x: 5.99, y: 2.21, w: 2.94, d: 0.61, rot: 0 },
-    { kind: 'stool', x: 5.10, y: 2.70 },
-    { kind: 'stool', x: 5.99, y: 2.70 },
-    { kind: 'stool', x: 6.90, y: 2.70 },
+    { kind: 'kitchen_island', x: 6.15, y: 2.21, w: 2.94, d: 0.61, rot: 0 },
+    { kind: 'stool', x: 5.30, y: 1.72 },
+    { kind: 'stool', x: 6.15, y: 1.72 },
+    { kind: 'stool', x: 7.00, y: 1.72 },
   ],
   views: [
     { id: 'overview', name: 'Overview', pos: [-1.8, -3.4, 14.5], tgt: [6.22, 4.25, 0.4], fov: 32 },

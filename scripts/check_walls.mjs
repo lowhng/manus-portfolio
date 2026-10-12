@@ -2,7 +2,7 @@
  * Check a unit's wall graph.
  *
  *   node scripts/check_walls.mjs
- *   node scripts/check_walls.mjs public/apartments/sunway-cochrane/data/type-a.js
+ *   node scripts/check_walls.mjs public/apartments/sunway-cochrane
  *   node scripts/check_walls.mjs --self-test
  *
  * Fails when a run end is not on another wall, an opening has no
@@ -301,6 +301,17 @@ const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPat
 if (isMain) {
   const arg = process.argv[2];
   if (arg === '--self-test') process.exit(selfTest());
-  const file = path.resolve(root, arg || 'public/apartments/sunway-cochrane/data/type-a.js');
-  process.exit(report(file));
+  const target = path.resolve(root, arg || 'public/apartments/sunway-cochrane/data/type-a.js');
+  const files = [];
+  if (fs.existsSync(target) && fs.statSync(target).isDirectory()) {
+    const dir = fs.existsSync(path.join(target, 'data')) ? path.join(target, 'data') : target;
+    for (const name of fs.readdirSync(dir).filter((n) => n.endsWith('.js')).sort()) {
+      files.push(path.join(dir, name));
+    }
+  } else {
+    files.push(target);
+  }
+  let failed = 0;
+  for (const file of files) failed |= report(file);
+  process.exit(failed ? 1 : 0);
 }
