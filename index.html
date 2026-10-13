@@ -129,6 +129,26 @@
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(253, 139, 0, 0.05);
             transform: translateY(-8px);
         }
+        @media (min-width: 768px) {
+            .services-grid {
+                grid-template-rows: repeat(6, auto);
+                row-gap: 0;
+            }
+            .service-card {
+                display: grid;
+                grid-template-rows: subgrid;
+                grid-row: span 6;
+            }
+            .service-card:hover {
+                transform: none;
+            }
+            .service-list {
+                display: grid;
+                grid-template-rows: subgrid;
+                grid-row: 3 / span 4;
+                margin-bottom: 0;
+            }
+        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
@@ -534,108 +554,91 @@
 <!-- Services Section -->
 <section class="py-section-gap px-gutter py-24" id="services">
 <div class="max-w-container-max mx-auto">
-<h2 class="font-display-lg text-headline-md text-center text-primary mb-16 reveal active">Services &amp; Pricing</h2>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+<h2 class="font-display-lg text-headline-md text-center text-primary mb-16 reveal active">Services</h2>
+<div class="services-grid grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
 <!-- Website Dev -->
-<div class="glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
+<div class="service-card glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
 <div class="absolute top-0 right-0 p-4 opacity-10">
 <span class="material-symbols-outlined text-8xl text-primary">web</span>
 </div>
 <div class="flex items-center gap-3 mb-4 relative z-10">
 <span class="material-symbols-outlined text-secondary">code</span>
-<h3 class="font-headline-md text-headline-md text-on-background">Website Development</h3>
+<h3 class="font-headline-md text-headline-md text-on-background min-h-[5rem] flex items-center">Website Development</h3>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-1 relative z-10">
-                        I build simple responsive websites and bring you along the journey. Fast turnaround time and affordable pricing.
+                        I build simple responsive websites and bring you along the journey. Fast turnaround time.
                     </p>
-<div class="space-y-4 mb-2 relative z-10">
-<div class="flex justify-between items-center text-on-surface border-b border-white/5 pb-3">
+<div class="service-list space-y-4 relative z-10">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">Basic Website (Single Page)</span>
-<span class="font-label-code text-secondary">1,299 NZD</span>
 </div>
-<div class="flex justify-between items-center text-on-surface border-b border-white/5 pb-3">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">SEO Starter Pack</span>
-<span class="font-label-code text-secondary">199 NZD</span>
 </div>
-<div class="flex justify-between items-center text-on-surface border-b border-white/5 pb-3">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">Multipage Website</span>
-<span class="font-label-code text-secondary">From 1,999 NZD</span>
 </div>
-<div class="flex justify-between items-center text-on-surface">
+<div class="text-on-surface">
 <span class="font-body-md">Website Edits</span>
-<span class="font-label-code text-secondary">From 100 NZD</span>
 </div>
 </div>
 </div>
 <!-- Photography -->
-<div class="glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col opacity-70">
-<div class="absolute top-4 right-4 z-20 rotate-12">
-<span class="bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-caps text-label-caps border border-error/40">Contact for Enquiry</span>
-</div>
+<div class="service-card glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
 <div class="absolute top-0 right-0 p-4 opacity-10">
-<span class="material-symbols-outlined text-8xl text-secondary">photo_camera</span>
+<span class="material-symbols-outlined text-8xl text-primary">photo_camera</span>
 </div>
 <div class="flex items-center gap-3 mb-4 relative z-10">
-<span class="material-symbols-outlined text-on-surface-variant">photo_camera</span>
-<h3 class="font-headline-md text-headline-md text-on-surface-variant">Photography</h3>
+<span class="material-symbols-outlined text-secondary">photo_camera</span>
+<h3 class="font-headline-md text-headline-md text-on-background min-h-[5rem] flex items-center">Photography</h3>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-1 relative z-10">
                         Professional photography services for events, portraits, and commercial use. High-quality images that tell your story.
                     </p>
-<div class="space-y-4 mb-8 relative z-10">
-<div class="flex justify-between items-center text-on-surface-variant border-b border-white/5 pb-3">
-<span class="font-body-md">Portrait Session (1hr)</span>
-<span class="font-label-code">350 NZD</span>
+<div class="service-list space-y-4 relative z-10">
+<div class="text-on-surface border-b border-white/5 pb-3">
+<span class="font-body-md">Portrait Session</span>
 </div>
-<div class="flex justify-between items-center text-on-surface-variant border-b border-white/5 pb-3">
-<span class="font-body-md">Event Photography (3hrs)</span>
-<span class="font-label-code">800 NZD</span>
+<div class="text-on-surface border-b border-white/5 pb-3">
+<span class="font-body-md">Event Photography</span>
 </div>
-<div class="flex justify-between items-center text-on-surface-variant border-b border-white/5 pb-3">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">Property Photography</span>
-<span class="font-label-code">500 NZD</span>
 </div>
-<div class="flex justify-between items-center text-on-surface-variant">
+<div class="text-on-surface">
 <span class="font-body-md">All Other Photography</span>
-<span class="font-label-code">POA</span>
 </div>
 </div>
 </div>
 <!-- Consulting -->
-<div class="glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col opacity-70">
-<div class="absolute top-4 right-4 z-20 rotate-12">
-<span class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full font-label-caps text-label-caps border border-white/10">Not Currently Offered</span>
-</div>
+<div class="service-card glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
 <div class="absolute top-0 right-0 p-4 opacity-10">
 <span class="material-symbols-outlined text-8xl text-primary">psychology</span>
 </div>
 <div class="flex items-center gap-3 mb-4 relative z-10">
-<span class="material-symbols-outlined text-on-surface-variant">psychology</span>
-<h3 class="font-headline-md text-headline-md text-on-surface-variant">Consulting &amp; Prototyping</h3>
+<span class="material-symbols-outlined text-secondary">psychology</span>
+<h3 class="font-headline-md text-headline-md text-on-background min-h-[5rem] flex items-center">Consulting &amp; Prototyping</h3>
 </div>
 <p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-1 relative z-10">
                         Strategic technology consulting and rapid prototyping services. Turn your ideas into actionable solutions.
                     </p>
-<div class="space-y-4 relative z-10">
-<div class="flex justify-between items-center text-on-surface-variant border-b border-white/5 pb-3">
+<div class="service-list space-y-4 relative z-10">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">Tech Consultation</span>
-<span class="font-label-code">120 NZD/hr</span>
 </div>
-<div class="flex justify-between items-center text-on-surface-variant border-b border-white/5 pb-3">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">UX Research &amp; Analysis</span>
-<span class="font-label-code">140 NZD/hr</span>
 </div>
-<div class="flex justify-between items-center text-on-surface-variant border-b border-white/5 pb-3">
+<div class="text-on-surface border-b border-white/5 pb-3">
 <span class="font-body-md">Rapid Prototyping</span>
-<span class="font-label-code">160 NZD/hr</span>
 </div>
-<div class="flex justify-between items-center text-on-surface-variant">
-<span class="font-body-md">Process Mapping</span>
-<span class="font-label-code">160 NZD/hr</span>
+<div class="text-on-surface">
+<span class="font-body-md">AR/VR Consultation</span>
 </div>
 </div>
 </div>
 </div>
+<p class="font-body-md text-body-md text-on-surface-variant text-center mt-12">Please contact for enquiry.</p>
 </div>
 </section>
 <!-- Contact Section -->
