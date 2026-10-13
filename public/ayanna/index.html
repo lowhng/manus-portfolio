@@ -248,8 +248,11 @@ let panoramaEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
-// Declared early: flyToPanorama / goView(..., true) at init can run before furniture setup
+// Declared early: goView(..., true) at init runs before furniture setup; syncControls reads both
 let editMode = false;
+let drag = null;
+const HINT = 'Drag to orbit · scroll to zoom · right‑drag to pan';
+const EDIT_HINT = 'Drag furniture to move · R to rotate · drag empty space to orbit';
 // Pinch zoom tracking
 const activePointers = new Map();
 let lastPinchDistance = 0;
@@ -406,8 +409,7 @@ function flyToPanorama(pos, tgt, fov, instant = false) {
     camera.updateProjectionMatrix();
     controls.target.copy(tgt);
     panoramaEuler.setFromQuaternion(camera.quaternion);
-    // Stay in orbit while furniture editing so drag/place keep working
-    if (!editMode) setPanoramaMode(true);
+    syncControls();
     return;
   }
   // Calculate target quaternion
@@ -429,6 +431,7 @@ function flyToPanorama(pos, tgt, fov, instant = false) {
     t1: tgt.clone(),
     isPanorama: true
   };
+  syncControls(); // suspend look-around for the flight
 }
 function stepAnim(now) {
   if (!anim) return;
@@ -447,16 +450,11 @@ function stepAnim(now) {
   }
   
   if (k >= 1) {
-    const wasPanorama = anim.isPanorama;
-    const panoramaTgt = anim.t1;
+    const panoramaTgt = anim.isPanorama ? anim.t1 : null;
     anim = null;
-    if (wasPanorama) {
-      // Animation complete, enable panorama mode and sync euler angles
-      if (panoramaTgt) controls.target.copy(panoramaTgt);
-      panoramaEuler.setFromQuaternion(camera.quaternion);
-      if (editMode) controls.update();
-      else setPanoramaMode(true);
-    }
+    if (panoramaTgt) controls.target.copy(panoramaTgt);
+    panoramaEuler.setFromQuaternion(camera.quaternion);
+    syncControls();
   }
 }
 controls.addEventListener('start', () => { anim = null; setActive(null); });
@@ -465,29 +463,51 @@ const viewsEl = document.getElementById('views');
 const chipEls = {};
 let currentView = VIEWS[0];
 function setActive(id) { for (const k in chipEls) chipEls[k].setAttribute('aria-pressed', String(k === id)); }
-function setPanoramaMode(enabled) {
-  panoramaMode = enabled;
-  const hintEl = document.getElementById('hint');
-  const panoramaHintEl = document.getElementById('panoramaHint');
-  
-  if (enabled) {
+const isInteriorView = () => !!(currentView && currentView.hfov);
+// Single source of truth: interior → look-around unless a furniture drag is active (or mid-flight).
+// Orbit is exterior-only — never enabled indoors.
+function syncControls() {
+  const interior = isInteriorView();
+  const carrying = !!drag;
+  const flying = !!anim;
+  const wantLook = interior && !carrying && !flying;
+
+  if (wantLook) {
+    if (!panoramaMode) {
+      panoramaEuler.setFromQuaternion(camera.quaternion);
+      panoramaMode = true;
+      labelsEl.classList.add('off');
+      renderer.domElement.style.cursor = 'grab';
+      renderer.domElement.style.touchAction = 'none';
+    }
     controls.enabled = false;
-    labelsEl.classList.add('off');
-    hintEl.hidden = true;
-    panoramaHintEl.hidden = false;
-    renderer.domElement.style.cursor = 'grab';
-    renderer.domElement.style.touchAction = 'none';
   } else {
-    controls.enabled = true;
-    syncLabels();
-    hintEl.hidden = false;
-    panoramaHintEl.hidden = true;
-    renderer.domElement.style.cursor = '';
-    renderer.domElement.style.touchAction = '';
-    isDragging = false;
-    panoramaPointerId = null;
-    activePointers.clear();
-    lastPinchDistance = 0;
+    if (panoramaMode) {
+      panoramaMode = false;
+      isDragging = false;
+      panoramaPointerId = null;
+      activePointers.clear();
+      lastPinchDistance = 0;
+      renderer.domElement.style.cursor = '';
+      renderer.domElement.style.touchAction = '';
+    }
+    // Orbit only outdoors, and only when not carrying a piece
+    controls.enabled = !interior && !carrying;
+    if (!interior) syncLabels();
+  }
+
+  const orbitHint = document.getElementById('hint');
+  const lookHint = document.getElementById('panoramaHint');
+  if (panoramaMode) {
+    orbitHint.hidden = true;
+    lookHint.hidden = false;
+    lookHint.textContent = editMode
+      ? 'Drag furniture to move · drag empty space to look around'
+      : 'Drag to look around · scroll to zoom';
+  } else {
+    lookHint.hidden = true;
+    orbitHint.hidden = false;
+    orbitHint.textContent = editMode ? EDIT_HINT : HINT;
   }
 }
 function goView(v, instant) {
@@ -496,15 +516,12 @@ function goView(v, instant) {
   interior = !!v.hfov; syncLabels();
   
   if (v.hfov) {
-    // Interior view: animate to position and enable panorama mode after
     controls.maxPolarAngle = Math.PI * 0.95;
-    setPanoramaMode(false); // Disable during animation
     flyToPanorama(v.pos, v.tgt, vfovFrom(v), instant);
   } else {
-    // Exterior view: use orbit controls
-    setPanoramaMode(false);
     controls.maxPolarAngle = Math.PI * 0.495;
     flyTo(v.pos, v.tgt, vfovFrom(v), instant);
+    syncControls();
   }
 }
 for (const v of VIEWS) {
@@ -528,8 +545,10 @@ for (const r of ROOMS) {
     const pos = B(r.c[0] - m * 0.15, r.c[1] - (m * 0.9 + 2.2), m * 1.2 + 3.2);
     controls.maxPolarAngle = Math.PI * 0.495;
     setActive(null);
+    currentView = { id: null }; // exterior orbit framing — not an hfov look-around view
     interior = false; syncLabels();
     flyTo(pos, tgt, camera.aspect < 0.8 ? 60 : 45);
+    syncControls();
   };
   li.appendChild(b); roomsEl.appendChild(li);
 }
@@ -595,7 +614,7 @@ const SKIP = /^(Floor_|Curtain_|Camera_Target)|glass/i;   // never blocks or get
 const TONE = { idle: 0x3f5a3a, ok: 0x4fbf5a, bad: 0xe25b4c };
 
 const items = [], solids = [], floors = [], pickables = [];
-let selected = null, hovered = null, drag = null, tap = null, hoverQueued = false;
+let selected = null, hovered = null, tap = null, hoverQueued = false;
 const floorAim = new THREE.Vector3(), floorRay = new THREE.Ray();
 
 const stageEl = document.getElementById('stage');
@@ -604,7 +623,6 @@ const pickerEl = document.getElementById('picker'), pickName = document.getEleme
 const homeBtn = document.getElementById('homeBtn'), editTools = document.getElementById('editTools'), showGridEl = document.getElementById('showGrid'), catalogEl = document.getElementById('catalog');
 const editToggle = document.getElementById('editToggle'), resetBtn = document.getElementById('resetLayout');
 const editHelp = document.getElementById('editHelp'), hintEl = document.getElementById('hint'), toastEl = document.getElementById('toast');
-const HINT = hintEl.textContent, EDIT_HINT = 'Drag furniture to move · R to rotate · drag empty space to orbit';
 
 let toastTimer;
 function toast(msg) {
@@ -873,40 +891,16 @@ function deletePiece(it) {
   toast(`Removed ${it.label}. Add it back from the menu.`);
 }
 const syncGrid = () => { if (gridMesh) gridMesh.visible = editMode && showGridEl.checked; };
-// Keep orbit target on the current look ray so leaving panorama does not snap the view
-function handoffPanoramaToOrbit() {
-  camera.getWorldDirection(floorAim);
-  controls.target.copy(camera.position).addScaledVector(floorAim, 2);
-  controls.update();
-}
 function setEdit(on) {
   editMode = on;
   editToggle.setAttribute('aria-pressed', String(on));
   editToggle.textContent = on ? 'Done moving' : 'Move furniture';
   resetBtn.hidden = editHelp.hidden = editTools.hidden = !on;
-  if (on) {
-    catalogEl.open = true;
-    // Look-around must release the pointer so furniture can be dragged/placed
-    if (panoramaMode) {
-      handoffPanoramaToOrbit();
-      setPanoramaMode(false);
-    }
-  }
-  hintEl.textContent = on ? EDIT_HINT : HINT;
+  if (on) catalogEl.open = true;
+  else { cancelDrag(); setHover(null); stageEl.classList.remove('over'); }
   stageEl.classList.toggle('editing', on);
   syncGrid();
-  if (!on) { 
-    cancelDrag(); 
-    setHover(null); 
-    stageEl.classList.remove('over');
-    // Restore look-around in interior views; orbit elsewhere
-    if (currentView && currentView.hfov) {
-      panoramaEuler.setFromQuaternion(camera.quaternion);
-      setPanoramaMode(true);
-    } else {
-      setPanoramaMode(false);
-    }
-  }
+  syncControls(); // interiors stay in look-around; edit mode alone does not enable orbit
   select(on ? selected : null);
 }
 
@@ -950,13 +944,14 @@ function floorPoint() {
 stageEl.addEventListener('pointerdown', (e) => {
   if (!editMode || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || drag) return;
   const it = pickItem(e);
-  if (!it) { tap = { id: e.pointerId, x: e.clientX, y: e.clientY }; return; }   // empty floor: let OrbitControls take it
-  controls.enabled = false;
+  // Empty space: exterior → OrbitControls; interior → panorama look-around (via syncControls)
+  if (!it) { tap = { id: e.pointerId, x: e.clientX, y: e.clientY }; return; }
   canvas.setPointerCapture(e.pointerId);
   select(it);
   const p = floorPoint();
   drag = { it, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, dx: p ? p.x - it.cx : 0, dz: p ? p.z - it.cz : 0, from: { cx: it.cx, cz: it.cz, rot: it.rot } };
   stageEl.classList.add('held');
+  syncControls(); // suspend look-around only while carrying
 }, true);
 
 window.addEventListener('pointermove', (e) => {
@@ -986,12 +981,12 @@ window.addEventListener('pointermove', (e) => {
 function endDrag(commit) {
   const d = drag; if (!d) return;
   drag = null;
-  controls.enabled = true;
   stageEl.classList.remove('held');
   const it = d.it; it.held = false;
-  if (!d.moved) { place(it, it.cx, it.cz, it.rot); return; }
-  if (commit && it.ok) place(it, it.cx, it.cz, it.rot);
+  if (!d.moved) place(it, it.cx, it.cz, it.rot);
+  else if (commit && it.ok) place(it, it.cx, it.cz, it.rot);
   else { place(it, d.from.cx, d.from.cz, d.from.rot); if (commit) toast("That doesn't fit there, so it went back"); }
+  syncControls(); // restore look-around immediately after place/cancel
 }
 function cancelDrag() { endDrag(false); }
 window.addEventListener('pointerup', (e) => {
@@ -1003,9 +998,9 @@ window.addEventListener('pointerup', (e) => {
 });
 window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
 
-// Panorama mode: drag to look around + pinch to zoom
+// Panorama mode: drag to look around + pinch to zoom (allowed during edit when not carrying)
 renderer.domElement.addEventListener('pointerdown', (e) => {
-  if (!panoramaMode || editMode) return;
+  if (!panoramaMode || drag) return;
   
   activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   
@@ -1124,24 +1119,21 @@ renderer.domElement.addEventListener('pointercancel', (e) => {
 
 // Panorama mode: pinch/wheel zoom via FOV
 renderer.domElement.addEventListener('wheel', (e) => {
-  if (!panoramaMode || editMode) return;
+  if (!panoramaMode || drag) return;
   e.preventDefault();
   const fovDelta = e.deltaY * 0.05;
   camera.fov = Math.max(30, Math.min(120, camera.fov + fovDelta));
   camera.updateProjectionMatrix();
 }, { passive: false });
 
-// ESC to exit panorama mode or furniture editing
+// ESC: cancel/deselect while editing; otherwise leave look-around for overview
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (panoramaMode) {
+    if (editMode) {
+      if (drag) cancelDrag();
+      else select(null);
+    } else if (panoramaMode) {
       goView(VIEWS[0]);
-    } else if (editMode) {
-      if (drag) {
-        cancelDrag();
-      } else {
-        select(null);
-      }
     }
   } else if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
     return;
