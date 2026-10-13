@@ -945,45 +945,6 @@ function floorPoint() {
   return floorRay.intersectPlane(floorPlane, hit);
 }
 
-stageEl.addEventListener('pointerdown', (e) => {
-  if (!editMode || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || drag) return;
-  const it = pickItem(e);
-  // Empty space: exterior → OrbitControls; interior → panorama look-around (via syncControls)
-  if (!it) { tap = { id: e.pointerId, x: e.clientX, y: e.clientY }; return; }
-  canvas.setPointerCapture(e.pointerId);
-  select(it);
-  const p = floorPoint();
-  drag = { it, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, dx: p ? p.x - it.cx : 0, dz: p ? p.z - it.cz : 0, from: { cx: it.cx, cz: it.cz, rot: it.rot } };
-  stageEl.classList.add('held');
-  // Suspend look-around / orbit input only — do not change camera mode or orientation
-  if (!isInteriorView()) controls.enabled = false;
-  renderer.domElement.style.cursor = 'grabbing';
-}, true);
-
-window.addEventListener('pointermove', (e) => {
-  if (!editMode) return;
-  if (drag) {
-    if (e.pointerId !== drag.id) return;
-    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
-    drag.moved = true; drag.it.held = true;
-    aim(e);
-    const p = floorPoint();
-    if (!p) return;
-    const [cx, cz] = snap(drag.it, p.x - drag.dx, p.z - drag.dz, drag.it.rot);
-    place(drag.it, cx, cz, drag.it.rot);
-    return;
-  }
-  if (e.pointerType === 'touch' || hoverQueued) return;
-  hoverQueued = true;
-  requestAnimationFrame(() => {
-    hoverQueued = false;
-    if (!editMode || drag) return;
-    const it = pickItem(e);
-    setHover(it);
-    stageEl.classList.toggle('over', !!it);
-  });
-});
-
 function endDrag(commit) {
   const d = drag; if (!d) return;
   drag = null;
@@ -996,132 +957,188 @@ function endDrag(commit) {
   syncControls();
 }
 function cancelDrag() { endDrag(false); }
-window.addEventListener('pointerup', (e) => {
-  if (drag && e.pointerId === drag.id) endDrag(true);
-  if (tap && e.pointerId === tap.id) {
-    if (Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 5) select(null);
-    tap = null;
-  }
-});
-window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
 
-// Panorama mode: drag to look around + pinch to zoom (allowed during edit when not carrying)
-renderer.domElement.addEventListener('pointerdown', (e) => {
-  if (!panoramaMode || drag) return;
-  
+// One pointer router on the canvas. Each gesture is either furniture or look-around
+// (or neither → OrbitControls outdoors). Panorama must never capture/stop a furniture gesture,
+// or pointerup never reaches place/endDrag.
+const gestureOf = new Map(); // pointerId → 'furn' | 'look'
+function releasePtr(id) {
+  if (canvas.hasPointerCapture(id)) {
+    try { canvas.releasePointerCapture(id); } catch { /* already released */ }
+  }
+}
+function beginFurnitureGesture(e) {
+  const it = pickItem(e);
+  if (!it) return false;
+  gestureOf.set(e.pointerId, 'furn');
+  try { canvas.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+  select(it);
+  const p = floorPoint();
+  drag = { it, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, dx: p ? p.x - it.cx : 0, dz: p ? p.z - it.cz : 0, from: { cx: it.cx, cz: it.cz, rot: it.rot } };
+  stageEl.classList.add('held');
+  // Suspend orbit input only — do not leave panorama mode (that would snap the camera)
+  if (!isInteriorView()) controls.enabled = false;
+  canvas.style.cursor = 'grabbing';
+  return true;
+}
+function moveFurnitureGesture(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+  drag.moved = true; drag.it.held = true;
+  aim(e);
+  const p = floorPoint();
+  if (!p) return;
+  const [cx, cz] = snap(drag.it, p.x - drag.dx, p.z - drag.dz, drag.it.rot);
+  place(drag.it, cx, cz, drag.it.rot);
+}
+function beginLookGesture(e) {
+  if (!panoramaMode || drag) return false;
+  gestureOf.set(e.pointerId, 'look');
   activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  
   if (activePointers.size === 1) {
-    // Single pointer: start drag to look
     isDragging = true;
     panoramaPointerId = e.pointerId;
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    renderer.domElement.style.cursor = 'grabbing';
+    canvas.style.cursor = 'grabbing';
   } else if (activePointers.size === 2) {
-    // Two pointers: start pinch zoom
     isDragging = false;
     const pointers = Array.from(activePointers.values());
-    const dx = pointers[1].x - pointers[0].x;
-    const dy = pointers[1].y - pointers[0].y;
-    lastPinchDistance = Math.hypot(dx, dy);
+    lastPinchDistance = Math.hypot(pointers[1].x - pointers[0].x, pointers[1].y - pointers[0].y);
   }
-  
-  renderer.domElement.setPointerCapture(e.pointerId);
-  e.preventDefault();
-  e.stopPropagation();
-});
-
-renderer.domElement.addEventListener('pointermove', (e) => {
-  if (!panoramaMode) return;
-  
-  if (activePointers.has(e.pointerId)) {
-    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  }
-  
+  try { canvas.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+  return true;
+}
+function moveLookGesture(e) {
+  if (!activePointers.has(e.pointerId)) return;
+  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (activePointers.size === 2) {
-    // Pinch zoom
     const pointers = Array.from(activePointers.values());
-    const dx = pointers[1].x - pointers[0].x;
-    const dy = pointers[1].y - pointers[0].y;
-    const distance = Math.hypot(dx, dy);
-    
+    const distance = Math.hypot(pointers[1].x - pointers[0].x, pointers[1].y - pointers[0].y);
     if (lastPinchDistance > 0) {
-      const scale = distance / lastPinchDistance;
-      const fovDelta = (1 - scale) * 20;
-      camera.fov = Math.max(30, Math.min(120, camera.fov + fovDelta));
+      camera.fov = Math.max(30, Math.min(120, camera.fov + (1 - distance / lastPinchDistance) * 20));
       camera.updateProjectionMatrix();
     }
-    
     lastPinchDistance = distance;
-    e.preventDefault();
-    e.stopPropagation();
   } else if (isDragging && e.pointerId === panoramaPointerId) {
-    // Single pointer drag to look
-    const deltaX = e.clientX - dragStartX;
-    const deltaY = e.clientY - dragStartY;
-    
-    panoramaEuler.y -= deltaX * 0.003;
-    panoramaEuler.x -= deltaY * 0.003;
+    panoramaEuler.y -= (e.clientX - dragStartX) * 0.003;
+    panoramaEuler.x -= (e.clientY - dragStartY) * 0.003;
     panoramaEuler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, panoramaEuler.x));
-    
     camera.quaternion.setFromEuler(panoramaEuler);
-    
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    e.preventDefault();
-    e.stopPropagation();
   }
-});
-
-renderer.domElement.addEventListener('pointerup', (e) => {
-  if (!panoramaMode) return;
-  
+}
+function endLookGesture(e) {
   activePointers.delete(e.pointerId);
-  
   if (e.pointerId === panoramaPointerId) {
     isDragging = false;
     panoramaPointerId = null;
-    renderer.domElement.style.cursor = 'grab';
+    canvas.style.cursor = panoramaMode ? 'grab' : '';
   }
-  
   if (activePointers.size === 1) {
-    // Back to single pointer: restart drag from current position
     const [pointerId, pointer] = Array.from(activePointers.entries())[0];
     panoramaPointerId = pointerId;
     dragStartX = pointer.x;
     dragStartY = pointer.y;
     isDragging = true;
-    renderer.domElement.style.cursor = 'grabbing';
+    canvas.style.cursor = 'grabbing';
   } else if (activePointers.size === 0) {
     lastPinchDistance = 0;
   }
-  
-  if (renderer.domElement.hasPointerCapture(e.pointerId)) {
-    renderer.domElement.releasePointerCapture(e.pointerId);
+  releasePtr(e.pointerId);
+  gestureOf.delete(e.pointerId);
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  if (drag) return; // already carrying — ignore extra pointers for furniture
+
+  if (editMode && beginFurnitureGesture(e)) {
+    e.preventDefault();
+    e.stopPropagation(); // whole gesture owned by furniture — not look-around/orbit
+    return;
   }
-  e.preventDefault();
-  e.stopPropagation();
+  if (editMode && !pickItem(e)) tap = { id: e.pointerId, x: e.clientX, y: e.clientY };
+
+  if (beginLookGesture(e)) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  // Exterior empty drag: fall through to OrbitControls
 });
 
-renderer.domElement.addEventListener('pointercancel', (e) => {
-  if (!panoramaMode) return;
-  
-  activePointers.delete(e.pointerId);
-  
-  if (e.pointerId === panoramaPointerId) {
-    isDragging = false;
-    panoramaPointerId = null;
-    renderer.domElement.style.cursor = 'grab';
+canvas.addEventListener('pointermove', (e) => {
+  const kind = gestureOf.get(e.pointerId) || (drag && e.pointerId === drag.id ? 'furn' : null);
+  if (kind === 'furn' || (drag && e.pointerId === drag.id)) {
+    moveFurnitureGesture(e);
+    e.preventDefault();
+    e.stopPropagation();
+    return;
   }
-  
-  if (activePointers.size === 0) {
-    lastPinchDistance = 0;
+  if (kind === 'look' || (panoramaMode && activePointers.has(e.pointerId))) {
+    moveLookGesture(e);
+    e.preventDefault();
+    e.stopPropagation();
+    return;
   }
-  
-  if (renderer.domElement.hasPointerCapture(e.pointerId)) {
-    renderer.domElement.releasePointerCapture(e.pointerId);
+  if (!editMode || drag || e.pointerType === 'touch' || hoverQueued) return;
+  hoverQueued = true;
+  requestAnimationFrame(() => {
+    hoverQueued = false;
+    if (!editMode || drag) return;
+    const it = pickItem(e);
+    setHover(it);
+    stageEl.classList.toggle('over', !!it);
+  });
+});
+
+function onPtrEnd(e, commit) {
+  if (drag && e.pointerId === drag.id) {
+    // Commit if the caller asks, or if the piece was already moved (spurious
+    // pointercancel after a drag must not undo a successful place).
+    const doCommit = commit || drag.moved;
+    gestureOf.delete(e.pointerId);
+    endDrag(doCommit);
+    releasePtr(e.pointerId);
+    e.preventDefault();
+    e.stopPropagation();
+  } else if (gestureOf.get(e.pointerId) === 'look' || activePointers.has(e.pointerId)) {
+    endLookGesture(e);
+    e.preventDefault();
+    e.stopPropagation();
   }
+  if (tap && e.pointerId === tap.id) {
+    if (commit && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 5) select(null);
+    tap = null;
+  }
+}
+canvas.addEventListener('pointerup', (e) => onPtrEnd(e, true));
+canvas.addEventListener('pointercancel', (e) => onPtrEnd(e, false));
+canvas.addEventListener('lostpointercapture', (e) => {
+  // Capture lost mid-gesture: finish furniture place/cancel without leaving it stuck
+  if (drag && e.pointerId === drag.id) {
+    const doCommit = drag.moved;
+    gestureOf.delete(e.pointerId);
+    endDrag(doCommit);
+  }
+});
+// Safety net if the event bypasses the canvas listener
+window.addEventListener('pointerup', (e) => {
+  if (drag && e.pointerId === drag.id) { gestureOf.delete(e.pointerId); endDrag(true); }
+  else if (tap && e.pointerId === tap.id) {
+    if (Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 5) select(null);
+    tap = null;
+  }
+});
+window.addEventListener('pointercancel', (e) => {
+  if (drag && e.pointerId === drag.id) {
+    const doCommit = drag.moved;
+    gestureOf.delete(e.pointerId);
+    endDrag(doCommit);
+  }
+  tap = null;
 });
 
 // Panorama mode: pinch/wheel zoom via FOV
