@@ -95,7 +95,11 @@ const PATCHES = {
 const stage = document.getElementById('stage');
 let renderer;
 try {
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: true,
+  preserveDrawingBuffer: params.get('shot') === '1',
+});
 } catch (err) {
   const el = document.getElementById('loadtxt');
   if (el) el.textContent = 'WebGL is not available in this browser — cannot render the 3D model.';
@@ -520,6 +524,7 @@ function applyLevelMode(mode) {
     entry.root.position.y = levelRise(entry.root.userData.index);
   }
   if (typeof refreshLabels === 'function') refreshLabels();
+  syncPlanLevel();
 }
 buildShell();
 if (floorsOnly) {
@@ -798,14 +803,19 @@ function refreshLabels() {
 }
 refreshLabels();
 function placeLabels() {
-  const w = stage.clientWidth, h = stage.clientHeight;
+  const split = document.documentElement.classList.contains('plan-split');
+  const rect = split ? stage.getBoundingClientRect() : null;
+  const w = split ? rect.width : stage.clientWidth;
+  const h = split ? rect.height : stage.clientHeight;
+  const ox = split ? rect.left : 0;
+  const oy = split ? rect.top : 0;
   for (const L of labelNodes) {
     const tmp = L.p.clone().project(camera);
     const vis = tmp.z < 1 && Math.abs(tmp.x) < 1.1 && Math.abs(tmp.y) < 1.1;
     L.el.style.display = vis ? '' : 'none';
     if (vis) {
-      L.el.style.left = `${(tmp.x * .5 + .5) * w}px`;
-      L.el.style.top = `${(-tmp.y * .5 + .5) * h}px`;
+      L.el.style.left = `${ox + (tmp.x * .5 + .5) * w}px`;
+      L.el.style.top = `${oy + (-tmp.y * .5 + .5) * h}px`;
     }
   }
 }
@@ -1009,7 +1019,190 @@ if (root.classList.contains('embed')) {
     const u = new URL(location.href); u.searchParams.delete('embed');
     window.open(u.href, '_blank', 'noopener');
   });
+  window.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Escape' || window.parent === window || document.fullscreenElement) return;
+    window.parent.postMessage({ type: 'apartments-close' }, location.origin);
+  });
 }
+
+// Original floor plan. Registration matches the door-arc check:
+// image pixel (ox, oy) is world (0, 0), mx/my are metres per pixel, image +y is down.
+let planMode = 'off';
+let planOpacity = 0.5;
+let planUi = false;
+let planMesh = null;
+let planTex = null;
+let wantedPlanFile = '';
+const planButtons = {};
+const texLoader = new THREE.TextureLoader();
+
+function activePlan() {
+  if (LEVELS) {
+    const level = levelMode === 'both' ? LEVELS[0] : LEVELS.find((l) => l.id === levelMode);
+    return level?.plan || LEVELS.find((l) => l.plan && l.plan.file)?.plan || null;
+  }
+  return U.plan && U.plan.file ? U.plan : null;
+}
+function planLevel() {
+  if (!LEVELS) return null;
+  return levelMode === 'both' ? LEVELS[0] : LEVELS.find((l) => l.id === levelMode) || LEVELS[0];
+}
+function markPlanReady() {
+  requestAnimationFrame(() => {
+    renderer.render(scene, camera);
+    document.documentElement.dataset.planReady = '1';
+  });
+}
+function updatePlanNote() {
+  const note = document.getElementById('planNote');
+  if (!note) return;
+  const level = planLevel();
+  if (!level) { note.hidden = true; return; }
+  note.hidden = false;
+  note.textContent = levelMode === 'both'
+    ? `${level.name} floor plan. Choose a level to match that floor.`
+    : `${level.name} floor plan`;
+}
+function updatePlanSheet(plan) {
+  const img = document.getElementById('planSheetImg');
+  if (!img || !plan) return;
+  const level = planLevel();
+  img.alt = level ? `${U.name} ${level.name} floor plan` : `${U.name} floor plan`;
+  if (img.getAttribute('src') === plan.file) {
+    if ((planMode === 'split' || planMode === 'sheet') && img.complete) markPlanReady();
+    return;
+  }
+  img.onload = () => {
+    if (planMode === 'split' || planMode === 'sheet') markPlanReady();
+  };
+  img.onerror = () => { document.documentElement.dataset.planReady = 'error'; };
+  img.src = plan.file;
+}
+function placePlanMesh(plan) {
+  const image = planTex?.image;
+  if (!planMesh || !plan || !image?.width || !image?.height) return;
+  const widthM = image.width * plan.mx;
+  const heightM = image.height * plan.my;
+  planMesh.geometry.dispose();
+  planMesh.geometry = new THREE.PlaneGeometry(widthM, heightM);
+  const x = (image.width / 2 - plan.ox) * plan.mx;
+  const worldY = (plan.oy - image.height / 2) * plan.my;
+  const rise = LEVELS && levelMode === 'both' ? levelRise(LEVELS.length - 1) : 0;
+  planMesh.position.set(x, rise + (U.wallH || 2.5) + 0.12, -worldY);
+  planMesh.rotation.set(-Math.PI / 2, 0, 0);
+  planMesh.material.opacity = planOpacity;
+  planMesh.material.map = planTex;
+}
+function ensurePlanMesh() {
+  if (planMesh) return;
+  const mat = new THREE.MeshBasicMaterial({
+    map: planTex,
+    transparent: true,
+    opacity: planOpacity,
+    depthWrite: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  planMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+  planMesh.name = 'plan-overlay';
+  planMesh.renderOrder = 10;
+  scene.add(planMesh);
+}
+function syncPlanLevel() {
+  if (!planUi) return;
+  const plan = activePlan();
+  updatePlanNote();
+  if (!plan) return;
+  updatePlanSheet(plan);
+  if (planMode !== 'overlay') {
+    if (planMesh) planMesh.visible = false;
+    return;
+  }
+  wantedPlanFile = plan.file;
+  if (planTex?.userData.file === plan.file) {
+    ensurePlanMesh();
+    placePlanMesh(plan);
+    planMesh.visible = true;
+    markPlanReady();
+    return;
+  }
+  texLoader.load(plan.file, (tex) => {
+    if (wantedPlanFile !== plan.file) { tex.dispose(); return; }
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    tex.userData.file = plan.file;
+    if (planTex) planTex.dispose();
+    planTex = tex;
+    ensurePlanMesh();
+    placePlanMesh(activePlan());
+    planMesh.visible = planMode === 'overlay';
+    if (planMode === 'overlay') markPlanReady();
+  }, undefined, () => {
+    document.documentElement.dataset.planReady = 'error';
+  });
+}
+let lastPlanMode = 'overlay';
+function setPlanMode(mode, { fly = false, instant = false } = {}) {
+  if (mode !== 'off') lastPlanMode = mode;
+  planMode = mode;
+  const rootEl = document.documentElement;
+  rootEl.classList.toggle('plan-split', mode === 'split');
+  rootEl.classList.toggle('plan-sheet', mode === 'sheet');
+  rootEl.dataset.planMode = mode;
+  rootEl.dataset.planReady = mode === 'off' ? '1' : '0';
+  for (const id in planButtons) planButtons[id].setAttribute('aria-pressed', String(id === mode));
+  const toggle = document.getElementById('planToggle');
+  if (toggle) toggle.setAttribute('aria-pressed', String(mode !== 'off'));
+  const sheet = document.getElementById('planSheet');
+  if (sheet) sheet.hidden = mode !== 'split' && mode !== 'sheet';
+  const wrap = document.getElementById('planOpacityWrap');
+  if (wrap) wrap.hidden = mode !== 'overlay';
+  if (planMesh) planMesh.visible = mode === 'overlay';
+  syncPlanLevel();
+  if (fly && mode === 'overlay') {
+    const planView = VIEWS.find((v) => v.id === 'plan');
+    if (planView) goView(planView, instant);
+  }
+  requestAnimationFrame(() => { resize(); requestAnimationFrame(resize); });
+}
+function initPlan() {
+  const modesEl = document.getElementById('planModes');
+  if (!modesEl || !activePlan()) return;
+  const op = Number(params.get('planOpacity'));
+  if (Number.isFinite(op)) planOpacity = Math.min(1, Math.max(0.15, op));
+  const slider = document.getElementById('planOpacity');
+  const sliderVal = document.getElementById('planOpacityVal');
+  if (slider) slider.value = String(Math.round(planOpacity * 100));
+  if (sliderVal) sliderVal.textContent = `${Math.round(planOpacity * 100)}%`;
+  slider?.addEventListener('input', () => {
+    planOpacity = Number(slider.value) / 100;
+    if (sliderVal) sliderVal.textContent = `${slider.value}%`;
+    if (planMesh) planMesh.material.opacity = planOpacity;
+  });
+  for (const [id, label] of [['off', 'Off'], ['overlay', 'Overlay'], ['split', 'Side by side'], ['sheet', 'Image']]) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip';
+    b.textContent = label;
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => setPlanMode(id, { fly: id === 'overlay' }));
+    planButtons[id] = b;
+    modesEl.appendChild(b);
+  }
+  document.getElementById('planToggle')?.addEventListener('click', () => {
+    if (planMode === 'off') setPlanMode(lastPlanMode, { fly: lastPlanMode === 'overlay' });
+    else setPlanMode('off');
+  });
+  const preset = params.get('plan');
+  const initial = preset === '1' || preset === 'overlay' ? 'overlay'
+    : preset === 'split' || preset === 'side' ? 'split'
+      : preset === 'sheet' || preset === 'image' ? 'sheet'
+        : 'off';
+  planUi = true;
+  const skipFly = params.get('view') || params.get('cam');
+  setPlanMode(initial, { fly: initial === 'overlay' && !skipFly, instant: true });
+}
+initPlan();
 
 let doorClock = performance.now();
 renderer.setAnimationLoop((now) => {

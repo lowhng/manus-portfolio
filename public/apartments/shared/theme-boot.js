@@ -50,7 +50,10 @@
       btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
       btn.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
     }
-    btn.addEventListener('click', () => setTheme(effective() === 'dark' ? 'light' : 'dark'));
+    btn.addEventListener('click', () => {
+      setTheme(effective() === 'dark' ? 'light' : 'dark');
+      label();
+    });
     parent.appendChild(btn);
     label();
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

@@ -26,7 +26,9 @@ document.body.insertAdjacentHTML('afterbegin', `
       <div class="legend" id="hackNote" hidden>Tinted walls can be removed</div>
       <div class="meta"></div>
     </div>
-    <button id="collapse" aria-expanded="true">Hide</button>
+    <div class="head-actions">
+      <button id="collapse" aria-expanded="true">Hide</button>
+    </div>
   </div>
   <div class="body">
     <div class="sec">
@@ -67,6 +69,30 @@ if (Array.isArray(U.levels) && U.levels.length > 1) {
     <div class="sec">
       <h2>Level</h2>
       <div class="chips" id="levels"></div>
+    </div>
+  `);
+}
+
+const hasPlan = (U.plan && U.plan.file)
+  || (Array.isArray(U.levels) && U.levels.some((level) => level.plan && level.plan.file));
+if (hasPlan) {
+  document.querySelector('.head-actions')?.insertAdjacentHTML('afterbegin', `
+    <button type="button" class="chip plan-toggle" id="planToggle" aria-pressed="false">Plan</button>
+  `);
+  document.querySelector('#panel .opts')?.closest('.sec')?.insertAdjacentHTML('afterend', `
+    <div class="sec" id="planSec">
+      <h2>Plan</h2>
+      <div class="chips" id="planModes" role="group" aria-label="Plan"></div>
+      <label class="plan-opacity" id="planOpacityWrap">
+        <span>Opacity <span id="planOpacityVal">50%</span></span>
+        <input type="range" id="planOpacity" min="15" max="100" step="5" value="50" aria-valuemin="15" aria-valuemax="100" aria-label="Floor plan opacity">
+      </label>
+      <p class="plan-note" id="planNote" hidden></p>
+    </div>
+  `);
+  document.body.insertAdjacentHTML('beforeend', `
+    <div id="planSheet" hidden>
+      <img id="planSheetImg" alt="">
     </div>
   `);
 }
