@@ -248,6 +248,8 @@ let panoramaEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
+// Declared early: flyToPanorama / goView(..., true) at init can run before furniture setup
+let editMode = false;
 // Pinch zoom tracking
 const activePointers = new Map();
 let lastPinchDistance = 0;
@@ -402,8 +404,10 @@ function flyToPanorama(pos, tgt, fov, instant = false) {
     camera.lookAt(tgt);
     camera.fov = fov;
     camera.updateProjectionMatrix();
+    controls.target.copy(tgt);
     panoramaEuler.setFromQuaternion(camera.quaternion);
-    setPanoramaMode(true);
+    // Stay in orbit while furniture editing so drag/place keep working
+    if (!editMode) setPanoramaMode(true);
     return;
   }
   // Calculate target quaternion
@@ -422,6 +426,7 @@ function flyToPanorama(pos, tgt, fov, instant = false) {
     f1: fov,
     q0: camera.quaternion.clone(),
     q1: targetQuaternion,
+    t1: tgt.clone(),
     isPanorama: true
   };
 }
@@ -443,11 +448,14 @@ function stepAnim(now) {
   
   if (k >= 1) {
     const wasPanorama = anim.isPanorama;
+    const panoramaTgt = anim.t1;
     anim = null;
     if (wasPanorama) {
       // Animation complete, enable panorama mode and sync euler angles
+      if (panoramaTgt) controls.target.copy(panoramaTgt);
       panoramaEuler.setFromQuaternion(camera.quaternion);
-      setPanoramaMode(true);
+      if (editMode) controls.update();
+      else setPanoramaMode(true);
     }
   }
 }
@@ -587,7 +595,8 @@ const SKIP = /^(Floor_|Curtain_|Camera_Target)|glass/i;   // never blocks or get
 const TONE = { idle: 0x3f5a3a, ok: 0x4fbf5a, bad: 0xe25b4c };
 
 const items = [], solids = [], floors = [], pickables = [];
-let editMode = false, selected = null, hovered = null, drag = null, tap = null, hoverQueued = false;
+let selected = null, hovered = null, drag = null, tap = null, hoverQueued = false;
+const floorAim = new THREE.Vector3(), floorRay = new THREE.Ray();
 
 const stageEl = document.getElementById('stage');
 const canvas = renderer.domElement;
@@ -784,10 +793,22 @@ function buildCatalog() {
     list.appendChild(sec);
   }
 }
+// Floor point under the camera's look direction (panorama does not move controls.target while looking around)
+function lookPointOnFloor() {
+  camera.getWorldDirection(floorAim);
+  const o = camera.position;
+  if (floorAim.y < -0.05) {
+    const t = Math.min(-o.y / floorAim.y, 20);
+    return { x: o.x + floorAim.x * t, z: o.z + floorAim.z * t };
+  }
+  const horiz = Math.hypot(floorAim.x, floorAim.z) || 1;
+  const dist = 2.5;
+  return { x: o.x + (floorAim.x / horiz) * dist, z: o.z + (floorAim.z / horiz) * dist };
+}
 // drop a new piece at the nearest free spot to where the camera is looking
 function addFromCatalog(src, name) {
   const tpl = templates[src];
-  const { x, z } = controls.target;
+  const { x, z } = lookPointOnFloor();
   const it = spawn(tpl, x, z, 0, name, null);
   const spot = findSpot(it, x, z, 0, 32);   // up to 8 m out: anywhere on the plan
   if (!spot) { removeItem(it); toast("There is no free spot big enough. Move or delete something first."); return; }
@@ -852,12 +873,25 @@ function deletePiece(it) {
   toast(`Removed ${it.label}. Add it back from the menu.`);
 }
 const syncGrid = () => { if (gridMesh) gridMesh.visible = editMode && showGridEl.checked; };
+// Keep orbit target on the current look ray so leaving panorama does not snap the view
+function handoffPanoramaToOrbit() {
+  camera.getWorldDirection(floorAim);
+  controls.target.copy(camera.position).addScaledVector(floorAim, 2);
+  controls.update();
+}
 function setEdit(on) {
   editMode = on;
   editToggle.setAttribute('aria-pressed', String(on));
   editToggle.textContent = on ? 'Done moving' : 'Move furniture';
   resetBtn.hidden = editHelp.hidden = editTools.hidden = !on;
-  if (on) catalogEl.open = true;
+  if (on) {
+    catalogEl.open = true;
+    // Look-around must release the pointer so furniture can be dragged/placed
+    if (panoramaMode) {
+      handoffPanoramaToOrbit();
+      setPanoramaMode(false);
+    }
+  }
   hintEl.textContent = on ? EDIT_HINT : HINT;
   stageEl.classList.toggle('editing', on);
   syncGrid();
@@ -865,8 +899,9 @@ function setEdit(on) {
     cancelDrag(); 
     setHover(null); 
     stageEl.classList.remove('over');
-    // Restore control mode based on current view
+    // Restore look-around in interior views; orbit elsewhere
     if (currentView && currentView.hfov) {
+      panoramaEuler.setFromQuaternion(camera.quaternion);
       setPanoramaMode(true);
     } else {
       setPanoramaMode(false);
@@ -888,7 +923,29 @@ function pickItem(e) {
   const h = ray.intersectObjects(pickables, false)[0];
   return h ? h.object.userData.item || null : null;
 }
-const floorPoint = () => ray.ray.intersectPlane(floorPlane, hit);
+// Ground hit under the cursor. Interior look-around is often near-horizontal, where a
+// y=0 plane miss (or a hit tens of metres away) would otherwise freeze placement.
+function floorPoint() {
+  const p = ray.ray.intersectPlane(floorPlane, hit);
+  // Three.js intersectPlane allows hits behind the ray (looking up → floor underfoot)
+  if (p) {
+    const along = (hit.x - ray.ray.origin.x) * ray.ray.direction.x
+      + (hit.y - ray.ray.origin.y) * ray.ray.direction.y
+      + (hit.z - ray.ray.origin.z) * ray.ray.direction.z;
+    if (along >= 0 && along <= 35) return p;
+  }
+  floorAim.copy(ray.ray.direction);
+  const horiz = Math.hypot(floorAim.x, floorAim.z);
+  if (horiz < 1e-6) return hit.set(ray.ray.origin.x, 0, ray.ray.origin.z);
+  const minDown = -0.18 * horiz; // ~10° down
+  if (floorAim.y > minDown) {
+    floorAim.y = minDown;
+    floorAim.normalize();
+  }
+  floorRay.origin.copy(ray.ray.origin);
+  floorRay.direction.copy(floorAim);
+  return floorRay.intersectPlane(floorPlane, hit);
+}
 
 stageEl.addEventListener('pointerdown', (e) => {
   if (!editMode || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || drag) return;
