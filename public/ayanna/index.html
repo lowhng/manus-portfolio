@@ -464,16 +464,18 @@ const chipEls = {};
 let currentView = VIEWS[0];
 function setActive(id) { for (const k in chipEls) chipEls[k].setAttribute('aria-pressed', String(k === id)); }
 const isInteriorView = () => !!(currentView && currentView.hfov);
-// Single source of truth: interior → look-around unless a furniture drag is active (or mid-flight).
-// Orbit is exterior-only — never enabled indoors.
+// Single source of truth for *camera mode*: interior → look-around, exterior → orbit.
+// Furniture drag only suspends look-around / orbit *input* — it must never rewrite the camera.
+// (Exiting panorama during a drag used to let OrbitControls.update() snap back to the view target.)
 function syncControls() {
   const interior = isInteriorView();
   const carrying = !!drag;
   const flying = !!anim;
-  const wantLook = interior && !carrying && !flying;
+  const wantLook = interior && !flying;
 
   if (wantLook) {
     if (!panoramaMode) {
+      // Resume look-around from wherever the camera already is — never a view preset
       panoramaEuler.setFromQuaternion(camera.quaternion);
       panoramaMode = true;
       labelsEl.classList.add('off');
@@ -509,6 +511,8 @@ function syncControls() {
     orbitHint.hidden = false;
     orbitHint.textContent = editMode ? EDIT_HINT : HINT;
   }
+  if (carrying) renderer.domElement.style.cursor = 'grabbing';
+  else if (panoramaMode && !isDragging) renderer.domElement.style.cursor = 'grab';
 }
 function goView(v, instant) {
   currentView = v;
@@ -951,7 +955,9 @@ stageEl.addEventListener('pointerdown', (e) => {
   const p = floorPoint();
   drag = { it, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, dx: p ? p.x - it.cx : 0, dz: p ? p.z - it.cz : 0, from: { cx: it.cx, cz: it.cz, rot: it.rot } };
   stageEl.classList.add('held');
-  syncControls(); // suspend look-around only while carrying
+  // Suspend look-around / orbit input only — do not change camera mode or orientation
+  if (!isInteriorView()) controls.enabled = false;
+  renderer.domElement.style.cursor = 'grabbing';
 }, true);
 
 window.addEventListener('pointermove', (e) => {
@@ -986,7 +992,8 @@ function endDrag(commit) {
   if (!d.moved) place(it, it.cx, it.cz, it.rot);
   else if (commit && it.ok) place(it, it.cx, it.cz, it.rot);
   else { place(it, d.from.cx, d.from.cz, d.from.rot); if (commit) toast("That doesn't fit there, so it went back"); }
-  syncControls(); // restore look-around immediately after place/cancel
+  // Resume input for the current view mode; keep camera exactly as-is
+  syncControls();
 }
 function cancelDrag() { endDrag(false); }
 window.addEventListener('pointerup', (e) => {
@@ -1188,11 +1195,14 @@ fetch('ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); re
   new GLTFLoader().parse(buf.buffer, '', onModel, onFail);
 }).catch(onFail);
 
+
+
+
+
 renderer.setAnimationLoop((now) => {
   stepAnim(now);
-  if (!panoramaMode) {
-    controls.update();
-  }
+  // Never update orbit while disabled — that would rewrite the camera from a stale target
+  if (!panoramaMode && controls.enabled) controls.update();
   renderer.render(scene, camera);
   placeLabels();
 });
