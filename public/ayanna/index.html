@@ -1195,10 +1195,6 @@ fetch('ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); re
   new GLTFLoader().parse(buf.buffer, '', onModel, onFail);
 }).catch(onFail);
 
-
-
-
-
 renderer.setAnimationLoop((now) => {
   stepAnim(now);
   // Never update orbit while disabled — that would rewrite the camera from a stale target
