@@ -57,7 +57,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft)}
 .toggle input{accent-color:var(--accent);width:15px;height:15px;margin:0}
 .foot{font-size:11px;color:var(--ink-faint);line-height:1.5}
-#hint{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:400 11px/1 var(--mono);color:var(--ink-soft);background:var(--panel);border:1px solid var(--panel-line);padding:8px 10px;border-radius:8px;backdrop-filter:blur(10px)}
+#hint,#panoramaHint{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));font:400 11px/1 var(--mono);color:var(--ink-soft);background:var(--panel);border:1px solid var(--panel-line);padding:8px 10px;border-radius:8px;backdrop-filter:blur(10px)}
 #loader{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none}
 #loader div{font:500 12px/1 var(--mono);color:var(--ink-soft);letter-spacing:.06em}
 #collapse{display:none}
@@ -166,6 +166,7 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
   </div>
 </aside>
 <div id="hint">Drag to orbit · scroll to zoom · right‑drag to pan</div>
+<div id="panoramaHint" hidden>Drag to look around · scroll to zoom</div>
 <div id="picker" role="toolbar" aria-label="Selected furniture" hidden>
   <span id="pickName"></span>
   <button class="chip" id="rotBtn" title="Rotate 90° (R)">Rotate<kbd>R</kbd></button>
@@ -240,6 +241,17 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.maxPolarAngle = Math.PI * 0.495;
 controls.maxDistance = 45;
+
+// Panorama look-around mode
+let panoramaMode = false;
+let panoramaEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+// Pinch zoom tracking
+const activePointers = new Map();
+let lastPinchDistance = 0;
+let panoramaPointerId = null;
 
 // Sun: Blender rotation (50°, 10°, -160°), light shines along local -Z
 const e = new THREE.Euler(0.8726646, 0.1745329, -2.7925267, 'XYZ');
@@ -383,15 +395,61 @@ function flyTo(pos, tgt, fov, instant = false) {
   }
   anim = { t0: performance.now(), dur: 1100, p0: camera.position.clone(), t0v: controls.target.clone(), f0: camera.fov, p1: pos.clone(), t1: tgt.clone(), f1: fov };
 }
+function flyToPanorama(pos, tgt, fov, instant = false) {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (instant || reduce) {
+    camera.position.copy(pos);
+    camera.lookAt(tgt);
+    camera.fov = fov;
+    camera.updateProjectionMatrix();
+    panoramaEuler.setFromQuaternion(camera.quaternion);
+    setPanoramaMode(true);
+    return;
+  }
+  // Calculate target quaternion
+  const targetQuaternion = new THREE.Quaternion();
+  const tempCam = camera.clone();
+  tempCam.position.copy(pos);
+  tempCam.lookAt(tgt);
+  targetQuaternion.copy(tempCam.quaternion);
+  
+  anim = { 
+    t0: performance.now(), 
+    dur: 1100, 
+    p0: camera.position.clone(), 
+    f0: camera.fov, 
+    p1: pos.clone(), 
+    f1: fov,
+    q0: camera.quaternion.clone(),
+    q1: targetQuaternion,
+    isPanorama: true
+  };
+}
 function stepAnim(now) {
   if (!anim) return;
   let k = Math.min(1, (now - anim.t0) / anim.dur);
   const s = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
   camera.position.lerpVectors(anim.p0, anim.p1, s);
-  controls.target.lerpVectors(anim.t0v, anim.t1, s);
   camera.fov = anim.f0 + (anim.f1 - anim.f0) * s;
   camera.updateProjectionMatrix();
-  if (k >= 1) anim = null;
+  
+  if (anim.isPanorama) {
+    // Animate quaternion for panorama mode
+    camera.quaternion.slerpQuaternions(anim.q0, anim.q1, s);
+  } else {
+    // Animate target for orbit mode
+    controls.target.lerpVectors(anim.t0v, anim.t1, s);
+  }
+  
+  if (k >= 1) {
+    const wasPanorama = anim.isPanorama;
+    anim = null;
+    if (wasPanorama) {
+      // Animation complete, enable panorama mode and sync euler angles
+      panoramaEuler.setFromQuaternion(camera.quaternion);
+      setPanoramaMode(true);
+    }
+  }
 }
 controls.addEventListener('start', () => { anim = null; setActive(null); });
 
@@ -399,12 +457,47 @@ const viewsEl = document.getElementById('views');
 const chipEls = {};
 let currentView = VIEWS[0];
 function setActive(id) { for (const k in chipEls) chipEls[k].setAttribute('aria-pressed', String(k === id)); }
+function setPanoramaMode(enabled) {
+  panoramaMode = enabled;
+  const hintEl = document.getElementById('hint');
+  const panoramaHintEl = document.getElementById('panoramaHint');
+  
+  if (enabled) {
+    controls.enabled = false;
+    labelsEl.classList.add('off');
+    hintEl.hidden = true;
+    panoramaHintEl.hidden = false;
+    renderer.domElement.style.cursor = 'grab';
+    renderer.domElement.style.touchAction = 'none';
+  } else {
+    controls.enabled = true;
+    syncLabels();
+    hintEl.hidden = false;
+    panoramaHintEl.hidden = true;
+    renderer.domElement.style.cursor = '';
+    renderer.domElement.style.touchAction = '';
+    isDragging = false;
+    panoramaPointerId = null;
+    activePointers.clear();
+    lastPinchDistance = 0;
+  }
+}
 function goView(v, instant) {
   currentView = v;
   setActive(v.id);
   interior = !!v.hfov; syncLabels();
-  controls.maxPolarAngle = v.hfov ? Math.PI * 0.95 : Math.PI * 0.495;
-  flyTo(v.pos, v.tgt, vfovFrom(v), instant);
+  
+  if (v.hfov) {
+    // Interior view: animate to position and enable panorama mode after
+    controls.maxPolarAngle = Math.PI * 0.95;
+    setPanoramaMode(false); // Disable during animation
+    flyToPanorama(v.pos, v.tgt, vfovFrom(v), instant);
+  } else {
+    // Exterior view: use orbit controls
+    setPanoramaMode(false);
+    controls.maxPolarAngle = Math.PI * 0.495;
+    flyTo(v.pos, v.tgt, vfovFrom(v), instant);
+  }
 }
 for (const v of VIEWS) {
   const b = document.createElement('button');
@@ -768,7 +861,17 @@ function setEdit(on) {
   hintEl.textContent = on ? EDIT_HINT : HINT;
   stageEl.classList.toggle('editing', on);
   syncGrid();
-  if (!on) { cancelDrag(); setHover(null); stageEl.classList.remove('over'); }
+  if (!on) { 
+    cancelDrag(); 
+    setHover(null); 
+    stageEl.classList.remove('over');
+    // Restore control mode based on current view
+    if (currentView && currentView.hfov) {
+      setPanoramaMode(true);
+    } else {
+      setPanoramaMode(false);
+    }
+  }
   select(on ? selected : null);
 }
 
@@ -843,11 +946,155 @@ window.addEventListener('pointerup', (e) => {
 });
 window.addEventListener('pointercancel', (e) => { if (drag && e.pointerId === drag.id) endDrag(false); tap = null; });
 
+// Panorama mode: drag to look around + pinch to zoom
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  if (!panoramaMode || editMode) return;
+  
+  activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  
+  if (activePointers.size === 1) {
+    // Single pointer: start drag to look
+    isDragging = true;
+    panoramaPointerId = e.pointerId;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    renderer.domElement.style.cursor = 'grabbing';
+  } else if (activePointers.size === 2) {
+    // Two pointers: start pinch zoom
+    isDragging = false;
+    const pointers = Array.from(activePointers.values());
+    const dx = pointers[1].x - pointers[0].x;
+    const dy = pointers[1].y - pointers[0].y;
+    lastPinchDistance = Math.hypot(dx, dy);
+  }
+  
+  renderer.domElement.setPointerCapture(e.pointerId);
+  e.preventDefault();
+  e.stopPropagation();
+});
+
+renderer.domElement.addEventListener('pointermove', (e) => {
+  if (!panoramaMode) return;
+  
+  if (activePointers.has(e.pointerId)) {
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  }
+  
+  if (activePointers.size === 2) {
+    // Pinch zoom
+    const pointers = Array.from(activePointers.values());
+    const dx = pointers[1].x - pointers[0].x;
+    const dy = pointers[1].y - pointers[0].y;
+    const distance = Math.hypot(dx, dy);
+    
+    if (lastPinchDistance > 0) {
+      const scale = distance / lastPinchDistance;
+      const fovDelta = (1 - scale) * 20;
+      camera.fov = Math.max(30, Math.min(120, camera.fov + fovDelta));
+      camera.updateProjectionMatrix();
+    }
+    
+    lastPinchDistance = distance;
+    e.preventDefault();
+    e.stopPropagation();
+  } else if (isDragging && e.pointerId === panoramaPointerId) {
+    // Single pointer drag to look
+    const deltaX = e.clientX - dragStartX;
+    const deltaY = e.clientY - dragStartY;
+    
+    panoramaEuler.y -= deltaX * 0.003;
+    panoramaEuler.x -= deltaY * 0.003;
+    panoramaEuler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, panoramaEuler.x));
+    
+    camera.quaternion.setFromEuler(panoramaEuler);
+    
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
+
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (!panoramaMode) return;
+  
+  activePointers.delete(e.pointerId);
+  
+  if (e.pointerId === panoramaPointerId) {
+    isDragging = false;
+    panoramaPointerId = null;
+    renderer.domElement.style.cursor = 'grab';
+  }
+  
+  if (activePointers.size === 1) {
+    // Back to single pointer: restart drag from current position
+    const [pointerId, pointer] = Array.from(activePointers.entries())[0];
+    panoramaPointerId = pointerId;
+    dragStartX = pointer.x;
+    dragStartY = pointer.y;
+    isDragging = true;
+    renderer.domElement.style.cursor = 'grabbing';
+  } else if (activePointers.size === 0) {
+    lastPinchDistance = 0;
+  }
+  
+  if (renderer.domElement.hasPointerCapture(e.pointerId)) {
+    renderer.domElement.releasePointerCapture(e.pointerId);
+  }
+  e.preventDefault();
+  e.stopPropagation();
+});
+
+renderer.domElement.addEventListener('pointercancel', (e) => {
+  if (!panoramaMode) return;
+  
+  activePointers.delete(e.pointerId);
+  
+  if (e.pointerId === panoramaPointerId) {
+    isDragging = false;
+    panoramaPointerId = null;
+    renderer.domElement.style.cursor = 'grab';
+  }
+  
+  if (activePointers.size === 0) {
+    lastPinchDistance = 0;
+  }
+  
+  if (renderer.domElement.hasPointerCapture(e.pointerId)) {
+    renderer.domElement.releasePointerCapture(e.pointerId);
+  }
+});
+
+// Panorama mode: pinch/wheel zoom via FOV
+renderer.domElement.addEventListener('wheel', (e) => {
+  if (!panoramaMode || editMode) return;
+  e.preventDefault();
+  const fovDelta = e.deltaY * 0.05;
+  camera.fov = Math.max(30, Math.min(120, camera.fov + fovDelta));
+  camera.updateProjectionMatrix();
+}, { passive: false });
+
+// ESC to exit panorama mode or furniture editing
 window.addEventListener('keydown', (e) => {
-  if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-  if ((e.key === 'r' || e.key === 'R') && selected) { rotate(selected); e.preventDefault(); }
-  else if ((e.key === 'Delete' || e.key === 'Backspace') && selected) { deletePiece(selected); e.preventDefault(); }
-  else if (e.key === 'Escape') { if (drag) cancelDrag(); else select(null); }
+  if (e.key === 'Escape') {
+    if (panoramaMode) {
+      goView(VIEWS[0]);
+    } else if (editMode) {
+      if (drag) {
+        cancelDrag();
+      } else {
+        select(null);
+      }
+    }
+  } else if (!editMode || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+    return;
+  } else if ((e.key === 'r' || e.key === 'R') && selected) {
+    rotate(selected);
+    e.preventDefault();
+  } else if ((e.key === 'Delete' || e.key === 'Backspace') && selected) {
+    deletePiece(selected);
+    e.preventDefault();
+  }
 });
 
 editToggle.disabled = true;
@@ -894,7 +1141,9 @@ fetch('ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); re
 
 renderer.setAnimationLoop((now) => {
   stepAnim(now);
-  controls.update();
+  if (!panoramaMode) {
+    controls.update();
+  }
   renderer.render(scene, camera);
   placeLabels();
 });
