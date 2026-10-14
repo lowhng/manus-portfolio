@@ -1,12 +1,9 @@
-"""Copy the movable furniture out of the Ayanna model into a furniture-only model.
+"""Copy furniture + kitchen/bath fixtures out of the Ayanna model.
 
-The Golden Leaf page reuses Ayanna's furniture but has its own walls, so it loads this
-smaller file instead of the whole Ayanna apartment. Mesh data and materials are copied
-byte for byte; nothing is re-encoded. Re-run after re-exporting the Ayanna model:
+Produces public/shared/furniture.txt (base64 GLB) for the apartment catalogue
+and Golden Leaf. Mesh data and materials are copied byte for byte.
 
     python3 scripts/extract_furniture.py
-
-Both files are base64-encoded GLB, the format ayanna/index.html already loads.
 """
 import base64
 import json
@@ -18,11 +15,21 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "public/ayanna/ayanna_model.txt"
 OUT = ROOT / "public/shared/furniture.txt"
 
-# Same list as MOVABLE in public/goldenleaf/index.html and public/ayanna/index.html
-MOVABLE = re.compile(
-    r"^(Armchair|Balcony_Chair_\d|Balcony_Plant_\d|Balcony_SideTable|Bed\d_Bed|Bed\d_Bedside(_[AB])?|Bed\d_Wardrobe"
-    r"|Bed2_Plant|Coffee_Table|Dining_Chair_\w+|Dining_Table|Living_Plant_[LR]"
-    r"|Master_(Bed|Bedside_[LR]|Desk|DeskChair|Dresser|Plant|Wardrobe)|Rug_\w+|Shoe_Cabinet|Sofa|TV_Unit)$"
+# Movable furniture (same as Ayanna/Golden Leaf) plus kitchen/bath fixtures
+KEEP = re.compile(
+    r"^("
+    r"Armchair|Balcony_Chair_\d|Balcony_Plant_\d|Balcony_SideTable|"
+    r"Bed\d_Bed|Bed\d_Bedside(_[AB])?|Bed\d_Wardrobe|Bed2_Plant|"
+    r"Coffee_Table|Dining_Chair_\w+|Dining_Table|"
+    r"Living_Plant_[LR]|"
+    r"Master_(Bed|Bedside_[LR]|Desk|DeskChair|Dresser|Plant|Wardrobe)|"
+    r"Rug_\w+|Shoe_Cabinet|Sofa|TV_Unit|"
+    # fixtures
+    r"Fridge|Kitchen_Run|Kitchen_Decor|Kitchen_Herb|"
+    r"Bath1_(Toilet|Vanity|Shower)|MBath_(Toilet|Vanity|Shower)|"
+    r"Yard_Washer|Foyer_Mirror|"
+    r"Dining_Art|Master_Art|Sofa_Art_[12]|Dining_Pendant_[123]"
+    r")$"
 )
 
 
@@ -50,9 +57,9 @@ def main():
     src, bin_data = read_glb(base64.b64decode(SRC.read_text().strip()))
     assert not src.get("images") and not src.get("textures"), "textures aren't handled; extend this script"
 
-    roots = [n for n in src["scenes"][src.get("scene", 0)]["nodes"] if MOVABLE.match(src["nodes"][n].get("name", ""))]
+    roots = [n for n in src["scenes"][src.get("scene", 0)]["nodes"]
+             if KEEP.match(src["nodes"][n].get("name", ""))]
 
-    # Old index -> new index, in first-use order
     def remapper():
         table = {}
         return table, lambda i: table.setdefault(i, len(table))
@@ -95,7 +102,6 @@ def main():
     for old, new in mat_map.items():
         materials[new] = src["materials"][old]
 
-    # Each accessor gets its own copy of its buffer view, packed into a fresh buffer
     accessors, views, out = [None] * len(acc_map), [], bytearray()
     for old, new in sorted(acc_map.items(), key=lambda kv: kv[1]):
         acc = dict(src["accessors"][old])
@@ -123,8 +129,10 @@ def main():
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(base64.b64encode(write_glb(gltf, bytes(out))).decode())
+    names = [src["nodes"][r].get("name") for r in roots]
     print(f"{len(roots)} pieces, {len(meshes)} meshes, {len(materials)} materials -> {OUT.relative_to(ROOT)} "
-          f"({OUT.stat().st_size / 1e6:.2f} MB, was {SRC.stat().st_size / 1e6:.2f} MB)")
+          f"({OUT.stat().st_size / 1e6:.2f} MB)")
+    print("Pieces:", ", ".join(names))
 
 
 if __name__ == "__main__":

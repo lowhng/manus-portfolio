@@ -1,0 +1,114 @@
+{
+  "condos": [
+    {
+      "slug": "sunway-cochrane",
+      "name": "Sunway Cochrane",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Sunway Property",
+      "intro": "Cheras, Kuala Lumpur. Four unit types from the sales-gallery plans. One model runs at a time; the others wait as floor plans until you scroll to them. Click a model to explore it.",
+      "sourceUrl": "https://assets.sunwayproperty.com/2026/03/Sunway-Cochrane-Brochure.pdf",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": "1+1", "baths": 1, "sqft": 650, "plan": "type-a-650sf.png", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": 2, "baths": 2, "sqft": 732, "plan": "type-b-732sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "2+1", "baths": 2, "sqft": 872, "plan": "type-c-872sf.png", "page": "type-c.html" },
+        { "id": "type-d", "name": "Type D", "beds": 3, "baths": 2, "sqft": 1001, "plan": "type-d-1001sf.png", "page": "type-d.html" }
+      ]
+    },
+    {
+      "slug": "sunway-alishan",
+      "name": "Sunway Alishan",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Sunway Alishan Sdn Bhd (Sunway Property)",
+      "intro": "Cheras, Kuala Lumpur — Batu 5, Jalan Cheras, about 400 m from EkoCheras Mall. Freehold. Four unit types from the sales brochure (expected completion October 2025). One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://sunwayproperty.com/sunway-alishan/",
+      "units": [
+        { "id": "type-a1", "name": "Type A1", "beds": 3, "baths": 2, "sqft": 1216, "plan": "type-a1-1216sf.png", "page": "type-a1.html" },
+        { "id": "type-a2", "name": "Type A2", "beds": 3, "baths": 2, "sqft": 1249, "plan": "type-a2-1249sf.png", "page": "type-a2.html" },
+        { "id": "type-b", "name": "Type B", "beds": 4, "baths": 3, "sqft": 1496, "plan": "type-b-1496sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": 4, "baths": 4, "sqft": 1798, "plan": "type-c-1798sf.png", "page": "type-c.html" }
+      ]
+    },
+    {
+      "slug": "sunway-velocity-3",
+      "name": "Sunway Velocity 3",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Sunway Velocity Three Sdn Bhd (Sunway Property)",
+      "intro": "Sunway Velocity township, Jalan Cheras / Maluri, Kuala Lumpur. Leasehold. Three unit types from the sales brochure (expected completion May 2028). One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://www.sunwayvelocity3.com/",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 2, "baths": 2, "sqft": 721, "plan": "type-a-721sf.png", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": 3, "baths": 2, "sqft": 926, "plan": "type-b-926sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "3+1", "baths": 2, "sqft": 1076, "plan": "type-c-1076sf.png", "page": "type-c.html" }
+      ]
+    },
+    {
+      "slug": "aster-residence",
+      "name": "Aster Residence",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Amber Homes Cheras Sdn Bhd",
+      "intro": "Jalan Cheras Hartamas, Taman Cheras Hartamas, with a link bridge to MRT Taman Connaught. Five unit types from the developer plans, including the Type D duplex. One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://www.amberhomes.com.my/home/project/aster-residence/",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 2, "baths": 2, "sqft": 650, "plan": "type-a-650sf.jpg", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": 3, "baths": 2, "sqft": 810, "plan": "type-b-810sf.jpg", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": 3, "baths": 3, "sqft": 953, "plan": "type-c-953sf.jpg", "page": "type-c.html" },
+        { "id": "type-c1", "name": "Type C1", "beds": 3, "baths": 3, "sqft": 957, "plan": "type-c1-957sf.jpg", "page": "type-c1.html" },
+        { "id": "type-d", "name": "Type D", "beds": 3, "baths": "2+1", "sqft": 1009, "plan": "type-d-duplex-1009sf.jpg", "page": "type-d.html" }
+      ]
+    },
+    {
+      "slug": "the-connaught-one",
+      "name": "The Connaught One",
+      "location": "Taman Connaught, Cheras, Kuala Lumpur",
+      "developer": "UEM Sunrise Berhad",
+      "intro": "Taman Connaught, Cheras, next to MRT Taman Connaught. Freehold serviced apartments by UEM Sunrise. Seven unit types from the developer floor plans. One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://www.uemsunrise.com/property/region/greater-kuala-lumpur/project/the-connaught-one",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 1, "baths": 1, "sqft": 452, "plan": "type-a-452sf.png", "page": "type-a.html" },
+        { "id": "type-a1", "name": "Type A1", "beds": 1, "baths": 1, "sqft": 468, "plan": "type-a1-468sf.png", "page": "type-a1.html" },
+        { "id": "type-a2", "name": "Type A2", "beds": 1, "baths": 1, "sqft": 452, "plan": "type-a2-452sf.png", "page": "type-a2.html" },
+        { "id": "type-b", "name": "Type B", "beds": 2, "baths": 1, "sqft": 708, "plan": "type-b-708sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "3+1", "baths": 2, "sqft": 960, "plan": "type-c-960sf.png", "page": "type-c.html" },
+        { "id": "type-d", "name": "Type D", "beds": 3, "baths": 2, "sqft": 1000, "plan": "type-d-1000sf.png", "page": "type-d.html" },
+        { "id": "type-e", "name": "Type E", "beds": 4, "baths": 3, "sqft": 1270, "plan": "type-e-1270sf.png", "page": "type-e.html" }
+      ]
+    },
+    {
+      "slug": "quartz-queensville",
+      "name": "Quartz Queensville",
+      "location": "Cheras, Kuala Lumpur",
+      "developer": "Dwitasik Sdn Bhd (Queensville)",
+      "intro": "Jalan Sri Permaisuri, Bandar Sri Permaisuri, Cheras. Leasehold, 99 years expiring May 2112. Six unit types from the Quartz @ Queens Residenz sales plans (new launch, estimated Q1 2028). One model runs at a time; click a model to explore it.",
+      "sourceUrl": "https://queensville.com.my/quartz/",
+      "units": [
+        { "id": "type-a", "name": "Type A", "beds": 2, "baths": 2, "sqft": 702, "plan": "type-a-702sf.png", "page": "type-a.html" },
+        { "id": "type-b", "name": "Type B", "beds": "2+1", "baths": 2, "sqft": 805, "plan": "type-b-805sf.png", "page": "type-b.html" },
+        { "id": "type-c", "name": "Type C", "beds": "2+1", "baths": 2, "sqft": 877, "plan": "type-c-877sf.png", "page": "type-c.html" },
+        { "id": "type-d", "name": "Type D", "beds": "3+1", "baths": 3, "sqft": 1011, "plan": "type-d-1011sf.png", "page": "type-d.html" },
+        { "id": "type-e", "name": "Type E", "beds": "3+1", "baths": 3, "sqft": 1063, "plan": "type-e-1063sf.png", "page": "type-e.html" },
+        { "id": "type-f", "name": "Type F", "beds": 4, "baths": 3, "sqft": 1212, "plan": "type-f-1212sf.png", "page": "type-f.html" }
+      ]
+    },
+    {
+      "slug": "emerald-9",
+      "name": "Emerald 9",
+      "location": "Cheras, Selangor",
+      "developer": "GuocoLand (Malaysia) Berhad",
+      "intro": "Jalan You City, Batu 9 Cheras. Freehold. Towers C and D (vacant possession Q2 2026) and Tower E (Q2 2027). Each plan is its own model: the Tower C and Tower D pairs are mirrors or shifted, not the same layout. One model runs at a time; click a plan to explore it.",
+      "sourceUrl": "https://guocoland.com.my/emerald9/",
+      "units": [
+        { "id": "tower-c-type-a", "group": "Tower C", "name": "Type A", "beds": 2, "baths": 1, "sqft": 675, "plan": "tower-c-type-a-675sf.jpg", "page": "tower-c-type-a.html" },
+        { "id": "tower-c-type-b", "group": "Tower C", "name": "Type B", "beds": "2+1", "baths": 2, "sqft": 852, "plan": "tower-c-type-b-852sf.jpg", "page": "tower-c-type-b.html" },
+        { "id": "tower-c-type-c", "group": "Tower C", "name": "Type C", "beds": 3, "baths": 2, "sqft": 1052, "plan": "tower-c-type-c-1052sf.jpg", "page": "tower-c-type-c.html" },
+        { "id": "tower-c-type-c1", "group": "Tower C", "name": "Type C1", "beds": 3, "baths": 2, "sqft": 1052, "plan": "tower-c-type-c1-1052sf.jpg", "page": "tower-c-type-c1.html" },
+        { "id": "tower-c-type-d", "group": "Tower C", "name": "Type D", "beds": "3+1", "baths": 3, "sqft": 1304, "plan": "tower-c-type-d-1304sf.jpg", "page": "tower-c-type-d.html" },
+        { "id": "tower-d-type-a", "group": "Tower D", "name": "Type A", "beds": 2, "baths": 1, "sqft": 675, "plan": "tower-d-type-a-675sf.png", "page": "tower-d-type-a.html" },
+        { "id": "tower-d-type-b", "group": "Tower D", "name": "Type B", "beds": "2+1", "baths": 2, "sqft": 852, "plan": "tower-d-type-b-852sf.png", "page": "tower-d-type-b.html" },
+        { "id": "tower-d-type-b1", "group": "Tower D", "name": "Type B1", "beds": "2+1", "baths": 2, "sqft": 851, "plan": "tower-d-type-b1-851sf.png", "page": "tower-d-type-b1.html" },
+        { "id": "tower-d-type-c", "group": "Tower D", "name": "Type C", "beds": 3, "baths": 2, "sqft": 1052, "plan": "tower-d-type-c-1052sf.png", "page": "tower-d-type-c.html" },
+        { "id": "tower-d-type-d", "group": "Tower D", "name": "Type D", "beds": "3+1", "baths": 3, "sqft": 1300, "plan": "tower-d-type-d-1300sf.png", "page": "tower-d-type-d.html" },
+        { "id": "tower-e", "group": "Tower E", "name": "Tower E", "beds": 2, "baths": 1, "sqft": 550, "plan": "tower-e-550sf.png", "page": "tower-e.html" }
+      ]
+    }
+  ]
+}
