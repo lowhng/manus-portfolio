@@ -59,7 +59,7 @@
     // This markup is exactly the snippet a client would paste.
     slot.innerHTML = `
 <div style="position:relative;width:100%;max-width:${slot.dataset.width || '100%'};aspect-ratio:${slot.dataset.ratio}">
-  <iframe src="${u.href}" title="Ayanna E2 Home – interactive 3D model" loading="lazy" allow="fullscreen"
+  <iframe src="${u.href}" title="Ayanna E2 Home – interactive 3D model" loading="lazy" allow="fullscreen; xr-spatial-tracking"
           style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px"></iframe>
 </div>`;
   }
