@@ -88,8 +88,8 @@ h1{margin:0;font:700 26px/1.05 var(--f-display);letter-spacing:-.005em;text-wrap
 .slope b{font:700 18px/1 var(--f-display);color:var(--accent)}
 .slope span{color:var(--ink-2);font-weight:500;font-size:11.5px}
 .fillbox{margin-top:10px;padding-top:9px;border-top:1px solid var(--rule)}
-#fillOp{width:100%;margin:2px 0;accent-color:#c8461e}
-#fillOpV{font:600 12px var(--f-mono);color:#c2451c;font-variant-numeric:tabular-nums}
+#fillOp{width:100%;margin:2px 0;accent-color:#2a6fd6}
+#fillOpV{font:600 12px var(--f-mono);color:#2a6fd6;font-variant-numeric:tabular-nums}
 .lbl.cut{background:rgba(200,70,30,.94);color:#fff;pointer-events:none}
 .lbl.cut small{color:#ffe1d4}
 </style>
@@ -121,11 +121,11 @@ h1{margin:0;font:700 26px/1.05 var(--f-display);letter-spacing:-.005em;text-wrap
         <div class="row cutends"><span>Short, steep</span><span>Long, gentle</span></div>
         <div class="slope" id="rampSlope" aria-live="polite"><b id="rampDeg">–</b><span id="rampRatio"></span></div>
         <div class="fillbox">
-          <label class="tgl"><input type="checkbox" id="fillChk"> Backfill the original wall to RL 115.60</label>
+          <label class="tgl"><input type="checkbox" id="fillChk" style="accent-color:#2a6fd6"> Backfill the original wall to RL 115.60 <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2a6fd6;opacity:.8;vertical-align:middle" aria-hidden="true"></span></label>
           <div id="fillCtl" hidden>
             <div class="row cutrow"><label for="fillOp">Backfill</label><output id="fillOpV" for="fillOp">60%</output></div>
             <input type="range" id="fillOp" min="0" max="100" step="1" value="60" aria-describedby="fillSum">
-            <p class="note" id="fillSum">About <b>10 m³</b> of fill behind the original wall, now 1.0 m high (top sleeper removed, shown in red).</p>
+            <p class="note" id="fillSum">About <b>10 m³</b> of fill (blue) behind the original wall, now 1.0 m high (top sleeper removed, shown in red). Two small humps cut down to that level show red.</p>
           </div>
         </div>
         <p class="note" id="cutSum">About <b id="cutM3">24 m³</b> in the ground (≈<span id="cutLoose">30</span> m³ once loose) to flatten the front yard to RL 113.64, the apron level. A new sleeper wall 1 m in front of the existing one shows 1.0 m (top RL 114.64) and returns 5.25 m along the east fence, so that end is flat. The driveway isn't touched; <span id="rampNote"></span></p>
@@ -318,7 +318,8 @@ function fixMaterial(mesh){
 // ---------- dig-out option ----------
 const deltaMat=new THREE.MeshStandardMaterial({color:0xc8461e,roughness:.85,metalness:0,transparent:true,opacity:.6,depthWrite:false,side:THREE.FrontSide});
 const CUT={exist:[],cut:[],wall:[],delta:[],orig:[],fill:[]};
-const fillMat=deltaMat.clone();
+const fillMat=deltaMat.clone(); fillMat.color.set(0x2a6fd6);   // blue = backfill (red is dig-out)
+const fillCutMat=deltaMat.clone(); // red: the two humps cut down to the backfill level
 function anc(o,n){while(o){if(o.name===n)return true;o=o.parent;}return false;}
 function collectCut(o){
   if(!o.isMesh)return;
@@ -341,8 +342,8 @@ function applyCut(){
   CUT.delta.forEach(m=>m.visible=on&&v>0.001);
   CUT.orig.forEach(m=>m.visible=!on);
   const fon=on&&fillChk.checked; fillCtl.hidden=!fillChk.checked;
-  const fv=+fillOp.value/100; fillOpV.textContent=Math.round(fv*100)+'%'; fillMat.opacity=fv;
-  const fs=fv>=0.99; if(fillMat.transparent===fs){fillMat.transparent=!fs;fillMat.depthWrite=fs;fillMat.needsUpdate=true;}
+  const fv=+fillOp.value/100; fillOpV.textContent=Math.round(fv*100)+'%'; fillMat.opacity=fv; fillCutMat.opacity=fv;
+  const fs=fv>=0.99; [fillMat,fillCutMat].forEach(M=>{if(M.transparent===fs){M.transparent=!fs;M.depthWrite=fs;M.needsUpdate=true;}});
   CUT.fill.forEach(m=>m.visible=fon&&fv>0.001);
 }
 
@@ -459,7 +460,7 @@ function onModel(g){
     new GLTFLoader().parse(buf.buffer,'',x=>{
       x.scene.traverse(o=>{if(!o.isMesh)return; const nm=(o.parent&&o.parent.name&&o.parent.name!=='Scene'?o.parent.name:o.name);
         const is=k=>anc(o,k)||nm.startsWith(k);
-        if(is('X_Backfill')){o.material=fillMat;o.castShadow=false;o.receiveShadow=false;o.renderOrder=6;CUT.fill.push(o);}
+        if(is('X_Backfill')){o.material=is('X_Backfill_Humps')?fillCutMat:fillMat;o.castShadow=false;o.receiveShadow=false;o.renderOrder=6;CUT.fill.push(o);}
         else if(is('X_Removed_Course')){o.material=deltaMat;o.castShadow=false;o.renderOrder=5;CUT.delta.push(o);}
         else {o.castShadow=true;o.receiveShadow=true;fixMaterial(o);CUT.wall.push(o);}});
       scene.add(x.scene); applyCut();
