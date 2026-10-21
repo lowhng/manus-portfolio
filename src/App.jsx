@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useRoutes,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Button } from "@/components/ui/button.jsx";
 import { Card, CardContent } from "@/components/ui/card.jsx";
 import { Badge } from "@/components/ui/badge.jsx";
@@ -675,50 +670,12 @@ function PortfolioContent() {
   );
 }
 
-function AppContent() {
-  const [routes, setRoutes] = useState([]);
-  const [routesLoaded, setRoutesLoaded] = useState(false);
-
-  useEffect(() => {
-    if (import.meta.env.VITE_TEMPO) {
-      // Dynamically import tempo routes only when needed
-      import("tempo-routes")
-        .then((tempoRoutes) => {
-          setRoutes(tempoRoutes.default || tempoRoutes);
-          setRoutesLoaded(true);
-        })
-        .catch(() => {
-          // Tempo routes not available
-          setRoutesLoaded(true);
-        });
-    } else {
-      setRoutesLoaded(true);
-    }
-  }, []);
-
-  // Show loading state while routes are being loaded in Tempo environment
-  if (import.meta.env.VITE_TEMPO && !routesLoaded) {
-    return <div>Loading...</div>;
-  }
-
-  const tempoRoutes = import.meta.env.VITE_TEMPO && useRoutes(routes);
-
-  if (tempoRoutes) {
-    return tempoRoutes;
-  }
-
-  return (
-    <Routes>
-      <Route path="/*" element={<PortfolioContent />} />
-      {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
-    </Routes>
-  );
-}
-
 function App() {
   return (
     <Router>
-      <AppContent />
+      <Routes>
+        <Route path="/*" element={<PortfolioContent />} />
+      </Routes>
     </Router>
   );
 }
