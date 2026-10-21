@@ -92,6 +92,9 @@ h1{margin:0;font:700 26px/1.05 var(--f-display);letter-spacing:-.005em;text-wrap
 #fillOpV{font:600 12px var(--f-mono);color:#2a6fd6;font-variant-numeric:tabular-nums}
 .lbl.cut{background:rgba(200,70,30,.94);color:#fff;pointer-events:none}
 .lbl.cut small{color:#ffe1d4}
+.lbl.ruler{background:rgba(31,42,46,.92);color:#fff;pointer-events:none;font-variant-numeric:tabular-nums}
+.lbl.ruler small{color:#cfd8da}
+.lbl.ruler.start{background:rgba(138,79,36,.92)}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500;600&family=Source+Sans+3:wght@400;500;600&display=swap">
@@ -116,7 +119,7 @@ h1{margin:0;font:700 26px/1.05 var(--f-display);letter-spacing:-.005em;text-wrap
         <div class="row cutrow"><label for="cutOp">Soil to dig out</label><output id="cutOpV" for="cutOp">60%</output></div>
         <input type="range" id="cutOp" min="0" max="100" step="1" value="60" aria-describedby="cutSum">
         <div class="row cutends"><span>Dug out</span><span>Ground as it is now</span></div>
-        <div class="row cutrow ramp"><label for="rampL">Driveway slope reaches</label><output id="rampV" for="rampL">0 m</output></div>
+        <div class="row cutrow ramp"><label for="rampL">Slope length from top of driveway</label><output id="rampV" for="rampL">0 m</output></div>
         <input type="range" id="rampL" min="0" max="12" step="0.25" value="8" aria-describedby="cutSum rampSlope">
         <div class="row cutends"><span>Short, steep</span><span>Long, gentle</span></div>
         <div class="slope" id="rampSlope" aria-live="polite"><b id="rampDeg">–</b><span id="rampRatio"></span></div>
@@ -421,7 +424,7 @@ function rebuildRamp(){
     ?`the ground falls in a straight line from the driveway edge to RL 113.64, ${L} m out from the top of the driveway${toe<10.9?'; near the house the driveway bulges past that line, so the 1:2 batter stays there':''}.`
     :'the ground slopes up to it at 1:2.';
   CUTL.el.firstChild.textContent=`Dig out ≈ ${Math.round(m3)} m³`;
-  window.__rampVol=vol;
+  window.__rampVol=vol; updRuler(L,gr);
 }
 document.getElementById('rampL').addEventListener('input',rebuildRamp);
 
@@ -546,6 +549,40 @@ const SPOTL=SPOTS.map(([t,p])=>{const l=document.createElement('div');l.classNam
   labelsEl.appendChild(l);return {el:l,p:b2t(p)};});
 const CUTL={el:(()=>{const l=document.createElement('div');l.className='lbl cut';
   l.innerHTML='<span>Dig out ≈ 24 m³</span><small>down to RL 113.64</small>';labelsEl.appendChild(l);return l;})(),p:b2t([13.5,-4.6,1.15])};
+// ---------- slope ruler (on the model) ----------
+const RUL={grp:new THREE.Group(),mat:new THREE.LineBasicMaterial({color:0x1f2a2e,depthTest:false,transparent:true,opacity:.95}),
+  dash:new THREE.LineDashedMaterial({color:0x1f2a2e,dashSize:.25,gapSize:.15,depthTest:false,transparent:true,opacity:.9})};
+RUL.grp.renderOrder=20; RUL.grp.visible=false; scene.add(RUL.grp);
+const RUL_START=(()=>{let b=null;RD.edge.forEach(e=>{if(!b||Math.abs(e[0]+7.6)<Math.abs(b[0]+7.6))b=e;});return b;})(); // [y,x,z] at the wall end
+const RULL={el:(()=>{const l=document.createElement('div');l.className='lbl ruler';
+  l.innerHTML='<span></span><small></small>';labelsEl.appendChild(l);return l;})(),p:new THREE.Vector3()};
+const RULS={el:(()=>{const l=document.createElement('div');l.className='lbl ruler start';
+  l.innerHTML='<span>0 m</span><small>top of driveway</small>';labelsEl.appendChild(l);return l;})(),p:new THREE.Vector3()};
+let rulerOn=false;
+function updRuler(L,gr){
+  RUL.grp.clear(); rulerOn=L>0.001;
+  if(!rulerOn)return;
+  const [y0,x0,z0]=RUL_START, yR=y0+0.15, lift=0.04, toe=x0+L;
+  const P=(x,z,y=yR)=>b2t([x,y,z+lift]);
+  const zAt=x=>z0*(1-Math.min(1,(x-x0)/L));            // along the ramp surface on this row
+  const pts=[]; for(let i=0;i<=40;i++){const x=x0+L*i/40;pts.push(P(x,zAt(x)));}
+  RUL.grp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),RUL.mat));
+  const ticks=[];                                          // 1 m ticks (0.5 m minor)
+  for(let d=0;d<=L+1e-6;d+=0.5){const x=x0+d,z=zAt(x),h=(Math.abs(d%1)<1e-6)?0.28:0.14;
+    ticks.push(P(x,z,yR-h/2),P(x,z,yR+h/2));}
+  ticks.push(P(toe,0,yR-0.35),P(toe,0,yR+0.35));           // end cap
+  RUL.grp.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ticks),RUL.mat));
+  RUL.grp.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([P(x0,0,yR),P(x0,z0+0.6,yR)]),RUL.mat)); // start post
+  // dashed toe line, house to wall, where it is east of the driveway edge
+  const tl=[]; RD.edge.forEach(([y,x])=>{if(y<=y0+0.01&&y>=-0.5&&x<toe)tl.push([y]);});
+  if(tl.length>1){const ys=tl.map(t=>t[0]);const a=Math.min(...ys),b=Math.max(...ys);
+    const ln=new THREE.Line(new THREE.BufferGeometry().setFromPoints([b2t([toe,a,lift]),b2t([toe,b,lift])]),RUL.dash);
+    ln.computeLineDistances(); RUL.grp.add(ln);}
+  RULL.p.copy(P(x0+L/2,zAt(x0+L/2)+0.35));
+  RULL.el.firstChild.textContent=`${(L%1?L.toFixed(2):L.toFixed(1))} m`;
+  RULL.el.lastChild.textContent=gr?(gr>=0.5?'1:2 batter governs':`${(Math.atan(gr)*180/Math.PI).toFixed(1)}° · 1:${(1/gr).toFixed(1)}`):'';
+  RULS.p.copy(P(x0,z0+0.75));
+}
 const lblChk=document.getElementById('lblChk');
 lblChk.onchange=()=>{if(lblChk.checked)labelsAuto=true;};
 
@@ -573,12 +610,13 @@ function frame(now){
   renderer.render(scene,camera);
   const show=lblChk.checked&&labelsAuto, spots=spotChk.checked;
   const cutL=cutChk.checked&&+cutOp.value>0;
-  labelsEl.hidden=!(show||spots||cutL);
+  labelsEl.hidden=!(show||spots||cutL||(cutChk.checked&&rulerOn));
   const place=(L,on)=>{if(!on){L.el.hidden=true;return;}tmp.copy(L.p).project(camera);
     const vis=tmp.z<1&&tmp.x>-1.1&&tmp.x<1.1&&tmp.y>-1.1&&tmp.y<1.1;
     L.el.hidden=!vis;if(vis)L.el.style.transform=`translate(${(tmp.x*.5+.5)*W}px,${(-tmp.y*.5+.5)*H}px) translate(-50%,-100%)`;};
   SPOTL.forEach(L=>place(L,spots));
   place(CUTL,cutL);
+  const rOn=cutChk.checked&&rulerOn; RUL.grp.visible=rOn; place(RULL,rOn); place(RULS,rOn);
   if(!show)LBL.forEach(L=>L.el.hidden=true);
   if(show){LBL.forEach(L=>{tmp.copy(L.p).project(camera);
     const vis=tmp.z<1&&tmp.x>-1.1&&tmp.x<1.1&&tmp.y>-1.1&&tmp.y<1.1;
