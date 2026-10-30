@@ -97,6 +97,8 @@ export function setupXR({
     hideForCapture(true);
     labelGroup.visible = true;
     const prev = renderer.getRenderTarget();
+    const prevBackground = scene.background;
+    if (!prevBackground) scene.background = skyColor();
     try {
       for (const view of views) {
         if (view.id !== 'overview' && view.id !== 'plan') continue;
@@ -114,6 +116,7 @@ export function setupXR({
       }
     } finally {
       renderer.setRenderTarget(prev);
+      scene.background = prevBackground;
       labelGroup.visible = false;
       hideForCapture(false);
     }
@@ -360,9 +363,15 @@ export function setupXR({
   renderer.xr.addEventListener('sessionstart', attach);
   renderer.xr.addEventListener('sessionend', detach);
 
+  // The desktop sky is the page's CSS gradient behind a transparent canvas.
+  // A headset shows a transparent clear as black, so paint the sky while in VR.
+  let savedBackground = null;
+
   function attach() {
     if (attached) return;
     snapshot = onSuspend();
+    savedBackground = scene.background;
+    if (!savedBackground) scene.background = skyColor();
     controls.enabled = false;
     camera.position.set(0, 0, 0);
     camera.quaternion.identity();
@@ -408,6 +417,8 @@ export function setupXR({
       controller.userData.hit = null;
       controller.userData.menuAction = null;
     }
+    scene.background = savedBackground;
+    savedBackground = null;
     const saved = snapshot;
     snapshot = null;
     onResume(saved);
@@ -478,10 +489,18 @@ export function setupXR({
     aim(controller);
     const hits = raycaster.intersectObject(root, true);
     if (!hits.length) return null;
+    // Rugs lie on the floor, so look through them to the floor underneath,
+    // but keep the marker on top of the rug where the ray first lands.
+    const floorHit = hits.find((h) => !isRug(h.object));
+    if (!floorHit || !floorHit.object.userData.isFloor) return null;
     const hit = hits[0];
-    if (!hit.object.userData.isFloor) return null;
     if (hit.distance < 0.35) return null;
     return { x: hit.point.x, y: hit.point.y, z: hit.point.z, distance: hit.distance };
+  }
+
+  function isRug(object) {
+    for (let o = object; o; o = o.parent) if (/^Rug_/.test(o.name)) return true;
+    return false;
   }
 
   function updateAim() {
@@ -605,8 +624,8 @@ export function setupXR({
     }
     object.position.copy(head).addScaledVector(forward, dist);
     object.position.y = head.y + yOffset;
+    // Object3D.lookAt points +Z at the head, which is the side the panels face.
     object.lookAt(head.x, object.position.y, head.z);
-    object.rotateY(Math.PI);
     if (storeEnd) storeEnd.copy(object.position);
     return dist;
   }
@@ -622,6 +641,11 @@ export function setupXR({
       syncButton();
     },
   };
+}
+
+function skyColor() {
+  const css = getComputedStyle(document.body).getPropertyValue('--sky-top').trim();
+  try { return new THREE.Color(css || '#dfe7ee'); } catch { return new THREE.Color('#dfe7ee'); }
 }
 
 function makeTarget() {
