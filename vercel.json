@@ -16,6 +16,11 @@
       "dest": "/ayanna/ayanna_model.txt"
     },
     {
+      "src": "/xr.js",
+      "has": [{ "type": "host", "value": "ayanna.weihong.dev" }],
+      "dest": "/ayanna/xr.js"
+    },
+    {
       "src": "/",
       "has": [{ "type": "host", "value": "52francis.weihong.dev" }],
       "dest": "/52francis/index.html"

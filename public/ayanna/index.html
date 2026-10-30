@@ -141,6 +141,7 @@ kbd{font:500 10.5px/1 var(--mono);margin-left:6px;padding:2px 4px;border-radius:
     <div class="sec">
       <h2>Views</h2>
       <div class="chips" id="views"></div>
+      <button class="chip" id="vrBtn" hidden title="Stand inside this unit with a VR headset">Enter VR</button>
     </div>
     <div class="sec">
       <h2>Rooms · approx. from model</h2>
@@ -192,6 +193,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { setupXR } from './xr.js';
 
 // Blender (x, y, z) -> three (x, z, -y)
 const B = (x, y, z = 0) => new THREE.Vector3(x, z, -y);
@@ -457,7 +459,10 @@ function stepAnim(now) {
     syncControls();
   }
 }
-controls.addEventListener('start', () => { anim = null; setActive(null); });
+controls.addEventListener('start', () => {
+  if (renderer.xr.isPresenting) return;
+  anim = null; setActive(null);
+});
 
 const viewsEl = document.getElementById('views');
 const chipEls = {};
@@ -515,6 +520,7 @@ function syncControls() {
   else if (panoramaMode && !isDragging) renderer.domElement.style.cursor = 'grab';
 }
 function goView(v, instant) {
+  if (renderer.xr.isPresenting) return;
   currentView = v;
   setActive(v.id);
   interior = !!v.hfov; syncLabels();
@@ -544,6 +550,7 @@ for (const r of ROOMS) {
   const dim = r.rect ? `${w.toFixed(1)} × ${h.toFixed(1)} m · ${(w * h).toFixed(1)} m²` : 'L‑shaped';
   b.innerHTML = `<span>${r.name}</span><span class="dim">${dim}</span>`;
   b.onclick = () => {
+    if (renderer.xr.isPresenting) return;
     const m = Math.max(w, h);
     const tgt = B(r.c[0], r.c[1], 0.3);
     const pos = B(r.c[0] - m * 0.15, r.c[1] - (m * 0.9 + 2.2), m * 1.2 + 3.2);
@@ -570,6 +577,7 @@ collapseBtn.onclick = () => {
 
 // ---------- resize ----------
 function resize() {
+  if (renderer.xr.isPresenting) return;
   const w = stage.clientWidth, h = stage.clientHeight;
   renderer.setSize(w, h, false);
   // shift the framing right to clear the side panel, but only while it is open
@@ -617,7 +625,7 @@ const FOLIAGE = /_(Leaves|Stems)$/;        // leaves may overhang, so they don't
 const SKIP = /^(Floor_|Curtain_|Camera_Target)|glass/i;   // never blocks or gets picked
 const TONE = { idle: 0x3f5a3a, ok: 0x4fbf5a, bad: 0xe25b4c };
 
-const items = [], solids = [], floors = [], pickables = [];
+const items = [], solids = [], floors = [], floorMeshes = [], pickables = [];
 let selected = null, hovered = null, tap = null, hoverQueued = false;
 const floorAim = new THREE.Vector3(), floorRay = new THREE.Ray();
 
@@ -842,7 +850,14 @@ function initFurniture(root) {
   furnRoot = root;
   root.updateMatrixWorld(true);
   const nodes = [...root.children];
-  for (const n of nodes) if (n.name.startsWith('Floor_')) floors.push(new THREE.Box3().setFromObject(n));
+  for (const n of nodes) if (n.name.startsWith('Floor_')) {
+    floors.push(new THREE.Box3().setFromObject(n));
+    n.traverse((o) => {
+      if (!o.isMesh) return;
+      o.userData.isFloor = true;
+      floorMeshes.push(o);
+    });
+  }
   for (const node of nodes) {
     if (SKIP.test(node.name)) continue;
     if (!MOVABLE.test(node.name)) { addSolid(node); continue; }   // walls, kitchen, bathroom fittings, wall art
@@ -1051,6 +1066,7 @@ function endLookGesture(e) {
 }
 
 canvas.addEventListener('pointerdown', (e) => {
+  if (renderer.xr.isPresenting) return;
   if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey) return;
   if (drag) return; // already carrying — ignore extra pointers for furniture
 
@@ -1143,7 +1159,7 @@ window.addEventListener('pointercancel', (e) => {
 
 // Panorama mode: pinch/wheel zoom via FOV
 renderer.domElement.addEventListener('wheel', (e) => {
-  if (!panoramaMode || drag) return;
+  if (renderer.xr.isPresenting || !panoramaMode || drag) return;
   e.preventDefault();
   const fovDelta = e.deltaY * 0.05;
   camera.fov = Math.max(30, Math.min(120, camera.fov + fovDelta));
@@ -1200,6 +1216,7 @@ function onModel(gltf) {
   });
   scene.add(root);
   initFurniture(root);
+  xr.setModelReady();
   document.getElementById('loader').hidden = true;
 }
 function onFail(err) {
@@ -1212,7 +1229,77 @@ fetch('ayanna_model.txt').then((r) => { if (!r.ok) throw new Error(r.status); re
   new GLTFLoader().parse(buf.buffer, '', onModel, onFail);
 }).catch(onFail);
 
+// VR suspends desktop orbit, look-around, and the panel's view offset, then restores them.
+let captureVis = null;
+const xr = setupXR({
+  renderer, scene, camera, controls, views: VIEWS,
+  rooms: ROOMS.map((r) => ({ name: r.name, position: B(r.c[0], r.c[1], 1.05) })),
+  getFloorMeshes: () => floorMeshes,
+  getModelRoot: () => furnRoot,
+  hideForCapture(hidden) {
+    if (hidden) {
+      captureVis = {
+        grid: gridMesh ? gridMesh.visible : false,
+        sel: markSel.g.visible,
+        hover: markHover.g.visible,
+      };
+      if (gridMesh) gridMesh.visible = false;
+      markSel.g.visible = false;
+      markHover.g.visible = false;
+    } else if (captureVis) {
+      if (gridMesh) gridMesh.visible = captureVis.grid;
+      markSel.g.visible = captureVis.sel;
+      markHover.g.visible = captureVis.hover;
+      captureVis = null;
+    }
+  },
+  onSuspend() {
+    const saved = {
+      position: camera.position.clone(),
+      quaternion: camera.quaternion.clone(),
+      up: camera.up.clone(),
+      fov: camera.fov,
+      near: camera.near,
+      far: camera.far,
+      target: controls.target.clone(),
+      euler: panoramaEuler.clone(),
+    };
+    anim = null;
+    if (editMode) setEdit(false);
+    isDragging = false;
+    panoramaPointerId = null;
+    activePointers.clear();
+    lastPinchDistance = 0;
+    controls.enabled = false;
+    sun.shadow.mapSize.set(1024, 1024);
+    if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
+    camera.clearViewOffset();
+    return saved;
+  },
+  onResume(saved) {
+    camera.position.copy(saved.position);
+    camera.quaternion.copy(saved.quaternion);
+    camera.up.copy(saved.up);
+    camera.scale.set(1, 1, 1);
+    camera.fov = saved.fov;
+    camera.near = saved.near;
+    camera.far = saved.far;
+    camera.updateProjectionMatrix();
+    controls.target.copy(saved.target);
+    panoramaEuler.copy(saved.euler);
+    sun.shadow.mapSize.set(4096, 4096);
+    if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; }
+    resize();
+    syncControls();
+  },
+});
+
 renderer.setAnimationLoop((now) => {
+  if (renderer.xr.isPresenting) {
+    xr.tick();
+    renderer.render(scene, camera);
+    return;
+  }
   stepAnim(now);
   // Never update orbit while disabled — that would rewrite the camera from a stale target
   if (!panoramaMode && controls.enabled) controls.update();
