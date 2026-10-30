@@ -15,10 +15,6 @@ export default defineConfig({
       "@": path.resolve(rootDir, "src"),
     },
   },
-  server: {
-    // @ts-expect-error TEMPO may be injected by Tempo tooling
-    allowedHosts: process.env.TEMPO === "true" ? true : undefined,
-  },
   build: {
     rollupOptions: {
       input: {
