@@ -1,826 +1,312 @@
-<!DOCTYPE html><html class="dark" lang="en"><head>
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Wei Hong Lo - Portfolio</title>
-<link rel="icon" type="image/png" href="/favicon.png" />
-<meta name="description" content="Wei Hong Lo - PhD, AR/VR Specialist, Digital Product Creator &amp; IT Consultant" />
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "surface-container-low": "#1c1b1b",
-                        "on-tertiary-fixed": "#1c1b1b",
-                        "background": "#0e0e0e",
-                        "tertiary-fixed-dim": "#c9c6c5",
-                        "surface-tint": "#eec12f",
-                        "inverse-on-surface": "#313030",
-                        "primary": "#ffe5a2", // Gold
-                        "inverse-surface": "#e5e2e1",
-                        "on-surface-variant": "#d1c5ad",
-                        "tertiary": "#eae6e5",
-                        "on-tertiary-fixed-variant": "#474646",
-                        "secondary-container": "#fd8b00", // Orange
-                        "on-surface": "#e5e2e1",
-                        "on-primary": "#3d2f00",
-                        "surface-container-highest": "#353535",
-                        "on-background": "#e5e2e1",
-                        "surface-container-high": "#2a2a2a",
-                        "on-secondary-container": "#603100",
-                        "outline": "#9a907a",
-                        "secondary-fixed-dim": "#ffb77d",
-                        "primary-fixed": "#ffe08b",
-                        "surface-container-lowest": "#050505",
-                        "secondary": "#fd8b00", // Orange
-                        "on-secondary": "#4d2600",
-                        "on-secondary-fixed": "#2f1500",
-                        "surface-bright": "#393939",
-                        "outline-variant": "#4e4634",
-                        "error": "#ffb4ab",
-                        "tertiary-fixed": "#e5e2e1",
-                        "on-primary-fixed": "#241a00",
-                        "surface-dim": "#131313",
-                        "surface-variant": "#353535",
-                        "on-tertiary-container": "#565555",
-                        "on-primary-fixed-variant": "#584400",
-                        "surface-container": "#20201f",
-                        "surface": "#131313",
-                        "primary-fixed-dim": "#eec12f",
-                        "error-container": "#93000a",
-                        "primary-container": "#f3c634",
-                        "inverse-primary": "#745b00",
-                        "on-secondary-fixed-variant": "#6e3900",
-                        "on-tertiary": "#313030",
-                        "secondary-fixed": "#ffdcc3",
-                        "on-error-container": "#ffdad6",
-                        "on-error": "#690005",
-                        "tertiary-container": "#cdcac9",
-                        "on-primary-container": "#695300"
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "9999px"
-                    },
-                    spacing: {
-                        "card-padding": "32px",
-                        "section-gap": "120px",
-                        "gutter": "24px",
-                        "container-max": "1280px"
-                    },
-                    fontFamily: {
-                        "headline-lg": ["Hanken Grotesk"],
-                        "label-md": ["Hanken Grotesk"],
-                        "caption": ["Hanken Grotesk"],
-                        "body-lg": ["Hanken Grotesk"],
-                        "headline-lg-mobile": ["Hanken Grotesk"],
-                        "body-md": ["Hanken Grotesk"],
-                        "headline-md": ["Hanken Grotesk"],
-                        "display-lg": ["Hanken Grotesk"],
-                        "label-code": ["JetBrains Mono", "monospace"]
-                    },
-                    fontSize: {
-                        "display-lg": ["64px", {lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800"}],
-                        "display-lg-mobile": ["40px", {lineHeight: "48px", letterSpacing: "-0.02em", fontWeight: "800"}],
-                        "headline-md": ["32px", {lineHeight: "40px", fontWeight: "600"}],
-                        "body-lg": ["18px", {lineHeight: "28px", fontWeight: "400"}],
-                        "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}],
-                        "label-code": ["14px", {lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "500"}],
-                        "label-caps": ["12px", {lineHeight: "16px", letterSpacing: "0.1em", fontWeight: "700"}]
-                    }
-                }
-            }
-        };
-    </script>
-<style>
-        :root {
-            --mouse-x: 50%;
-            --mouse-y: 50%;
-        }
-        .glass-card {
-            background: rgba(32, 32, 31, 0.4);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(238, 193, 47, 0.1);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .glass-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(253, 139, 0, 0.08), transparent 40%);
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .glass-card:hover::before {
-            opacity: 1;
-        }
-        .glass-card:hover {
-            border-color: rgba(253, 139, 0, 0.5);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(253, 139, 0, 0.05);
-            transform: translateY(-8px);
-        }
-        @media (min-width: 768px) {
-            .services-grid {
-                grid-template-rows: repeat(6, auto);
-                row-gap: 0;
-            }
-            .service-card {
-                display: grid;
-                grid-template-rows: subgrid;
-                grid-row: span 6;
-            }
-            .service-card:hover {
-                transform: none;
-            }
-            .service-list {
-                display: grid;
-                grid-template-rows: subgrid;
-                grid-row: 3 / span 4;
-                margin-bottom: 0;
-            }
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .btn-primary {
-            background-color: #fd8b00; /* Orange */
-            color: #1c1b1b;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            font-weight: 700;
-        }
-        .btn-primary:hover {
-            background-color: #ffa43a;
-            box-shadow: 0 0 25px rgba(253, 139, 0, 0.5);
-            transform: scale(1.05);
-        }
-        .btn-secondary {
-            border: 1px solid #fd8b00;
-            color: #fd8b00;
-            transition: all 0.3s ease;
-        }
-        .btn-secondary:hover {
-            background-color: rgba(253, 139, 0, 0.1);
-            box-shadow: 0 0 15px rgba(253, 139, 0, 0.3);
-            transform: scale(1.05);
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -33px;
-            top: 10px;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #fd8b00;
-            box-shadow: 0 0 10px #fd8b00;
-        }
-        .timeline-line {
-            position: absolute;
-            left: -26px;
-            top: 26px;
-            bottom: -10px;
-            width: 2px;
-            background: linear-gradient(to bottom, #fd8b00, transparent);
-        }
-
-        .ambient-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            background: #050505;
-        }
-        #particles-container {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .gradient-mesh {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            opacity: 0.3;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(238, 193, 47, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(253, 139, 0, 0.1) 0%, transparent 50%);
-            filter: blur(80px);
-            animation: mesh-move 20s ease-in-out infinite alternate;
-        }
-        @keyframes mesh-move {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(5%, 5%) scale(1.1); }
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(253, 139, 0, 0.3);
-            border-radius: 50%;
-            box-shadow: 0 0 12px rgba(253, 139, 0, 0.85), 0 0 4px rgba(238, 193, 47, 0.6);
-            animation: float-particle linear infinite;
-        }
-        @keyframes float-particle {
-            0% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 0.85; }
-            90% { opacity: 0.85; }
-            100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
-        }
-
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-    </style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wei Hong Lo — Tech Consultant, Photographer, AI Enthusiast</title>
+<meta name="description" content="Wei Hong Lo — PhD in Mixed Reality, tech consultant, photographer and digital product creator based in Dunedin, New Zealand.">
+<meta name="theme-color" content="#0e0e0e">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Hanken+Grotesk:wght@400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/v2/style.css">
+<script>document.documentElement.classList.add("js");</script>
+<script type="module" src="/src/v2/main.js"></script>
 </head>
-<body class="bg-background text-on-background selection:bg-secondary selection:text-on-secondary">
-<div class="ambient-bg"></div>
-<div class="gradient-mesh"></div>
-<div id="particles-container"><div class="particle" style="width: 1.0148px; height: 1.0148px; left: 58.2788vw; top: 76.172vh; animation-duration: 20.042s; animation-delay: 5.05547s;"></div><div class="particle" style="width: 1.91545px; height: 1.91545px; left: 6.6531vw; top: 36.5vh; animation-duration: 23.5898s; animation-delay: 8.46372s;"></div><div class="particle" style="width: 2.19461px; height: 2.19461px; left: 70.3965vw; top: 96.3261vh; animation-duration: 16.0182s; animation-delay: 3.38193s;"></div><div class="particle" style="width: 2.17265px; height: 2.17265px; left: 82.3555vw; top: 40.2483vh; animation-duration: 24.5541s; animation-delay: 6.60104s;"></div><div class="particle" style="width: 2.24251px; height: 2.24251px; left: 18.7277vw; top: 20.7118vh; animation-duration: 28.6592s; animation-delay: 8.03303s;"></div><div class="particle" style="width: 2.82524px; height: 2.82524px; left: 92.2059vw; top: 88.381vh; animation-duration: 22.6031s; animation-delay: 1.95867s;"></div><div class="particle" style="width: 1.27595px; height: 1.27595px; left: 32.9611vw; top: 30.7397vh; animation-duration: 29.5179s; animation-delay: 1.89706s;"></div><div class="particle" style="width: 2.24451px; height: 2.24451px; left: 79.24vw; top: 25.9669vh; animation-duration: 22.4856s; animation-delay: 2.18627s;"></div><div class="particle" style="width: 1.68929px; height: 1.68929px; left: 58.43vw; top: 61.2616vh; animation-duration: 18.965s; animation-delay: 0.522071s;"></div><div class="particle" style="width: 2.54863px; height: 2.54863px; left: 98.0567vw; top: 70.4061vh; animation-duration: 21.2881s; animation-delay: 2.39061s;"></div><div class="particle" style="width: 1.11567px; height: 1.11567px; left: 71.187vw; top: 6.97638vh; animation-duration: 15.9507s; animation-delay: 3.6434s;"></div><div class="particle" style="width: 1.91036px; height: 1.91036px; left: 7.87441vw; top: 28.2064vh; animation-duration: 16.8353s; animation-delay: 7.53215s;"></div><div class="particle" style="width: 1.21974px; height: 1.21974px; left: 67.4911vw; top: 60.4311vh; animation-duration: 27.6508s; animation-delay: 1.14277s;"></div><div class="particle" style="width: 2.81505px; height: 2.81505px; left: 74.4401vw; top: 78.8137vh; animation-duration: 16.9922s; animation-delay: 9.75506s;"></div><div class="particle" style="width: 2.72717px; height: 2.72717px; left: 79.0432vw; top: 59.2853vh; animation-duration: 22.4553s; animation-delay: 2.56703s;"></div><div class="particle" style="width: 1.55197px; height: 1.55197px; left: 33.5806vw; top: 3.0244vh; animation-duration: 23.5284s; animation-delay: 3.72759s;"></div><div class="particle" style="width: 1.61847px; height: 1.61847px; left: 41.9101vw; top: 98.0525vh; animation-duration: 21.9703s; animation-delay: 5.86783s;"></div><div class="particle" style="width: 1.52308px; height: 1.52308px; left: 5.58479vw; top: 64.3827vh; animation-duration: 25.4522s; animation-delay: 0.534708s;"></div><div class="particle" style="width: 1.89864px; height: 1.89864px; left: 5.83373vw; top: 51.2386vh; animation-duration: 15.6985s; animation-delay: 7.38512s;"></div><div class="particle" style="width: 2.11015px; height: 2.11015px; left: 99.2693vw; top: 25.927vh; animation-duration: 24.1809s; animation-delay: 2.6438s;"></div><div class="particle" style="width: 2.00192px; height: 2.00192px; left: 62.7799vw; top: 56.0705vh; animation-duration: 18.6584s; animation-delay: 7.20026s;"></div><div class="particle" style="width: 2.2402px; height: 2.2402px; left: 22.5146vw; top: 51.4767vh; animation-duration: 22.9233s; animation-delay: 7.11253s;"></div><div class="particle" style="width: 1.63525px; height: 1.63525px; left: 7.10776vw; top: 30.2703vh; animation-duration: 14.0979s; animation-delay: 3.22135s;"></div><div class="particle" style="width: 1.96893px; height: 1.96893px; left: 71.2907vw; top: 7.57572vh; animation-duration: 11.7932s; animation-delay: 2.66798s;"></div><div class="particle" style="width: 1.76411px; height: 1.76411px; left: 64.1805vw; top: 12.695vh; animation-duration: 17.3563s; animation-delay: 8.44102s;"></div><div class="particle" style="width: 2.95109px; height: 2.95109px; left: 8.30982vw; top: 4.42968vh; animation-duration: 20.861s; animation-delay: 3.00785s;"></div><div class="particle" style="width: 2.20176px; height: 2.20176px; left: 55.3546vw; top: 12.6742vh; animation-duration: 27.0087s; animation-delay: 4.85275s;"></div><div class="particle" style="width: 1.58249px; height: 1.58249px; left: 53.6924vw; top: 53.1323vh; animation-duration: 11.6557s; animation-delay: 0.541784s;"></div><div class="particle" style="width: 2.93932px; height: 2.93932px; left: 14.6895vw; top: 62.2515vh; animation-duration: 24.3294s; animation-delay: 5.11471s;"></div><div class="particle" style="width: 1.9354px; height: 1.9354px; left: 63.1719vw; top: 83.4804vh; animation-duration: 10.0714s; animation-delay: 3.66854s;"></div><div class="particle" style="width: 2.89667px; height: 2.89667px; left: 27.0603vw; top: 86.3123vh; animation-duration: 29.4183s; animation-delay: 8.1479s;"></div><div class="particle" style="width: 1.99971px; height: 1.99971px; left: 59.0884vw; top: 47.8493vh; animation-duration: 13.3583s; animation-delay: 5.39427s;"></div><div class="particle" style="width: 1.47758px; height: 1.47758px; left: 92.7661vw; top: 16.6621vh; animation-duration: 27.9211s; animation-delay: 0.837779s;"></div><div class="particle" style="width: 2.69011px; height: 2.69011px; left: 74.1703vw; top: 88.7495vh; animation-duration: 14.0632s; animation-delay: 9.96318s;"></div><div class="particle" style="width: 1.81514px; height: 1.81514px; left: 11.7947vw; top: 23.9323vh; animation-duration: 24.4825s; animation-delay: 0.282589s;"></div><div class="particle" style="width: 2.71839px; height: 2.71839px; left: 81.5963vw; top: 10.7941vh; animation-duration: 10.2551s; animation-delay: 8.58474s;"></div><div class="particle" style="width: 2.31973px; height: 2.31973px; left: 17.2486vw; top: 11.2799vh; animation-duration: 26.241s; animation-delay: 6.41973s;"></div><div class="particle" style="width: 2.38852px; height: 2.38852px; left: 97.3516vw; top: 93.3888vh; animation-duration: 13.2605s; animation-delay: 9.47735s;"></div><div class="particle" style="width: 1.43653px; height: 1.43653px; left: 77.9527vw; top: 85.8896vh; animation-duration: 27.6705s; animation-delay: 6.54773s;"></div><div class="particle" style="width: 1.20134px; height: 1.20134px; left: 8.82886vw; top: 79.2862vh; animation-duration: 11.6382s; animation-delay: 7.22446s;"></div></div>
-<!-- TopNavBar Shell -->
-<nav class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/5">
-<div class="max-w-container-max mx-auto px-gutter flex justify-between items-center h-20">
-<span class="font-display-lg text-headline-md text-primary tracking-tighter cursor-pointer">Wei Hong Lo</span>
-<div class="hidden md:flex items-center space-x-8">
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors duration-300" href="#about">About</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors duration-300" href="#skills">Skills</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors duration-300" href="#experience">Experience</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors duration-300" href="#projects">Projects</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors duration-300" href="#services">Services</a>
-<a class="btn-primary px-6 py-2 rounded-full font-label-code text-label-code uppercase tracking-wider transition-all active:scale-95" href="#contact">Hire Me</a>
-</div>
-<button id="mobile-menu-button" class="md:hidden text-primary" type="button" aria-expanded="false" aria-controls="mobile-menu">
-<span class="material-symbols-outlined">menu</span>
-</button>
-</div>
-<div id="mobile-menu" class="md:hidden hidden border-t border-white/5 bg-background/95 backdrop-blur-xl">
-<div class="px-gutter py-4 flex flex-col space-y-4">
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#about">About</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#skills">Skills</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#experience">Experience</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#projects">Projects</a>
-<a class="font-body-md text-body-md text-on-surface-variant font-medium hover:text-secondary transition-colors" href="#services">Services</a>
-<a class="btn-primary px-6 py-2 rounded-full font-label-code text-label-code uppercase tracking-wider text-center" href="#contact">Hire Me</a>
-</div>
-</div>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="dock" aria-label="Primary">
+  <span class="dock__pill" aria-hidden="true"></span>
+  <a href="#top" class="dock__home">Home</a>
+  <a href="#about">About</a>
+  <a href="#experience">Experience</a>
+  <a href="#projects">Projects</a>
+  <a href="#services">Services</a>
+  <a href="#contact">Contact</a>
 </nav>
-<main class="relative pt-20">
-<!-- Hero Section -->
-<section class="min-h-[90vh] flex items-center justify-center relative overflow-hidden px-gutter py-24" id="hero">
-<div class="relative z-10 max-w-4xl text-center reveal active">
-<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-6 leading-tight">
-                Hi, I'm <span class="text-primary">Wei Hong Lo</span>
-</h1>
-<p class="font-body-lg text-body-lg text-on-surface mb-6">
-                Tech Consultant | Photographer | AI Enthusiast
-            </p>
-<p class="font-body-lg text-body-lg text-on-surface-variant mb-12 max-w-3xl mx-auto">
-                Passionate about using technology to solve challenges and help communities. Exploring web development technologies, AI-driven tools, and creating innovative SaaS solutions with a focus on user experiences. Under my business brand Wei Hong Innovations, I help small businesses solve day-to-day problems with technology and create simple websites too!
-            </p>
-<div class="flex flex-col md:flex-row items-center justify-center gap-6">
-<a class="btn-primary px-10 py-4 rounded-xl font-label-code text-label-code flex items-center gap-2 group h-16" href="#projects">
-                    View My Work
-                    <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
-</a>
-<a class="btn-secondary px-10 py-4 rounded-xl font-label-code text-label-code inline-flex items-center justify-center h-16" href="#contact">Get in Touch</a>
-</div>
-</div>
-<div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
-<a href="#about" class="text-secondary" aria-label="Scroll to about">
-<span class="material-symbols-outlined text-4xl">keyboard_double_arrow_down</span>
-</a>
-</div>
+
+<main id="main">
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="#top" aria-label="Wei Hong Lo — home"><span class="brand__mark" aria-hidden="true">WH</span><span>Wei Hong Lo</span></a>
+      <a class="btn btn--line" href="#contact"><span>Hire me</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+    </header>
+
+    <div class="bento">
+      <div class="tile tile--name" style="--d:0ms">
+        <p class="chip chip--line"><span class="pulse" aria-hidden="true"></span>Hi, I'm</p>
+        <h1 class="name" aria-label="Wei Hong Lo">
+          <span class="name__a" aria-hidden="true" data-chars>Wei Hong</span>
+          <span class="name__row" aria-hidden="true">
+            <span class="name__b" data-chars>Lo</span>
+            <span class="rolepill"><span class="roles"><span class="is-on">Tech Consultant</span><span>Photographer</span><span>AI Enthusiast</span></span></span>
+          </span>
+        </h1>
+        <p class="sr-only">Tech Consultant, Photographer, AI Enthusiast</p>
+      </div>
+
+      <figure class="tile tile--photo" style="--d:80ms" data-tilt>
+        <img src="/assets/profile.jpg" alt="Portrait of Wei Hong Lo under cherry blossoms" width="1432" height="1432">
+        <figcaption class="chip chip--glass">Dunedin, New Zealand</figcaption>
+      </figure>
+
+      <div class="tile tile--intro" style="--d:160ms">
+        <p>Passionate about using technology to solve challenges and help communities. Under my business brand <strong>Wei Hong Innovations</strong>, I help small businesses solve day-to-day problems with technology — AI-driven tools, SaaS products, and simple websites too.</p>
+        <a class="textlink" href="#contact">Get in touch <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      </div>
+
+      <div class="tile tile--clock" style="--d:240ms">
+        <svg class="clock" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="clock__face" cx="50" cy="50" r="46"/>
+          <g class="clock__ticks"><path d="M50 8v6M50 86v6M8 50h6M86 50h6"/></g>
+          <line class="clock__h" x1="50" y1="50" x2="50" y2="27"/>
+          <line class="clock__m" x1="50" y1="50" x2="50" y2="15"/>
+          <line class="clock__s" x1="50" y1="56" x2="50" y2="12"/>
+          <circle class="clock__pin" cx="50" cy="50" r="3"/>
+        </svg>
+        <p class="clock__text"><span>My time in Dunedin</span><b class="js-clock">--:--</b></p>
+      </div>
+
+      <a class="tile tile--cta" style="--d:320ms" href="#projects">
+        <span class="tile--cta__label">View my work</span>
+        <span class="tile--cta__arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span>
+      </a>
+    </div>
+  </div>
 </section>
-<!-- About Section -->
-<section class="py-section-gap max-w-container-max mx-auto px-gutter py-24" id="about">
-<div class="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
-<div class="md:col-span-5 relative group reveal active">
-<div class="absolute -inset-4 bg-primary/10 rounded-3xl blur-2xl transition-all duration-500 group-hover:bg-secondary/10"></div>
-<div class="relative aspect-square rounded-3xl overflow-hidden glass-card border-2 border-primary/20">
-<img class="w-full h-full object-cover" alt="Wei Hong Lo" src="/assets/profile.jpg">
-</div>
-</div>
-<div class="md:col-span-7 reveal active">
-<h2 class="font-display-lg text-headline-md text-primary mb-8 flex items-center gap-4">
-<span class="w-12 h-[2px] bg-secondary"></span>
-                    About Me
-                </h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant mb-6">
-                    I'm a digital product creator and technology enthusiast focused on building innovative SaaS solutions. With a <span class="text-primary font-bold">PhD in Mixed Reality (AR/VR) Visualization</span> and User Experience, I bring deep technical expertise combined with user-centered design thinking.
-                </p>
-<p class="font-body-lg text-body-lg text-on-surface-variant mb-10">
-                    Recently, I've been exploring advanced web development technologies, including Next.js, Tailwind CSS, Vercel, and Netlify, to create intuitive, responsive, and scalable web applications. My interest lies in harnessing AI-driven tools and integrations to enhance user experiences and streamline business processes.
-                </p>
-<div class="grid grid-cols-2 gap-4">
-<div class="glass-card p-6 rounded-2xl">
-<span class="font-display-lg text-headline-md text-primary block">PhD</span>
-<span class="font-label-code text-label-code text-on-surface-variant">Mixed Reality UX</span>
-</div>
-<div class="glass-card p-6 rounded-2xl">
-<span class="font-display-lg text-headline-md text-secondary block">Consultant</span>
-<span class="font-label-code text-label-code text-on-surface-variant">Tech &amp; Utilities</span>
-</div>
-</div>
-</div>
-</div>
+
+<!-- About -->
+<section class="sheet sheet--gold" id="about">
+  <div class="wrap">
+    <header class="head">
+      <span class="chip chip--ink">About me</span>
+    </header>
+    <h2 class="statement" data-reveal>I'm a digital product creator and technology enthusiast focused on building innovative SaaS solutions.</h2>
+    <div class="about__cols">
+      <p data-reveal>With a <strong>PhD in Mixed Reality (AR/VR) Visualization</strong> and User Experience, I bring deep technical expertise combined with user-centered design thinking.</p>
+      <p data-reveal style="--d:80ms">Recently, I've been exploring advanced web development technologies, including Next.js, Tailwind CSS, Vercel, and Netlify, to create intuitive, responsive, and scalable web applications. My interest lies in harnessing AI-driven tools and integrations to enhance user experiences and streamline business processes.</p>
+    </div>
+    <dl class="facts">
+      <div data-reveal style="--d:0ms"><dt>PhD</dt><dd>Mixed Reality UX</dd></div>
+      <div data-reveal style="--d:80ms"><dt>Consultant</dt><dd>Tech &amp; Utilities</dd></div>
+      <div data-reveal style="--d:160ms"><dt>Dunedin</dt><dd>New Zealand</dd></div>
+    </dl>
+
+    <div class="play" id="skills" data-reveal>
+      <div class="play__head">
+        <h2 class="h3">Skills &amp; expertise</h2>
+        <p class="play__hint" aria-hidden="true">Drag them. Throw them.</p>
+        <ul class="legend" aria-hidden="true">
+          <li class="legend--tech">Technical</li>
+          <li class="legend--soft">Soft</li>
+          <li class="legend--design">Design</li>
+        </ul>
+      </div>
+      <ul class="play__box" aria-label="Skills">
+        <li class="bubble bubble--tech" data-size="1.08">Web Development<span class="sr-only"> (technical)</span></li>
+        <li class="bubble bubble--tech" data-size="1">AR/VR Development<span class="sr-only"> (technical)</span></li>
+        <li class="bubble bubble--soft" data-size="1.04">Project Management<span class="sr-only"> (soft skill)</span></li>
+        <li class="bubble bubble--soft" data-size="0.98">Research &amp; Analysis<span class="sr-only"> (soft skill)</span></li>
+        <li class="bubble bubble--design" data-size="0.9">UX/UI Design<span class="sr-only"> (design)</span></li>
+        <li class="bubble bubble--design" data-size="0.94">Photography<span class="sr-only"> (design)</span></li>
+      </ul>
+    </div>
+  </div>
 </section>
-<!-- Skills Section -->
-<section class="py-section-gap px-gutter py-24" id="skills">
-<div class="max-w-container-max mx-auto">
-<h2 class="font-display-lg text-headline-md text-center text-primary mb-16 reveal active">Skills &amp; Expertise</h2>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-<!-- Technical Skills -->
-<div class="glass-card p-card-padding rounded-3xl reveal active">
-<div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-primary">terminal</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-background mb-6">Technical Skills</h3>
-<ul class="space-y-4">
-<li class="flex items-center gap-3 font-label-code text-label-code text-on-surface-variant bg-surface-container-low/50 p-3 rounded-lg border border-white/5">
-<span class="material-symbols-outlined text-secondary text-sm">code</span> Web Development
-                        </li>
-<li class="flex items-center gap-3 font-label-code text-label-code text-on-surface-variant bg-surface-container-low/50 p-3 rounded-lg border border-white/5">
-<span class="material-symbols-outlined text-secondary text-sm">layers</span> AR/VR Development
-                        </li>
-</ul>
-</div>
-<!-- Soft Skills -->
-<div class="glass-card p-card-padding rounded-3xl reveal active">
-<div class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-secondary">groups</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-background mb-6">Soft Skills</h3>
-<ul class="space-y-4">
-<li class="flex items-center gap-3 font-label-code text-label-code text-on-surface-variant bg-surface-container-low/50 p-3 rounded-lg border border-white/5">
-<span class="material-symbols-outlined text-primary text-sm">assignment</span> Project Management
-                        </li>
-<li class="flex items-center gap-3 font-label-code text-label-code text-on-surface-variant bg-surface-container-low/50 p-3 rounded-lg border border-white/5">
-<span class="material-symbols-outlined text-primary text-sm">analytics</span> Research &amp; Analysis
-                        </li>
-</ul>
-</div>
-<!-- Design Skills -->
-<div class="glass-card p-card-padding rounded-3xl reveal active">
-<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
-<span class="material-symbols-outlined text-primary">palette</span>
-</div>
-<h3 class="font-headline-md text-headline-md text-on-background mb-6">Design Skills</h3>
-<ul class="space-y-4">
-<li class="flex items-center gap-3 font-label-code text-label-code text-on-surface-variant bg-surface-container-low/50 p-3 rounded-lg border border-white/5">
-<span class="material-symbols-outlined text-secondary text-sm">brush</span> UX/UI Design
-                        </li>
-<li class="flex items-center gap-3 font-label-code text-label-code text-on-surface-variant bg-surface-container-low/50 p-3 rounded-lg border border-white/5">
-<span class="material-symbols-outlined text-secondary text-sm">photo_camera</span> Photography
-                        </li>
-</ul>
-</div>
-</div>
-</div>
+
+<!-- Experience -->
+<section class="sheet sheet--ink" id="experience">
+  <div class="wrap">
+    <header class="head">
+      <span class="chip chip--line">Experience</span>
+      <h2 class="h2" data-reveal>Where I've worked</h2>
+    </header>
+
+    <div class="gantt" data-reveal>
+      <div class="gantt__axis" aria-hidden="true"></div>
+      <div class="gantt__rows">
+        <button class="bar is-on" type="button" data-start="2024-10" aria-pressed="true" aria-controls="role-mettle">
+          <span class="bar__label"><b>Senior Consultant</b><span>Mettle International</span></span>
+          <span class="bar__track"><span class="bar__fill"></span></span>
+        </button>
+        <button class="bar" type="button" data-start="2024-02" data-end="2024-09" aria-pressed="false" aria-controls="role-ba">
+          <span class="bar__label"><b>IT Business Analyst</b><span>SPICAE</span></span>
+          <span class="bar__track"><span class="bar__fill"></span></span>
+        </button>
+        <button class="bar" type="button" data-start="2023-02" data-end="2024-02" aria-pressed="false" aria-controls="role-ux">
+          <span class="bar__label"><b>UX Consultant</b><span>SPICAE</span></span>
+          <span class="bar__track"><span class="bar__fill"></span></span>
+        </button>
+        <button class="bar" type="button" data-start="2022-07" data-end="2024-04" aria-pressed="false" aria-controls="role-otago">
+          <span class="bar__label"><b>Research Assistant</b><span>University of Otago</span></span>
+          <span class="bar__track"><span class="bar__fill"></span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="roles-detail" aria-live="polite">
+      <article class="role is-on" id="role-mettle">
+        <div class="role__meta"><p class="role__date">Oct 2024 — Present</p><h3>Senior Consultant</h3><p class="role__org">Mettle International</p></div>
+        <div class="role__body">
+          <p>At Mettle, I lead consulting engagements in the utilities sector, with a focus on digital transformation and service delivery optimisation. My primary project involves a medium-sized Electricity Distribution Business (EDB), where I'm driving the design and rollout of a new Service Request Portal on Microsoft Power Platform. I also manage a few other projects within the same client.</p>
+          <ul class="tags"><li>Consulting</li><li>Development</li><li>Technology</li></ul>
+        </div>
+      </article>
+      <article class="role" id="role-ba">
+        <div class="role__meta"><p class="role__date">Feb 2024 — Sep 2024</p><h3>IT Business Analyst</h3><p class="role__org">SPICAE</p></div>
+        <div class="role__body">
+          <p>I worked with a medium-sized electricity distribution company (different from my current client), supporting the rollout of an Asset Management System and improving the end-to-end service request process. My role combined business analysis, UX consulting, and project delivery across multiple streams.</p>
+          <ul class="tags"><li>UX Research</li><li>Business Analysis</li><li>Prototyping</li></ul>
+        </div>
+      </article>
+      <article class="role" id="role-ux">
+        <div class="role__meta"><p class="role__date">Feb 2023 — Feb 2024</p><h3>UX Consultant</h3><p class="role__org">SPICAE</p></div>
+        <div class="role__body">
+          <p>I was contracted as a UX Consultant for SPICAE for a specific project managing power outage notifications to customers for an Electricity Distribution Business. I conducted a brainstorming workshop and developed user personas, user journey maps, requirements, and suggested actions to be taken for current and future iterations of the product.</p>
+          <ul class="tags"><li>UX Design</li><li>User Research</li><li>Workshops</li></ul>
+        </div>
+      </article>
+      <article class="role" id="role-otago">
+        <div class="role__meta"><p class="role__date">Jul 2022 — Apr 2024</p><h3>Research Assistant</h3><p class="role__org">University of Otago</p></div>
+        <div class="role__body">
+          <p>Worked as a Research Assistant on multiple projects, including my PhD project on using Augmented Reality in on-site sports spectating. My job was to revamp and reorganise work done by other PhD students and bring it to a usable state on-site. Concurrently, I worked on widget placement strategy for AR head-mounted displays for pervasive AR, designing a user study to evaluate various placement strategies.</p>
+          <ul class="tags"><li>AR/VR</li><li>Unity</li><li>User Studies</li><li>Research</li></ul>
+        </div>
+      </article>
+    </div>
+  </div>
 </section>
-<!-- Experience Section -->
-<section class="py-section-gap px-gutter py-24" id="experience">
-<div class="max-w-container-max mx-auto">
-<h2 class="font-display-lg text-headline-md text-primary mb-16 reveal active">Experience</h2>
-<div class="ml-10 space-y-12">
-<!-- Mettle -->
-<div class="relative timeline-item glass-card p-8 rounded-2xl group reveal active">
-<div class="timeline-line"></div>
-<div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-<div>
-<h3 class="font-headline-md text-headline-md text-secondary">Senior Consultant</h3>
-<p class="font-body-md text-body-md text-on-surface font-semibold">Mettle International</p>
-</div>
-<span class="font-label-code text-label-code text-on-surface-variant md:text-right mt-2 md:mt-0">Oct 2024 - Present</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6">
-                        At Mettle, I lead consulting engagements in the utilities sector, with a focus on digital transformation and service delivery optimisation. My primary project involves a medium-sized Electricity Distribution Business (EDB), where I’m driving the design and rollout of a new Service Request Portal on Microsoft Power Platform. I also manage a few other projects within the same client.
-                    </p>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">Consulting</span>
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">Development</span>
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">Technology</span>
-</div>
-</div>
-<!-- SPICAE IT BA -->
-<div class="relative timeline-item glass-card p-8 rounded-2xl group reveal active">
-<div class="timeline-line"></div>
-<div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface">IT Business Analyst</h3>
-<p class="font-body-md text-body-md text-on-surface font-semibold">SPICAE</p>
-</div>
-<span class="font-label-code text-label-code text-on-surface-variant md:text-right mt-2 md:mt-0">Feb 2024 - Sep 2024</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6">
-                        I worked with a medium-sized electricity distribution company (different from my current client), supporting the rollout of an Asset Management System and improving the end-to-end service request process. My role combined business analysis, UX consulting, and project delivery across multiple streams.
-                    </p>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-secondary/10 rounded-full font-label-caps text-label-caps text-secondary">UX Research</span>
-<span class="px-3 py-1 bg-secondary/10 rounded-full font-label-caps text-label-caps text-secondary">Business Analysis</span>
-<span class="px-3 py-1 bg-secondary/10 rounded-full font-label-caps text-label-caps text-secondary">Prototyping</span>
-</div>
-</div>
-<!-- SPICAE UX -->
-<div class="relative timeline-item glass-card p-8 rounded-2xl group reveal active">
-<div class="timeline-line"></div>
-<div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface">UX Consultant</h3>
-<p class="font-body-md text-body-md text-on-surface font-semibold">SPICAE</p>
-</div>
-<span class="font-label-code text-label-code text-on-surface-variant md:text-right mt-2 md:mt-0">Feb 2023 - Feb 2024</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6">
-                        I was contracted as a UX Consultant for SPICAE for a specific project managing power outage notifications to customers for an Electricity Distribution Business. I conducted a brainstorming workshop and developed user personas, user journey maps, requirements, and suggested actions to be taken for current and future iterations of the product.
-                    </p>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-secondary/10 rounded-full font-label-caps text-label-caps text-secondary">UX Design</span>
-<span class="px-3 py-1 bg-secondary/10 rounded-full font-label-caps text-label-caps text-secondary">User Research</span>
-<span class="px-3 py-1 bg-secondary/10 rounded-full font-label-caps text-label-caps text-secondary">Workshops</span>
-</div>
-</div>
-<!-- Otago -->
-<div class="relative timeline-item glass-card p-8 rounded-2xl group reveal active">
-<div class="flex flex-col md:flex-row md:items-center justify-between mb-4">
-<div>
-<h3 class="font-headline-md text-headline-md text-on-surface">Research Assistant</h3>
-<p class="font-body-md text-body-md text-on-surface font-semibold">University of Otago</p>
-</div>
-<span class="font-label-code text-label-code text-on-surface-variant md:text-right mt-2 md:mt-0">Jul 2022 - Apr 2024</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6">
-                        Worked as a Research Assistant on multiple projects, including my PhD project regarding using Augmented Reality in on-site sports spectating scenario. My job is to revamp and reorganise work done by other PhD students and bring it to a usable state on-site. Concurrently, I was also working on widget placement strategy for AR head-mounted displays for pervasive AR. I was tasked to design a user study to evaluate various placement strategies.
-                    </p>
-<div class="flex flex-wrap gap-2">
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">AR/VR</span>
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">Unity</span>
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">User Studies</span>
-<span class="px-3 py-1 bg-primary/10 rounded-full font-label-caps text-label-caps text-primary">Research</span>
-</div>
-</div>
-</div>
-</div>
+
+<!-- Projects -->
+<section class="sheet sheet--ink2" id="projects">
+  <div class="wrap">
+    <header class="head">
+      <span class="chip chip--line">Projects</span>
+      <h2 class="h2" data-reveal>Featured projects</h2>
+    </header>
+    <div class="deck">
+      <article class="pcard pcard--ink" style="--i:0">
+        <div class="pcard__text">
+          <p class="pcard__n">01</p>
+          <h3>ShareShare</h3>
+          <p>AI-powered receipt scanning and bill splitting app that automatically extracts items and prices, assigns them to friends, and calculates splits instantly.</p>
+          <ul class="tags"><li>AI</li><li>Web Development</li><li>PWA</li><li>NextJS</li></ul>
+          <a class="btn" href="https://getshareshare.app" target="_blank" rel="noopener noreferrer"><span>Visit site</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+        <a class="shot" href="https://getshareshare.app" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+          <span class="shot__bar"><i></i><i></i><i></i><span>getshareshare.app</span></span>
+          <img src="/assets/shareshare.png" alt="" width="2452" height="1374" loading="lazy">
+        </a>
+      </article>
+      <article class="pcard pcard--gold" style="--i:1">
+        <div class="pcard__text">
+          <p class="pcard__n">02</p>
+          <h3>NZ Electricity Calculator</h3>
+          <p>A web application that calculates electricity costs based on appliance usage for New Zealand households.</p>
+          <ul class="tags"><li>React</li><li>Tailwind CSS</li><li>Vercel</li></ul>
+          <a class="btn btn--ink" href="https://nzec.vercel.app" target="_blank" rel="noopener noreferrer"><span>Visit site</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+        <a class="shot" href="https://nzec.vercel.app" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+          <span class="shot__bar"><i></i><i></i><i></i><span>nzec.vercel.app</span></span>
+          <img src="/assets/nzec.png" alt="" width="2532" height="1438" loading="lazy">
+        </a>
+      </article>
+      <article class="pcard pcard--orange" style="--i:2">
+        <div class="pcard__text">
+          <p class="pcard__n">03 <span>Client project</span></p>
+          <h3>PhysioMed Otago</h3>
+          <p>Professional physiotherapy practice website featuring modern aesthetics, service information, and patient resources.</p>
+          <ul class="tags"><li>Web Development</li><li>HTML</li><li>SEO</li><li>Responsive Design</li></ul>
+          <a class="btn btn--ink" href="https://physiomedotago.co.nz" target="_blank" rel="noopener noreferrer"><span>Visit site</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+        </div>
+        <a class="shot" href="https://physiomedotago.co.nz" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+          <span class="shot__bar"><i></i><i></i><i></i><span>physiomedotago.co.nz</span></span>
+          <img src="/assets/physiomed-screenshot.png" alt="" width="2450" height="1442" loading="lazy">
+        </a>
+      </article>
+    </div>
+  </div>
 </section>
-<!-- Projects Section -->
-<section class="py-section-gap px-gutter py-24" id="projects">
-<div class="max-w-container-max mx-auto">
-<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 reveal active">
-<div>
-<h2 class="font-display-lg text-headline-md text-primary mb-4">Featured Projects</h2>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-<!-- Project 1 -->
-<a class="glass-card group rounded-3xl overflow-hidden flex flex-col reveal active" href="https://getshareshare.app" target="_blank" rel="noopener noreferrer">
-<div class="aspect-video relative overflow-hidden">
-<img alt="ShareShare" class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" src="/assets/shareshare.png">
-</div>
-<div class="p-8 flex-1 flex flex-col relative z-10">
-<h3 class="font-headline-md text-headline-md text-primary mb-3">ShareShare</h3>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-1">
-                            AI-powered receipt scanning and bill splitting app that automatically extracts items and prices, assigns them to friends, and calculates splits instantly.
-                        </p>
-<div class="flex flex-wrap gap-2">
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">AI</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">Web Development</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">PWA</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">NextJS</span>
-</div>
-</div>
-</a>
-<!-- Project 2 -->
-<a class="glass-card group rounded-3xl overflow-hidden flex flex-col reveal active" href="https://nzec.vercel.app" target="_blank" rel="noopener noreferrer">
-<div class="aspect-video relative overflow-hidden">
-<img alt="NZ Electricity Calculator" class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" src="/assets/nzec.png">
-</div>
-<div class="p-8 flex-1 flex flex-col relative z-10">
-<h3 class="font-headline-md text-headline-md text-primary mb-3">NZ Electricity Calculator</h3>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-1">
-                            A web application to calculate electricity costs depending of appliances usage for New Zealand households.
-                        </p>
-<div class="flex flex-wrap gap-2">
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">React</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">Tailwind CSS</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">Vercel</span>
-</div>
-</div>
-</a>
-<!-- Project 3 -->
-<a class="glass-card group rounded-3xl overflow-hidden flex flex-col reveal active" href="https://physiomedotago.co.nz" target="_blank" rel="noopener noreferrer">
-<div class="aspect-video relative overflow-hidden">
-<img alt="PhysioMed Otago" class="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" src="/assets/physiomed-screenshot.png">
-</div>
-<div class="p-8 flex-1 flex flex-col relative z-10">
-<div class="flex items-center gap-2 mb-3 flex-wrap">
-<h3 class="font-headline-md text-headline-md text-primary">PhysioMed Otago</h3>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-primary/10 text-primary rounded border border-primary/20">Client Project</span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-1">
-                            Professional physiotherapy practice website featuring modern aesthetics, service information, and patient resources.
-                        </p>
-<div class="flex flex-wrap gap-2">
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">Web Development</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">HTML</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">SEO</span>
-<span class="text-[10px] font-label-caps px-2 py-1 bg-secondary/10 text-secondary rounded border border-secondary/20">Responsive Design</span>
-</div>
-</div>
-</a>
-</div>
-</div>
+
+<!-- Services -->
+<section class="sheet sheet--ink" id="services">
+  <div class="wrap">
+    <header class="head">
+      <span class="chip chip--line">Services</span>
+      <h2 class="h2" data-reveal>How I can help</h2>
+    </header>
+    <div class="svcs" data-reveal>
+      <article class="svc is-on">
+        <h3><button class="svc__tab" type="button" aria-expanded="true" aria-controls="svc-1"><span class="svc__n">01</span><span class="svc__name">Website Development</span></button></h3>
+        <div class="svc__body" id="svc-1"><div class="svc__inner">
+          <p>I build simple responsive websites and bring you along the journey. Fast turnaround time.</p>
+          <ul><li>Basic Website (Single Page)</li><li>SEO Starter Pack</li><li>Multipage Website</li><li>Website Edits</li></ul>
+        </div></div>
+      </article>
+      <article class="svc">
+        <h3><button class="svc__tab" type="button" aria-expanded="false" aria-controls="svc-2"><span class="svc__n">02</span><span class="svc__name">Photography</span></button></h3>
+        <div class="svc__body" id="svc-2"><div class="svc__inner">
+          <p>Professional photography services for events, portraits, and commercial use. High-quality images that tell your story.</p>
+          <ul><li>Portrait Session</li><li>Event Photography</li><li>Property Photography</li><li>All Other Photography</li></ul>
+        </div></div>
+      </article>
+      <article class="svc">
+        <h3><button class="svc__tab" type="button" aria-expanded="false" aria-controls="svc-3"><span class="svc__n">03</span><span class="svc__name">Consulting &amp; Prototyping</span></button></h3>
+        <div class="svc__body" id="svc-3"><div class="svc__inner">
+          <p>Strategic technology consulting and rapid prototyping services. Turn your ideas into actionable solutions.</p>
+          <ul><li>Tech Consultation</li><li>UX Research &amp; Analysis</li><li>Rapid Prototyping</li><li>AR/VR Consultation</li></ul>
+        </div></div>
+      </article>
+    </div>
+    <p class="svcs__note" data-reveal>Please contact for enquiry. <a class="textlink" href="#contact">Get in touch <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></p>
+  </div>
 </section>
-<!-- Services Section -->
-<section class="py-section-gap px-gutter py-24" id="services">
-<div class="max-w-container-max mx-auto">
-<h2 class="font-display-lg text-headline-md text-center text-primary mb-16 reveal active">Services</h2>
-<div class="services-grid grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-<!-- Website Dev -->
-<div class="service-card glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
-<div class="absolute top-0 right-0 p-4 opacity-10">
-<span class="material-symbols-outlined text-8xl text-primary">web</span>
-</div>
-<div class="flex items-center gap-3 mb-4 relative z-10">
-<span class="material-symbols-outlined text-secondary">code</span>
-<h3 class="font-headline-md text-headline-md text-on-background min-h-[5rem] flex items-center">Website Development</h3>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-1 relative z-10">
-                        I build simple responsive websites and bring you along the journey. Fast turnaround time.
-                    </p>
-<div class="service-list space-y-4 relative z-10">
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Basic Website (Single Page)</span>
-</div>
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">SEO Starter Pack</span>
-</div>
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Multipage Website</span>
-</div>
-<div class="text-on-surface">
-<span class="font-body-md">Website Edits</span>
-</div>
-</div>
-</div>
-<!-- Photography -->
-<div class="service-card glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
-<div class="absolute top-0 right-0 p-4 opacity-10">
-<span class="material-symbols-outlined text-8xl text-primary">photo_camera</span>
-</div>
-<div class="flex items-center gap-3 mb-4 relative z-10">
-<span class="material-symbols-outlined text-secondary">photo_camera</span>
-<h3 class="font-headline-md text-headline-md text-on-background min-h-[5rem] flex items-center">Photography</h3>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-1 relative z-10">
-                        Professional photography services for events, portraits, and commercial use. High-quality images that tell your story.
-                    </p>
-<div class="service-list space-y-4 relative z-10">
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Portrait Session</span>
-</div>
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Event Photography</span>
-</div>
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Property Photography</span>
-</div>
-<div class="text-on-surface">
-<span class="font-body-md">All Other Photography</span>
-</div>
-</div>
-</div>
-<!-- Consulting -->
-<div class="service-card glass-card p-10 rounded-3xl relative overflow-hidden group reveal active flex flex-col">
-<div class="absolute top-0 right-0 p-4 opacity-10">
-<span class="material-symbols-outlined text-8xl text-primary">psychology</span>
-</div>
-<div class="flex items-center gap-3 mb-4 relative z-10">
-<span class="material-symbols-outlined text-secondary">psychology</span>
-<h3 class="font-headline-md text-headline-md text-on-background min-h-[5rem] flex items-center">Consulting &amp; Prototyping</h3>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant mb-8 flex-1 relative z-10">
-                        Strategic technology consulting and rapid prototyping services. Turn your ideas into actionable solutions.
-                    </p>
-<div class="service-list space-y-4 relative z-10">
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Tech Consultation</span>
-</div>
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">UX Research &amp; Analysis</span>
-</div>
-<div class="text-on-surface border-b border-white/5 pb-3">
-<span class="font-body-md">Rapid Prototyping</span>
-</div>
-<div class="text-on-surface">
-<span class="font-body-md">AR/VR Consultation</span>
-</div>
-</div>
-</div>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant text-center mt-12">Please contact for enquiry.</p>
-</div>
+
+<!-- Contact -->
+<section class="sheet sheet--orange" id="contact">
+  <div class="wrap">
+    <header class="head">
+      <span class="chip chip--ink">Contact</span>
+    </header>
+    <h2 class="shout" data-reveal>Get in touch.</h2>
+    <div class="contact">
+      <div class="contact__info">
+        <p data-reveal>I'm always interested in new opportunities and collaborations. Whether you have a project in mind or just want to connect, feel free to reach out!</p>
+        <ul class="contact__links">
+          <li data-reveal style="--d:60ms"><a href="mailto:hello@weihong.dev"><small>Email</small><span>hello@weihong.dev</span></a></li>
+          <li data-reveal style="--d:120ms"><a href="https://linkedin.com/in/weihonglo" target="_blank" rel="noopener noreferrer"><small>LinkedIn</small><span>linkedin.com/in/weihonglo</span></a></li>
+          <li data-reveal style="--d:180ms"><a href="https://maps.google.com/?q=Dunedin,New+Zealand" target="_blank" rel="noopener noreferrer"><small>Location</small><span>Dunedin, New Zealand</span></a></li>
+        </ul>
+      </div>
+      <form class="form" id="contact-form" action="https://formspree.io/f/xrgvvdda" method="POST" data-reveal>
+        <div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" required autocomplete="name"></div>
+        <div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+        <div class="field"><label for="message">Message</label><textarea id="message" name="message" rows="4" required></textarea></div>
+        <div class="form__foot">
+          <button class="btn" id="contact-submit" type="submit"><span>Send message</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></button>
+          <p id="contact-status" class="form__status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
-<!-- Contact Section -->
-<section class="py-section-gap px-gutter relative overflow-hidden py-24" id="contact">
-<div class="max-w-3xl mx-auto relative z-10 text-center reveal active">
-<h2 class="font-display-lg text-headline-md text-primary mb-6">Get In Touch</h2>
-<p class="font-body-lg text-body-lg text-on-surface-variant mb-12">
-                I'm always interested in new opportunities and collaborations. Whether you have a project in mind or just want to connect, feel free to reach out!
-            </p>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-<a class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 hover:border-secondary/50 group" href="mailto:hello@weihong.dev">
-<div class="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-secondary text-3xl">mail</span>
-</div>
-<span class="font-label-code text-label-code text-on-background font-semibold">Email</span>
-<span class="font-body-md text-body-md text-on-surface-variant">hello@weihong.dev</span>
-</a>
-<a class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 hover:border-primary/50 group" href="https://linkedin.com/in/weihonglo" target="_blank" rel="noopener noreferrer">
-<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-primary text-3xl">account_circle</span>
-</div>
-<span class="font-label-code text-label-code text-on-background font-semibold">LinkedIn</span>
-<span class="font-body-md text-body-md text-on-surface-variant">linkedin.com/in/weihonglo</span>
-</a>
-<a class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 hover:border-primary/50 group" href="https://maps.google.com/?q=Dunedin,New+Zealand" target="_blank" rel="noopener noreferrer">
-<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
-<span class="material-symbols-outlined text-primary text-3xl">location_on</span>
-</div>
-<span class="font-label-code text-label-code text-on-background font-semibold">Location</span>
-<span class="font-body-md text-body-md text-on-surface-variant">Dunedin, New Zealand</span>
-</a>
-</div>
-<div class="glass-card p-10 rounded-3xl text-left">
-<form id="contact-form" class="space-y-6 gap-6" action="https://formspree.io/f/xrgvvdda" method="POST">
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-<div class="space-y-2">
-<label for="name" class="font-label-code text-label-code text-on-surface-variant">YOUR NAME</label>
-<input id="name" name="name" required autocomplete="name" class="w-full bg-surface-container-lowest border-white/10 rounded-xl px-4 py-3 focus:border-secondary outline-none transition-colors text-on-surface" type="text">
-</div>
-<div class="space-y-2">
-<label for="email" class="font-label-code text-label-code text-on-surface-variant">EMAIL ADDRESS</label>
-<input id="email" name="email" required autocomplete="email" class="w-full bg-surface-container-lowest border-white/10 rounded-xl px-4 py-3 focus:border-secondary outline-none transition-colors text-on-surface" type="email">
-</div>
-</div>
-<div class="space-y-2">
-<label for="message" class="font-label-code text-label-code text-on-surface-variant">MESSAGE</label>
-<textarea id="message" name="message" required class="w-full bg-surface-container-lowest border-white/10 rounded-xl px-4 py-3 focus:border-secondary outline-none transition-colors text-on-surface" rows="4"></textarea>
-</div>
-<button id="contact-submit" class="w-full btn-primary py-4 rounded-xl font-label-code text-label-code uppercase tracking-widest disabled:opacity-60 disabled:pointer-events-none" type="submit">Send Message</button>
-<p id="contact-status" class="font-body-md text-body-md text-on-surface-variant text-center hidden" role="status" aria-live="polite"></p>
-</form>
-</div>
-</div>
-</section>
+
 </main>
-<!-- Footer Shell -->
-<footer class="w-full py-section-gap bg-surface-container-lowest border-t border-white/5">
-<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-<div>
-<span class="font-display-lg text-display-lg-mobile text-primary block mb-2">Wei Hong Lo</span>
-<p class="font-label-code text-label-code text-on-surface-variant">© 2026 Wei Hong Lo. Built with lots of ☕</p>
-</div>
-<div class="flex flex-wrap gap-8 md:justify-end">
-<a class="font-label-code text-label-code text-secondary hover:text-primary transition-all duration-300 group" href="https://linkedin.com/in/weihonglo" target="_blank" rel="noopener noreferrer">
-                LinkedIn <span class="inline-block group-hover:translate-x-1 transition-transform">→</span>
-</a>
-<a class="font-label-code text-label-code text-on-surface-variant hover:text-secondary transition-all duration-300 group" href="https://github.com/lowhng" target="_blank" rel="noopener noreferrer">
-                GitHub <span class="inline-block group-hover:translate-x-1 transition-transform">→</span>
-</a>
-<a class="font-label-code text-label-code text-on-surface-variant hover:text-secondary transition-all duration-300 group" href="mailto:hello@weihong.dev">
-                Email <span class="inline-block group-hover:translate-x-1 transition-transform">→</span>
-</a>
-</div>
-</div>
+
+<footer class="sheet sheet--ink footer">
+  <div class="wrap footer__row">
+    <p>© 2026 Wei Hong Lo. Built with lots of ☕</p>
+    <nav aria-label="Social">
+      <a href="https://linkedin.com/in/weihonglo" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href="https://github.com/lowhng" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="mailto:hello@weihong.dev">Email</a>
+    </nav>
+  </div>
 </footer>
-<script>
-    // Particle System Generation
-    const particleContainer = document.getElementById('particles-container');
-    particleContainer.innerHTML = '';
-    const particleCount = 55;
-
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        const size = Math.random() * 2.5 + 1.5;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.left = `${Math.random() * 100}vw`;
-        particle.style.top = `${Math.random() * 100}vh`;
-        particle.style.animationDuration = `${Math.random() * 18 + 10}s`;
-        particle.style.animationDelay = `${Math.random() * 8}s`;
-        particleContainer.appendChild(particle);
-    }
-
-    // Mouse tracking for glass cards
-    document.addEventListener('mousemove', e => {
-        const cards = document.querySelectorAll('.glass-card');
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
-        });
-    });
-
-    // Intersection Observer for scroll animations
-    const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-    // Mobile nav toggle
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-    if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-            const isOpen = !mobileMenu.classList.contains('hidden');
-            mobileMenu.classList.toggle('hidden', isOpen);
-            mobileMenuButton.setAttribute('aria-expanded', String(!isOpen));
-        });
-    }
-
-    // Smooth scroll for nav links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            const target = document.querySelector(targetId);
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
-                    mobileMenuButton?.setAttribute('aria-expanded', 'false');
-                }
-            }
-        });
-    });
-
-    // Contact form via Formspree (same endpoint as previous site)
-    const contactForm = document.getElementById('contact-form');
-    const contactSubmit = document.getElementById('contact-submit');
-    const contactStatus = document.getElementById('contact-status');
-
-    if (contactForm && contactSubmit && contactStatus) {
-        contactForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            contactSubmit.disabled = true;
-            contactStatus.classList.remove('hidden', 'text-error', 'text-secondary');
-            contactStatus.textContent = 'Sending...';
-
-            try {
-                const response = await fetch(contactForm.action, {
-                    method: 'POST',
-                    body: new FormData(contactForm),
-                    headers: { Accept: 'application/json' }
-                });
-
-                if (response.ok) {
-                    contactForm.reset();
-                    contactStatus.classList.add('text-secondary');
-                    contactStatus.textContent = 'Thanks! Your message has been sent.';
-                } else {
-                    throw new Error('Form submission failed');
-                }
-            } catch (error) {
-                contactStatus.classList.add('text-error');
-                contactStatus.textContent = 'Something went wrong. Please email hello@weihong.dev instead.';
-            } finally {
-                contactSubmit.disabled = false;
-            }
-        });
-    }
-</script>
-
-
-</body></html>
+</body>
+</html>
